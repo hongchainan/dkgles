@@ -5,11 +5,10 @@ import android.util.FloatMath;
 
 public class Quaternion implements Cloneable
 {
-	private float _w;
-	private float _x;
-	private float _y;
-	private float _z;
-	
+	public float _w;
+	public float _x;
+	public float _y;
+	public float _z;
 	
 	public Quaternion()
 	{

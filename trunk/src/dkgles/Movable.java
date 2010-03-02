@@ -2,20 +2,21 @@ package dkgles;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
+import dkgles.math.MathUtils;
 
 public class Movable
 {
-	public static final int GLOBAL 	= 0;
+	public static final int PARENT 	= 0;
 	public static final int LOCAL 	= 1;
 	
 	
 	private String 			_name;
 	private List<Movable> 	_childList;
 	private Movable			_parent;
-	private Transformation	_localTransformation;
+	protected Transformation	_localTransformation;
+	protected Transformation 	_worldTransformationCache;
 	private Drawable		_drawable;
+	protected boolean		_dirty;
 	
 	public Movable(String name)
 	{
@@ -23,23 +24,26 @@ public class Movable
 		_parent = null;
 		_childList = new ArrayList<Movable>();
 		_localTransformation = new Transformation();
+		_worldTransformationCache = new Transformation();
 	}
 	
 	
-	public void rotate(float degree, float x, float y, float z, int space)
+	public void rotate(float angle, float x, float y, float z, int space)
 	{
 		if (space == LOCAL)
 		{
-			_localTransformation.rotateLocal(MathUtils.DegreeToRadian(degree), x, y, z);
+			_localTransformation.rotateInLocalSpace(angle, x, y, z);
 		}
-		else if (space == GLOBAL)
+		else if (space == PARENT)
 		{
-			_localTransformation.rotateGlobal(MathUtils.DegreeToRadian(degree), x, y, z);
+			_localTransformation.rotateInParentSpace(angle, x, y, z);
 		}
 		else
 		{
 			// throw exception
 		}
+		
+		_dirty = true;
 	}
 	
 	
@@ -47,16 +51,18 @@ public class Movable
 	{
 		if (space == LOCAL)
 		{
-			_localTransformation.translateLocal(x, y, z);
+			_localTransformation.translateInLocalSpace(x, y, z);
 		}
-		else if (space == GLOBAL)
+		else if (space == PARENT)
 		{
-			_localTransformation.translateGlobal(x, y, z);
+			_localTransformation.translateInParentSpace(x, y, z);
 		}
 		else
 		{
 			// throw exception
 		}
+		
+		_dirty = true;
 	}
 	
 	
@@ -78,21 +84,21 @@ public class Movable
 	}
 	
 	
-	public void roll(float degree)
+	public void roll(float angle)
 	{
-		rotate(degree, 0.0f, 0.0f, 1.0f, LOCAL);
+		rotate(angle, 0.0f, 0.0f, 1.0f, LOCAL);
 	}
 	
 	
-	public void yaw(float degree)
+	public void yaw(float angle)
 	{
-		rotate(degree, 0.0f, 1.0f, 0.0f, LOCAL);
+		rotate(angle, 0.0f, 1.0f, 0.0f, LOCAL);
 	}
 	
 	
-	public void pitch(float degree)
+	public void pitch(float angle)
 	{
-		rotate(degree, 1.0f, 0.0f, 0.0f, LOCAL);
+		rotate(angle, 1.0f, 0.0f, 0.0f, LOCAL);
 	}
 	
 	
@@ -108,26 +114,38 @@ public class Movable
 	}
 	
 	
-	public void setParent(Movable parent)
+	public void setDrawable(Drawable drawable)
+	{
+		_drawable = drawable;
+	}
+	
+	
+	private void setParent(Movable parent)
 	{
 		_parent = parent;
 	}
 	
 	
-	public void updateTransformation(Transformation parentTransformation)
+	public void updateTransformation(Transformation parentTransformation, boolean parentDirty)
 	{
-		Transformation worldTransformation = parentTransformation.mul(_localTransformation);
-		
-		if (_drawable != null)
+		if (_dirty||parentDirty)
 		{
-			_drawable.setWorldTransformation(worldTransformation);
-			_drawable.render();
+			_worldTransformationCache.mul(parentTransformation, _localTransformation);
+			
+			if (_drawable != null)
+			{
+				_drawable.setWorldTransformation(_worldTransformationCache);
+				//_drawable.render();
+			}
+			
 		}
-		
+			
 		for (Movable m : _childList)
 		{
-			m.updateTransformation(worldTransformation);
+			m.updateTransformation(_worldTransformationCache, _dirty);
 		}
+		
+		_dirty = false;
 	}
 	
 	

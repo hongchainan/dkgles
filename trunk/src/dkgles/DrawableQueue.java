@@ -1,13 +1,13 @@
-package dkgles.core
+package dkgles;
 
 public class DrawableQueue
 {
-	private DrawableQueue 	_instance = new DrawList();
-	private Queue<Drawable> _queue;
+	static private DrawableQueue _instance = new DrawableQueue();
+	//private Queue<Drawable> _queue;
 
 	private DrawableQueue()
 	{
-		_queue = new Queue<Drawable>();
+		//_queue = new Queue<Drawable>();
 	}
 	
 	
@@ -18,6 +18,6 @@ public class DrawableQueue
 	
 	public void add(Drawable drawable)
 	{
-		_queue.add(drawable);
+		//_queue.add(drawable);
 	}
 }
