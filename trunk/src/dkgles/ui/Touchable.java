@@ -13,10 +13,10 @@ public class Touchable extends Rectangle
 	
 	public boolean hit(float x, float y)
 	{
-		float rx = StrictMath.abs(_position[0] - x);
-		float ry = StrictMath.abs(_position[1] - y);
+		float rx = StrictMath.abs(_position[0] - x)*2;
+		float ry = StrictMath.abs(_position[1] - y)*2;
 		
-		if (rx > _width / 2 || ry > _height/2)
+		if (rx > _width || ry > _height)
 		{
 			return false;
 		}
