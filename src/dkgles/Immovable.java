@@ -1,5 +1,8 @@
 package dkgles;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Immovable
 {
 	public Immovable(String name, Transformation transformation)
