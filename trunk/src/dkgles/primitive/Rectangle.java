@@ -2,6 +2,7 @@ package dkgles.primitive;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import dkgles.Material;
 import dkgles.Mesh;
 
 public class Rectangle extends Mesh

@@ -2,14 +2,16 @@ package dkgles.render;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import dkgles.Drawable;
+
 public class DepthLayeredRenderer
 {
 	
-	public DepthLayeredRenderer instance()
+	public static DepthLayeredRenderer instance()
 	{
 		if (_instance==null)
 		{
-			_instance = new DepthLayeredRenderer();
+			_instance = new DepthLayeredRenderer(10);
 		}
 		
 		return _instance;

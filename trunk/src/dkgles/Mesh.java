@@ -1,9 +1,9 @@
 package dkgles;
 
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -14,9 +14,18 @@ public class Mesh extends Drawable
 		super(name);
 	}
 	
+	public void setMaterial(Material material)
+	{
+		_material = material;
+	}
 	
 	public void renderImpl(GL10 gl)
 	{
+		if (_material!=null)
+		{
+			_material.apply(gl);
+		}
+		
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		
@@ -67,6 +76,9 @@ public class Mesh extends Drawable
 	
 	
 	private int _numOfIndices = -1;
+	
+	private Material _material;
+	
 	
 	protected FloatBuffer _verticesBuffer;
 	protected FloatBuffer _texcoordsBuffer;

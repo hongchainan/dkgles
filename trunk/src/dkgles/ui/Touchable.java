@@ -1,11 +1,12 @@
 package dkgles.ui;
 
+import dkgles.Material;
 import dkgles.Transformation;
 import dkgles.primitive.Rectangle;
 
 public class Touchable extends Rectangle
 {
-	public Touchable(String name, float width, float height)
+	public Touchable(String name, float width, float height, Material material)
 	{
 		super(name, width, height);
 		_position = new float[3];
@@ -35,6 +36,7 @@ public class Touchable extends Rectangle
 	{
 		//do nothing
 	}
+	
 	
 	protected float[] _position;
 }
