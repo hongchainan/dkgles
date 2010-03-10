@@ -3,12 +3,16 @@ package dkgles;
 import javax.microedition.khronos.opengles.GL10;
 
 
-public class Texture
+public class Texture implements Resource
 {
 	public Texture(int id)
 	{
 		_id = new int[1];
 		_id[0] = id;
+	}
+	
+	public void acquire()
+	{
 		
 	}
 	

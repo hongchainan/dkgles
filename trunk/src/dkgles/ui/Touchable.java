@@ -8,7 +8,7 @@ public class Touchable extends Rectangle
 {
 	public Touchable(String name, float width, float height, Material material)
 	{
-		super(name, width, height);
+		super(name, width, height, material);
 		_position = new float[3];
 	}
 	

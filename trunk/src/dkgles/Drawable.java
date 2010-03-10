@@ -6,13 +6,13 @@ import javax.microedition.khronos.opengles.GL10;
 public abstract class Drawable
 {
 	
-	String 		_name;
-	Transformation 	_worldTransformation;
+	
 	
 	public Drawable(String name)
 	{
 		_name = name;
 		_visible = true;
+		_groupID = 0;
 	}
 	
 	
@@ -26,6 +26,21 @@ public abstract class Drawable
 		_visible = false;
 	}
 	
+	/**
+	 * Set render group id
+	 */
+	public void groupID(int id)
+	{
+		_groupID = id;
+	}
+	
+	/**
+	 * Get render group id
+	 */
+	public int groupID()
+	{
+		return _groupID;
+	}
 	
 	public boolean visible()
 	{
@@ -51,6 +66,9 @@ public abstract class Drawable
 	
 	public abstract void renderImpl(GL10 gl);
 	
-	protected boolean _visible;
+	protected boolean 				_visible;
+	protected int							_groupID;
+	protected String 					_name;
+	protexted Transformation 	_worldTransformation;
 	
 }

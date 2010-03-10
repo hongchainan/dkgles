@@ -39,6 +39,12 @@ public class DepthLayeredRenderer
 		return _depthLayers[layer];
 	}
 	
+	public void onSize(float width, float height)
+	{
+		_width = width;
+		_height = height;
+	}
+	
 	
 	void render(GL10 gl)
 	{
