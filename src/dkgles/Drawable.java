@@ -66,9 +66,9 @@ public abstract class Drawable
 	
 	public abstract void renderImpl(GL10 gl);
 	
-	protected boolean 				_visible;
-	protected int							_groupID;
-	protected String 					_name;
-	protexted Transformation 	_worldTransformation;
+	protected boolean 			_visible;
+	protected int				_groupID;
+	protected String 			_name;
+	protected Transformation 	_worldTransformation;
 	
 }

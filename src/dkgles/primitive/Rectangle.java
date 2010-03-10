@@ -7,12 +7,13 @@ import dkgles.Mesh;
 
 public class Rectangle extends Mesh
 {
-	public Rectangle(String name, float width, float height)
+	public Rectangle(String name, float width, float height, Material material)
 	{
 		super(name);
 		
 		_width = width;
 		_height = height;
+		_material = material;
 		
 		initVerticesBuffer();
 		initTexcoordsBuffer();
@@ -21,6 +22,8 @@ public class Rectangle extends Mesh
 	
 	public void renderImpl(GL10 gl)
 	{
+		//_material.apply(gl);
+		
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		
@@ -63,7 +66,7 @@ public class Rectangle extends Mesh
 	}
 	
 	
-	
+	protected Material _material;
 	protected float _width;
 	protected float _height;
 }

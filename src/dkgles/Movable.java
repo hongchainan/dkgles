@@ -65,6 +65,22 @@ public class Movable
 		_dirty = true;
 	}
 	
+	/**
+	 * Set position
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public void position(float x, float y, float z)
+	{
+		_localTransformation._matrix[12] = x;
+		_localTransformation._matrix[13] = y;
+		_localTransformation._matrix[14] = z;
+		
+		_dirty = true;
+	}
+	
 	
 	public void moveForward(float dist)
 	{
@@ -104,6 +120,19 @@ public class Movable
 	
 	public void lookAt(float x, float y, float z)
 	{
+		//TODO
+	}
+	
+	/**
+	 * Create a new child of this node
+	 * @param name
+	 * @return child
+	 */
+	public Movable createChild(String name)
+	{
+		Movable child = new Movable(name);
+		addChild(child);
+		return child;
 	}
 	
 	

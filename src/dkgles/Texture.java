@@ -29,4 +29,9 @@ public class Texture implements Resource
 	}
 		
 	private int[] _id;
+
+	public void release() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -41,8 +41,8 @@ public class DepthLayeredRenderer
 	
 	public void onSize(float width, float height)
 	{
-		_width = width;
-		_height = height;
+		//_width = width;
+		//_height = height;
 	}
 	
 	
