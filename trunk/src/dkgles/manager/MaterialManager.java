@@ -19,7 +19,15 @@ public class MaterialManager
 	
 	private MaterialManager()
 	{
-		
+		_materialMap = new HashMap<String, Material>();
+	}
+	
+	/**
+	 * release all material resources
+	 */
+	public void releaseAll()
+	{
+		//TODO
 	}
 	
 	public Material create(String name, Texture texture)

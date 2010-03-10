@@ -13,18 +13,9 @@ public class Transformation implements Cloneable
 	
 	public Transformation()
 	{
-		//_translatation = new Vector3(0.0f, 0.0f, 0.0f);
-		//_orientation   = new Quaternion();
 		_matrix = new float[16];
 		Matrix.setIdentityM(_matrix, 0);
 	}
-	
-	
-	//public Transformation(Quaternion orientation, Vector3 translatation)
-	//{
-		//_orientation = orientation;
-		//_translatation = translatation;
-	//}
 	
 	
 	public void rotateInLocalSpace(float angle, float x, float y, float z)

@@ -16,15 +16,15 @@ public class Mesh extends Drawable
 	
 	public void setMaterial(Material material)
 	{
-		_material = material;
+		//_material = material;
 	}
 	
 	public void renderImpl(GL10 gl)
 	{
-		if (_material!=null)
-		{
-			_material.apply(gl);
-		}
+		//if (_material!=null)
+		//{
+		//	_material.apply(gl);
+		//}
 		
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
@@ -77,7 +77,7 @@ public class Mesh extends Drawable
 	
 	private int _numOfIndices = -1;
 	
-	private Material _material;
+	//private Material _material;
 	
 	
 	protected FloatBuffer _verticesBuffer;

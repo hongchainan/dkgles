@@ -3,6 +3,8 @@ package dkgles.ui;
 import java.util.ArrayList;
 
 import android.util.Log;
+import dkgles.Material;
+import dkgles.Movable;
 
 public class UIManager
 {
@@ -17,6 +19,10 @@ public class UIManager
 		return _instance;
 	}
 	
+	public Touchable createTouchable(String name, float width, float height, Material material)
+	{
+		return new Touchable(name, width, height, material);
+	}
 	
 	public void addTouchable(Touchable touchable)
 	{
@@ -42,8 +48,14 @@ public class UIManager
 		_height = height;
 	}
 	
+	public Movable root()
+	{
+		return _root;
+	}
+	
 	private UIManager()
 	{
+		_root = new Movable("UIROOT");
 		_touchables = new ArrayList<Touchable>(); 
 	}
 	
@@ -51,6 +63,7 @@ public class UIManager
 	private ArrayList<Touchable> 	_touchables;
 	private float _width;
 	private float _height;
+	private Movable _root;
 	
 	private static final String CLASS_TAG = "UIManager";
 }

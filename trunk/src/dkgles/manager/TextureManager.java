@@ -27,6 +27,14 @@ public class TextureManager
 		return t;
 	}
 	
+	/**
+	 * release all texture resources
+	 */
+	public void releaseAll()
+	{
+		//TODO
+	}
+	
 	public Texture get(String name)
 	{
 		return _textures.get(name);
