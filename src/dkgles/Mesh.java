@@ -26,18 +26,54 @@ public class Mesh extends Drawable
 		//	_material.apply(gl);
 		//}
 		
+		//gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		//gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		
+		//gl.glVertexPointer(3, GL10.GL_FLOAT, 0, _verticesBuffer);
+		//gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, _texcoordsBuffer);
+		
+		//gl.glDrawElements(GL10.GL_TRIANGLES, _numOfIndices, 
+		//	GL10.GL_UNSIGNED_SHORT, _indicesBuffer);
+			
+		//gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		//gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+	}
+	
+	/**
+	 * issue gl render command by glDrawArrays
+	 */
+	public void renderByDrawArray(GL10 gl, int vcount)
+	{
+		openBufferPtr(gl);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, vcount); 
+		closeBuffrPtr(gl);
+	}
+	
+	/**
+	 * issues gl render command by gl 
+	 */
+	public void renderByDrawElement(GL10 gl, int icount)
+	{
+		openBufferPtr(gl);
+		gl.glDrawElements(GL10.GL_TRIANGLES, icount, 
+			GL10.GL_UNSIGNED_SHORT, _indicesBuffer);
+		closeBufferPtr(gl);
+	}
+	
+	private void openBufferPtr(GL10 gl)
+	{
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, _verticesBuffer);
 		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, _texcoordsBuffer);
-		
-		gl.glDrawElements(GL10.GL_TRIANGLES, _numOfIndices, 
-			GL10.GL_UNSIGNED_SHORT, _indicesBuffer);
-			
+	}
+	
+	
+	private void closeBufferPtr(GL10 gl)
+	{
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-		
 	}
 	
 	
@@ -50,6 +86,7 @@ public class Mesh extends Drawable
 		_verticesBuffer.position(0);
 	}
 	
+	
 	protected void setIndices(short[] indices)
 	{
 		// short is 2 bytes, therefore we multiply the number if
@@ -60,7 +97,7 @@ public class Mesh extends Drawable
 		_indicesBuffer.put(indices);
 		_indicesBuffer.position(0);
 		_numOfIndices = indices.length;
-    }
+  }
 	
 	
 	protected void setTexcoords(float[] texcoords)
@@ -72,17 +109,11 @@ public class Mesh extends Drawable
 		_texcoordsBuffer = tbb.asFloatBuffer();
 		_texcoordsBuffer.put(texcoords);
 		_texcoordsBuffer.position(0);
-    }
+  }
 	
-	
-	private int _numOfIndices = -1;
-	
-	//private Material _material;
-	
-	
-	protected FloatBuffer _verticesBuffer;
-	protected FloatBuffer _texcoordsBuffer;
-	private ShortBuffer _indicesBuffer = null;
+	private FloatBuffer _verticesBuffer;
+	private FloatBuffer _texcoordsBuffer;
+	private	ShortBuffer _indicesBuffer;
 	
 	
 	

@@ -1,12 +1,9 @@
 package dkgles;
 
-//import java.lang.String;
 import javax.microedition.khronos.opengles.GL10;
 
 public abstract class Drawable
 {
-	
-	
 	
 	public Drawable(String name)
 	{
