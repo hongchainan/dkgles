@@ -22,19 +22,11 @@ public class Rectangle extends Mesh
 	
 	public void renderImpl(GL10 gl)
 	{
-		//_material.apply(gl);
-		
-		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-		
-		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, _verticesBuffer);
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, _texcoordsBuffer);
-		
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0,4); 
-		
-		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-		
+		if (_material != null)
+		{
+			_material.apply(gl);
+		}
+		renderByDrawArray(gl, 4);
 	}
 	
 	private void initVerticesBuffer()
