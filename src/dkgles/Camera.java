@@ -1,16 +1,14 @@
 package dkgles;
 
+import android.opengl.Matrix;
+import android.util.Log;
+
 //import javax.microedition.khronos.opengles.GL10;
 
 
 public class Camera extends Movable
 {
-	
 	public static final int PERSPECTIVE = 0;
-	
-	private float _nearPlane;
-	private float _farPlane;
-	private float _fov;
 	
 	public Camera(String name)
 	{
@@ -18,60 +16,69 @@ public class Camera extends Movable
 		_nearPlane = 0.1f;
 		_farPlane = 10000.0f;
 		_fov = 45.0f;
+		_viewMatrix = new float[16];
+		Matrix.setIdentityM(_viewMatrix, 0);
 	}
-	
 	
 	public void updateTransformation(Transformation parentTransformation, boolean parentDirty)
 	{
 		if (_dirty||parentDirty)
 		{
+			//Log.v(TAG, "dirty- update");
 			_worldTransformationCache.mul(parentTransformation, _localTransformation);
-			
+			_worldTransformationCache.getViewMatrix(_viewMatrix);
 		}
 	}
 	
 	
-	public float nearPlane()
+	public final float nearPlane()
 	{
 		return _nearPlane;
 	}
 	
 	
-	public void nearPlane(float np)
+	public final void nearPlane(float np)
 	{
 		_nearPlane = np;
 	}
 	
 	
-	public float farPlane()
+	public final float farPlane()
 	{
 		return _farPlane;
 	}
 	
 	
-	public void farPlane(float fp)
+	public final void farPlane(float fp)
 	{
 		_farPlane = fp;
 	}
 	
-	
-	public float fov()
+	/**
+	 * Get field of view
+	 * @return
+	 */
+	public final float fov()
 	{
 		return _fov;
 	}
 	
 	
-	public void fov(float f)
+	public final void fov(float f)
 	{
 		_fov = f;
 	}
 	
+	public float[] viewMatrix()
+	{
+		return _viewMatrix;
+	}
 	
-	//public FloatBuffer getViewMatrix()
-	//{
-	//	FloatBuffer fb = FloatBuffer.allocate(16);
-	//}
+	private float[] _viewMatrix;
+	private float _nearPlane;
+	private float _farPlane;
+	private float _fov;
 	
-	
+	private final static String TAG = "Camera"; 
 	
 }

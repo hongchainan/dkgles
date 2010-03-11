@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.util.Log;
 import dkgles.Texture;
 import dkgles.TextureFactory;
 
@@ -22,6 +23,7 @@ public class TextureManager
 	
 	public Texture create(GL10 gl, String name, InputStream is)
 	{
+		Log.d(TAG, name);
 		Texture t = TextureFactory.create(gl, is);
 		_textures.put(name, t);
 		return t;
@@ -48,4 +50,5 @@ public class TextureManager
 	private HashMap<String, Texture> _textures;
 	
 	private static TextureManager _instance;
+	private final static String TAG = "TEXTURE_MANAGER";
 }

@@ -46,7 +46,7 @@ public class Mesh extends Drawable
 	{
 		openBufferPtr(gl);
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, vcount); 
-		closeBuffrPtr(gl);
+		closeBufferPtr(gl);
 	}
 	
 	/**
@@ -96,7 +96,6 @@ public class Mesh extends Drawable
 		_indicesBuffer = ibb.asShortBuffer();
 		_indicesBuffer.put(indices);
 		_indicesBuffer.position(0);
-		_numOfIndices = indices.length;
   }
 	
 	

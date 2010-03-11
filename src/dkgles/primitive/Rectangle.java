@@ -48,10 +48,10 @@ public class Rectangle extends Mesh
 	private void initTexcoordsBuffer()
 	{
 		float[] texcoords = new float[]{
-				0.0f, 1.0f,
-				1.0f, 1.0f,
 				0.0f, 0.0f,
-				1.0f, 0.0f
+				1.0f, 0.0f,
+				0.0f, 1.0f,
+				1.0f, 1.0f
 		};
 		
 		setTexcoords(texcoords);
