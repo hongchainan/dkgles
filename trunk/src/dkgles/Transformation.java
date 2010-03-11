@@ -91,9 +91,9 @@ public class Transformation implements Cloneable
 	}
 	
 	
-	public void getViewMatrix(float[] m16)
+	public void getViewMatrix(float[] view)
 	{
-		
+		Matrix.invertM(view, 0, _matrix, 0);
 	}
 	
 	public Object clone() throws CloneNotSupportedException 

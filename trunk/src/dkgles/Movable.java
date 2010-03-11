@@ -27,7 +27,14 @@ public class Movable
 		_worldTransformationCache = new Transformation();
 	}
 	
-	
+	/**
+	 * Rotate this movable scene node
+	 * @param angle in radian
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param space Movable.LOCAL / Movable.PARENT
+	 */
 	public void rotate(float angle, float x, float y, float z, int space)
 	{
 		if (space == LOCAL)
@@ -99,7 +106,10 @@ public class Movable
 		translate(.0f, dist, .0f, LOCAL);
 	}
 	
-	
+	/**
+	 * Rotate around local axis Z
+	 * @param angle
+	 */
 	public void roll(float angle)
 	{
 		rotate(angle, 0.0f, 0.0f, 1.0f, LOCAL);
