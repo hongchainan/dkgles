@@ -2,9 +2,12 @@ package dkgles.ui;
 
 import java.util.ArrayList;
 
+import android.content.Context;
+import android.os.Vibrator;
 import android.util.Log;
 import dkgles.Material;
 import dkgles.Movable;
+import dkgles.android.wrapper.ServiceManager;
 
 public class UIManager
 {
@@ -21,7 +24,11 @@ public class UIManager
 	
 	public Touchable createTouchable(String name, float width, float height, Material material)
 	{
-		return new Touchable(name, width, height, material);
+		Touchable t = new Touchable(name, width, height, material);
+		
+		addTouchable(t);
+	
+		return t;
 	}
 	
 	public void addTouchable(Touchable touchable)
@@ -31,11 +38,29 @@ public class UIManager
 	
 	public void touch(float x, float y)
 	{
+		float _x = (x - _width/2)/ _height;
+		float _y = -(y - _height/2) / _height;
+		
+		Log.d(CLASS_TAG, "touch:" + _x + ", " + _y);
+		
 		for (Touchable touchable : _touchables)
 		{
-			if (touchable.hit(x/_width, y/_height))
+			if (touchable.hit(_x, _y))
 			{
+				ServiceManager.instance().vibrator().vibrate(100);
 				touchable.onTouch();
+			}
+		}
+	}
+	
+	
+	public void untouch(float x, float y)
+	{
+		for (Touchable touchable : _touchables)
+		{
+			if (touchable.touch())
+			{
+				touchable.untouch();
 			}
 		}
 	}
@@ -56,7 +81,8 @@ public class UIManager
 	private UIManager()
 	{
 		_root = new Movable("UIROOT");
-		_touchables = new ArrayList<Touchable>(); 
+		_touchables = new ArrayList<Touchable>();
+		
 	}
 	
 	private static UIManager _instance;
