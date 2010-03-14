@@ -2,6 +2,9 @@ package dkgles;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.util.Log;
+import dkgles.manager.TextureManager;
+
 
 public class Texture implements Resource
 {
@@ -9,6 +12,8 @@ public class Texture implements Resource
 	{
 		_id = new int[1];
 		_id[0] = id;
+		
+		Log.v(TAG, "created, id = " + _id[0]);
 	}
 	
 	public void acquire()
@@ -22,16 +27,19 @@ public class Texture implements Resource
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, _id[0]);
 	}
 	
-	
-	public void release(GL10 gl)
+	/**
+	 * Release openGL texture resouce
+	 */
+	public void release()
 	{
-		gl.glDeleteTextures(1, _id, 0);
-	}
+		if (_id[0]==INVALID_ID)
+			return;
 		
+		TextureManager.instance().releaseTexture(_id);
+		_id[0] = INVALID_ID;
+	}
+	
+	private final static String TAG = "Texture";
+	private final static int INVALID_ID = -1;
 	private int[] _id;
-
-	public void release() {
-		// TODO Auto-generated method stub
-		
-	}
 }
