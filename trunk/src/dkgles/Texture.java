@@ -3,43 +3,32 @@ package dkgles;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.util.Log;
-import dkgles.manager.TextureManager;
 
 
-public class Texture implements Resource
+
+public class Texture
 {
-	public Texture(int id)
+	public Texture(String name, int gid)
 	{
-		_id = new int[1];
-		_id[0] = id;
-		
-		Log.v(TAG, "created, id = " + _id[0]);
+		_gid = gid;
+		_name = name;
+		//Log.v(TAG, "created, id = " + _id[0]);
 	}
-	
-	public void acquire()
-	{
-		
-	}
-	
 	
 	public void bind(GL10 gl)
 	{
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, _id[0]);
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, _gid);
 	}
 	
-	/**
-	 * Release openGL texture resouce
-	 */
-	public void release()
+	public void glID()
 	{
-		if (_id[0]==INVALID_ID)
-			return;
-		
-		TextureManager.instance().releaseTexture(_id);
-		_id[0] = INVALID_ID;
+		return _gid;
 	}
+	
+	private int 	_gid;// GL texture ID
+	private String _name;
 	
 	private final static String TAG = "Texture";
 	private final static int INVALID_ID = -1;
-	private int[] _id;
+	
 }

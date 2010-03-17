@@ -19,7 +19,7 @@ public class MaterialManager
 	
 	private MaterialManager()
 	{
-		_materialMap = new HashMap<String, Material>();
+		_materialMap = new HashMap<int, Material>();
 	}
 	
 	/**
@@ -28,25 +28,33 @@ public class MaterialManager
 	public void releaseAll()
 	{
 		//TODO
+		_materials.clear();
 	}
 	
-	public Material create(String name, Texture texture)
+	
+	/**
+	 * return material ID
+	 */
+	public int create(String name, Texture)
 	{
 		Material m = new Material(name);
 		m.bindTexture(texture);
 		
-		_materialMap.put(name, m);
+		int id = 0;
+		while (_materials.containsKey(id))
+		{
+			id++;
+		}
 		
-		return m;	
+		_materials.put(id, m);
+		return id;
 	}
 	
-	public Material get(String name)
+	public Material get(int mid)
 	{
-		return _materialMap.get(name);
+		return _materials.get(mid);
 	}
 	
-	
-	
-	private HashMap<String, Material> _materialMap;
+	private HashMap<int, Material> _materials;
 	private static MaterialManager _instance;
 }
