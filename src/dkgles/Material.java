@@ -10,6 +10,18 @@ public class Material
 		_red = _green = _blue = _alpha = 1.0f;
 	}
 	
+	
+	public void red(float val)
+	{
+		_red = val;
+	}
+	
+	
+	public void alpha(float val)
+	{
+		_alpha = val;
+	}
+	
 	public void bindTexture(Texture texture)
 	{
 		_texture = texture;
@@ -25,8 +37,7 @@ public class Material
 	
 	public void apply(GL10 gl)
 	{
-		gl.glColor4f(_r, _g, _b, _a);
-		
+		gl.glColor4f(_red, _green, _blue, _alpha);
 		if (_texture!=null)
 		{
 			_texture.bind(gl);
@@ -38,6 +49,7 @@ public class Material
 	private float _blue;
 	private float _alpha;
 	
+	private final static String TAG = "Material";
 	private final String _name;
 	private Texture _texture;
 	
