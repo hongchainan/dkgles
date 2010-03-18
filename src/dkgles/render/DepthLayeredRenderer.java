@@ -19,25 +19,25 @@ public class DepthLayeredRenderer
 	
 	private DepthLayeredRenderer(int numOfLayers)
 	{
-		_numOfLayers = numOfLayers;
-		_depthLayers = new DepthLayer[_numOfLayers];
+		//_numOfLayers = numOfLayers;
+		//_depthLayers = new DepthLayer[_numOfLayers];
 		
-		for (int i=0;i<_numOfLayers;i++)
-		{
-			_depthLayers[i] = new DepthLayer(i);
-		}
+		//for (int i=0;i<_numOfLayers;i++)
+		//{
+		//	_depthLayers[i] = new DepthLayer(i);
+		//}
 	}
 	
 	public void addDrawableToLayer(Drawable drawable, int layer)
 	{
-		_depthLayers[layer].addDrawble(drawable);
+		//_depthLayers[layer].addDrawble(drawable);
 	}
 	
 	
-	DepthLayer getDepthLayer(int layer)
-	{
-		return _depthLayers[layer];
-	}
+	//DepthLayer getDepthLayer(int layer)
+	//{
+	//	return _depthLayers[layer];
+	//}
 	
 	public void onSize(float width, float height)
 	{
@@ -48,13 +48,13 @@ public class DepthLayeredRenderer
 	
 	void render(GL10 gl)
 	{
-		for (DepthLayer layer : _depthLayers)
-		{
-			layer.render(gl);
-		}
+		//for (DepthLayer layer : _depthLayers)
+		//{
+		//	layer.render(gl);
+		//}
 	}
 	
 	private static DepthLayeredRenderer _instance;
-	private DepthLayer[] _depthLayers;
+	//private DepthLayer[] _depthLayers;
 	private int _numOfLayers;
 }

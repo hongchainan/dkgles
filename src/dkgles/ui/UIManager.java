@@ -2,12 +2,12 @@ package dkgles.ui;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.os.Vibrator;
 import android.util.Log;
 import dkgles.Material;
 import dkgles.Movable;
 import dkgles.android.wrapper.ServiceManager;
+import dkgles.render.OrthoRenderer;
+import dkgles.render.RenderQueue;
 
 public class UIManager
 {
@@ -27,6 +27,7 @@ public class UIManager
 		Touchable t = new Touchable(name, width, height, material);
 		
 		addTouchable(t);
+		_renderQueue.addDrawble(t);
 	
 		return t;
 	}
@@ -82,8 +83,13 @@ public class UIManager
 	{
 		_root = new Movable("UIROOT");
 		_touchables = new ArrayList<Touchable>();
+		_renderQueue = new RenderQueue(3);
+		
+		OrthoRenderer.instance().setRenderQueue(_renderQueue);
 		
 	}
+	
+	private RenderQueue		_renderQueue;
 	
 	private static UIManager _instance;
 	private ArrayList<Touchable> 	_touchables;
