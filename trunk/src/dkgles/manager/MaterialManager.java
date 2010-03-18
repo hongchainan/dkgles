@@ -19,7 +19,7 @@ public class MaterialManager
 	
 	private MaterialManager()
 	{
-		_materialMap = new HashMap<int, Material>();
+		_materials = new HashMap<Integer, Material>();
 	}
 	
 	/**
@@ -35,7 +35,7 @@ public class MaterialManager
 	/**
 	 * return material ID
 	 */
-	public int create(String name, Texture)
+	public int create(String name, Texture texture)
 	{
 		Material m = new Material(name);
 		m.bindTexture(texture);
@@ -52,9 +52,11 @@ public class MaterialManager
 	
 	public Material get(int mid)
 	{
-		return _materials.get(mid);
+		Material m = _materials.get(mid); 
+		return m;
 	}
 	
-	private HashMap<int, Material> _materials;
+	private HashMap<Integer, Material> _materials;
 	private static MaterialManager _instance;
+	private final static String TAG = "MATERIAL_MANAGER";
 }

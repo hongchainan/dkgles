@@ -2,7 +2,7 @@ package dkgles;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.util.Log;
+//import android.util.Log;
 
 
 
@@ -20,7 +20,7 @@ public class Texture
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, _gid);
 	}
 	
-	public void glID()
+	public int glID()
 	{
 		return _gid;
 	}

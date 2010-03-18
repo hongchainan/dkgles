@@ -55,7 +55,6 @@ public abstract class Drawable
 	{
 		if (!_visible)
 			return;
-		
 		gl.glMultMatrixf(_worldTransformation._matrix, 0);
 		renderImpl(gl);
 	}

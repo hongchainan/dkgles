@@ -2,9 +2,11 @@ package dkgles.manager;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
@@ -74,8 +76,11 @@ public class TextureManager
         
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
 		bitmap.recycle();
-        
-		return new Texture(name, id[0]);
+		
+		Texture t = new Texture(name, id[0]); 	
+		_textures.put(rsc_id, t);
+     
+		return t; 
 	}
 	
 	public void release(int rsc_id)
@@ -97,7 +102,7 @@ public class TextureManager
 	
 	public void releaseAll()
 	{
-		Set<int> set = _textures.keySet();
+		Set<Integer> set = _textures.keySet();
 		
 		for (int k : set)
 		{
@@ -116,14 +121,14 @@ public class TextureManager
 	
 	private TextureManager()
 	{
-		_textures = new HashMap<int, Texture>();
+		_textures = new HashMap<Integer, Texture>();
 	}
 	
 	private Context			_context;
 	private GL10 			_gl;
 	private boolean 		_initialized;
 	
-	private HashMap<int, Texture> _textures;
+	private HashMap<Integer, Texture> _textures;
 	
 	private static TextureManager _instance;
 	private final static String TAG = "TEXTURE_MANAGER";

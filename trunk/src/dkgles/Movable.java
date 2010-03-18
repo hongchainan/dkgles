@@ -10,13 +10,7 @@ public class Movable
 	public static final int LOCAL 	= 1;
 	
 	
-	private String 			_name;
-	private List<Movable> 	_childList;
-	private Movable			_parent;
-	protected Transformation	_localTransformation;
-	protected Transformation 	_worldTransformationCache;
-	private Drawable		_drawable;
-	protected boolean		_dirty;
+	
 	
 	public Movable(String name)
 	{
@@ -85,6 +79,14 @@ public class Movable
 		_localTransformation._matrix[13] = y;
 		_localTransformation._matrix[14] = z;
 		
+		_dirty = true;
+	}
+	
+	public void scale(float x, float y, float z)
+	{
+		_localTransformation._matrix[0] = x;
+		_localTransformation._matrix[5] = y;
+		_localTransformation._matrix[10] = z;
 		_dirty = true;
 	}
 	
@@ -176,7 +178,6 @@ public class Movable
 				_drawable.setWorldTransformation(_worldTransformationCache);
 				//_drawable.render();
 			}
-			
 		}
 			
 		for (Movable m : _childList)
@@ -187,10 +188,12 @@ public class Movable
 		_dirty = false;
 	}
 	
+	protected Transformation	_localTransformation;
+	protected Transformation 	_worldTransformationCache;
+	protected boolean			_dirty;
 	
-	
-	
-	
-	
-	
+	private String 			_name;
+	private List<Movable> 	_childList;
+	private Movable			_parent;
+	private Drawable		_drawable;
 }

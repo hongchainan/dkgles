@@ -16,12 +16,6 @@ public class Material
 		_red = val;
 	}
 	
-	
-	public void alpha(float val)
-	{
-		_alpha = val;
-	}
-	
 	public void bindTexture(Texture texture)
 	{
 		_texture = texture;
@@ -30,9 +24,9 @@ public class Material
 	/**
 	 *
 	 */
-	public void alpha(float alpha)
+	public void alpha(float val)
 	{
-		_alpha = alpha;
+		_alpha = val;
 	}
 	
 	public void apply(GL10 gl)
