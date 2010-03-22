@@ -26,7 +26,7 @@ public class Texture
 	}
 	
 	private int 	_gid;// GL texture ID
-	private String _name;
+	private final String _name;
 	
 	private final static String TAG = "Texture";
 	private final static int INVALID_ID = -1;
