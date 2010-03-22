@@ -36,18 +36,39 @@ public class ServiceManager
 	
 	public Vibrator vibrator()
 	{
-		return _vibrator;
+		if (_initialized)
+		{
+			return _vibrator;
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	
 	public PowerManager powerManager()
 	{
-		return _powerManager;
+		if (_initialized)
+		{
+			return _powerManager;
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	public SensorManager sensorManager()
 	{
-		return _sensorManager;
+		if (_initialized)
+		{
+			return _sensorManager;
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	
@@ -64,4 +85,5 @@ public class ServiceManager
 	private boolean _initialized;
 	
 	private static ServiceManager _instance;
+	private static final String TAG = "ServiceManager";
 }
