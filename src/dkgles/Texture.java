@@ -25,6 +25,11 @@ public class Texture
 		return _gid;
 	}
 	
+	public String toString()
+	{
+		return _name + " gid: " + _gid;
+	}
+	
 	private int 	_gid;// GL texture ID
 	private final String _name;
 	
