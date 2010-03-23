@@ -1,7 +1,8 @@
 package dkgles.manager;
 
-import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -13,7 +14,6 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
 import android.util.Log;
 import dkgles.Texture;
-import dkgles.TextureFactory;
 
 public class TextureManager
 {
@@ -46,6 +46,7 @@ public class TextureManager
 	{
 		if (_textures.containsKey(rsc_id))
 		{
+			Log.v(TAG, "found exist texture:" + rsc_id);
 			return _textures.get(rsc_id);
 		}
 		
@@ -84,9 +85,9 @@ public class TextureManager
 			bitmap.recycle();
 			
 			Texture t = new Texture(name, id[0]); 	
-			_textures.put(rsc_id, t);
+			_textures.put(new Integer(rsc_id), t);
 			
-			Log.d(TAG, "create: " + name + ", id: " + id[0]);
+			Log.d(TAG, "create texture: " + t);
 			
 			return t; 			
 		}
@@ -106,8 +107,10 @@ public class TextureManager
 		
 		int [] id = new int[1];
 		id[0] = t.glID();
-			
+		
 		_gl.glDeleteTextures(1, id, 0);
+		
+		Log.v(TAG, "release texture:" + t);
 		
 		// mark this reference is no more used.
 		id = null;
@@ -116,13 +119,22 @@ public class TextureManager
 	
 	public void releaseAll()
 	{
+		Log.v(TAG, "releaseAll()");
 		Set<Integer> set = _textures.keySet();
 		
-		for (int k : set)
-		{
-			release(k);
-		}
-		
+		Iterator<Integer> ir = set.iterator();
+	    while (ir.hasNext()) 
+	    {
+	    	try
+	    	{
+	    		Integer key = (Integer)ir.next();
+	    		release(key);
+	    	}
+	    	catch(NoSuchElementException e)
+	    	{
+	    		Log.e(TAG, "something wrong when release textures");
+	    	}
+	    }
 		_textures.clear();
 	}
 	
@@ -145,5 +157,5 @@ public class TextureManager
 	private HashMap<Integer, Texture> _textures;
 	
 	private static TextureManager _instance;
-	private final static String TAG = "TEXTURE_MANAGER";
+	private final static String TAG = "TextureManager";
 }
