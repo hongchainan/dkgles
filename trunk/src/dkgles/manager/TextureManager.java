@@ -120,9 +120,11 @@ public class TextureManager
 	public void releaseAll()
 	{
 		Log.v(TAG, "releaseAll()");
-		Set<Integer> set = _textures.keySet();
+		//Set<Integer> set = _textures.keySet();
+		//Iterator<Integer> ir = set.iterator();
+		Collection<Integer> col = _textures.keySet().value;
+		Iterator<Integer> ir = col.iterator();
 		
-		Iterator<Integer> ir = set.iterator();
 	    while (ir.hasNext()) 
 	    {
 	    	try
