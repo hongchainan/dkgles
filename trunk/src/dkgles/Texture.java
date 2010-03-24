@@ -20,6 +20,13 @@ public class Texture
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, _gid);
 	}
 	
+	public void release(GL10 gl)
+	{
+		int [] id = new int[1];
+		id[0] = _gid;
+		gl.glDeleteTextures(1, id, 0);
+	}
+	
 	public int glID()
 	{
 		return _gid;

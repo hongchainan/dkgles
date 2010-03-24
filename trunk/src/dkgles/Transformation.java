@@ -17,6 +17,20 @@ public class Transformation implements Cloneable
 		Matrix.setIdentityM(_matrix, 0);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public static Transformation identity()
+	{
+		if (_identity==null)
+		{
+			_identity = new Transformation(); 
+		}
+		
+		return _identity;
+	}
+	
 	
 	public void rotateInLocalSpace(float angle, float x, float y, float z)
 	{
@@ -101,4 +115,7 @@ public class Transformation implements Cloneable
 		Transformation t 	= (Transformation)super.clone();
 		return t;
 	}
+	
+	private static Transformation _identity;
+	
 }

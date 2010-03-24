@@ -2,6 +2,9 @@ package dkgles;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.opengl.GLException;
+import android.util.Log;
+
 public abstract class Drawable
 {
 	
@@ -55,8 +58,23 @@ public abstract class Drawable
 	{
 		if (!_visible)
 			return;
-		gl.glMultMatrixf(_worldTransformation._matrix, 0);
-		renderImpl(gl);
+		
+		try
+		{
+			gl.glMultMatrixf(_worldTransformation._matrix, 0);
+			renderImpl(gl);
+		}
+		catch(GLException e)
+		{
+			Log.e(TAG, "catch a GLException:" + e.getMessage());
+			throw e;
+		}
+	}
+	
+	
+	public String toString()
+	{
+		return _name + ", group ID:" + _groupID; 
 	}
 	
 	
@@ -66,5 +84,6 @@ public abstract class Drawable
 	protected int				_groupID;
 	protected String 			_name;
 	protected Transformation 	_worldTransformation;
+	private static final String TAG = "Drawable";
 	
 }

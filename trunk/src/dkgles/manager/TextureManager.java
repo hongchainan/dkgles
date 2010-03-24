@@ -2,8 +2,6 @@ package dkgles.manager;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -11,6 +9,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.GLException;
 import android.opengl.GLUtils;
 import android.util.Log;
 import dkgles.Texture;
@@ -27,7 +26,7 @@ public class TextureManager
 		return _instance;
 	}
 	
-	public void initialize(Context context, GL10 gl)
+	public synchronized void initialize(Context context, GL10 gl)
 	{
 		_context = context;
 		_gl = gl;
@@ -42,7 +41,7 @@ public class TextureManager
 	/**
 	 *
 	 */
-	public Texture create(String name, int rsc_id)
+	public synchronized Texture create(String name, int rsc_id)
 	{
 		if (_textures.containsKey(rsc_id))
 		{
@@ -62,12 +61,17 @@ public class TextureManager
 				return null;
 			}
 			
-			_gl.glEnable(GL10.GL_TEXTURE_2D);
-			
 			int[] id = new int[1];
 			_gl.glGenTextures(1, id, 0);
+			
+			if (id[0]==0)
+			{
+				Log.e(TAG, "GL gens invalid id for:" + name);
+				return null;
+			}
 	        
 			// 	Set default parameters
+			_gl.glEnable(GL10.GL_TEXTURE_2D);
 			_gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
 
 			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
@@ -96,9 +100,14 @@ public class TextureManager
 			Log.e(TAG, "resource not found, id: " + rsc_id);
 			return null;
 		}
+		catch(GLException e)
+		{
+			Log.e(TAG, "catch a GLException:" + e.getMessage());
+			return null;
+		}
 	}
 	
-	public void release(int rsc_id)
+	public synchronized void release(int rsc_id)
 	{
 		Texture t = _textures.remove(rsc_id);
 		
@@ -117,31 +126,24 @@ public class TextureManager
 		t = null;
 	}
 	
-	public void releaseAll()
+	public synchronized void releaseAll()
 	{
 		Log.v(TAG, "releaseAll()");
-		//Set<Integer> set = _textures.keySet();
-		//Iterator<Integer> ir = set.iterator();
-		Collection<Integer> col = _textures.keySet().value;
-		Iterator<Integer> ir = col.iterator();
 		
-	    while (ir.hasNext()) 
-	    {
-	    	try
-	    	{
-	    		Integer key = (Integer)ir.next();
-	    		release(key);
-	    	}
-	    	catch(NoSuchElementException e)
-	    	{
-	    		Log.e(TAG, "something wrong when release textures");
-	    	}
-	    }
+		Iterator<Texture> iter = _textures.values().iterator();
+		
+		while (iter.hasNext())
+		{
+			Texture t = (Texture)iter.next();
+			Log.v(TAG, "release texture:" + t);
+			t.release(_gl);
+		}
+		
 		_textures.clear();
 	}
 	
 	
-	public Texture get(int rsc_id)
+	public synchronized Texture get(int rsc_id)
 	{
 		return _textures.get(rsc_id);
 	}
@@ -150,6 +152,20 @@ public class TextureManager
 	private TextureManager()
 	{
 		_textures = new HashMap<Integer, Texture>();
+	}
+	
+	protected void finalize() throws Throwable 
+	{
+		Log.v(TAG, "finalize()");
+		
+	    try
+	    {
+	    	releaseAll();
+	    }
+	    finally
+	    {
+	        super.finalize();
+	    }
 	}
 	
 	private Context			_context;
