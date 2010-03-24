@@ -83,7 +83,7 @@ public class UIManager
 	{
 		_root = new Movable("UIROOT");
 		_touchables = new ArrayList<Touchable>();
-		_renderQueue = new RenderQueue(3);
+		_renderQueue = new RenderQueue("FOO", 3);
 		
 		OrthoRenderer.instance().setRenderQueue(_renderQueue);
 		

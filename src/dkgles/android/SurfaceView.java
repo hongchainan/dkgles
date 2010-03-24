@@ -11,7 +11,7 @@ public class SurfaceView extends GLSurfaceView
 	public SurfaceView(Context context)
 	{
 		super(context);
-		// TODO Auto-generated constructor stub
+		setDebugFlags(DEBUG_CHECK_GL_ERROR);
 	}
 
 
