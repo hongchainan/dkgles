@@ -11,7 +11,7 @@ public class SurfaceView extends GLSurfaceView
 	public SurfaceView(Context context)
 	{
 		super(context);
-		setDebugFlags(DEBUG_CHECK_GL_ERROR);
+		//setDebugFlags(DEBUG_CHECK_GL_ERROR);
 	}
 
 

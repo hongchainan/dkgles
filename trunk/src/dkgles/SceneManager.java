@@ -5,7 +5,7 @@ public class SceneManager
 	
 	private SceneManager()
 	{
-		_root = new Movable("ROOT");
+		_root = new Movable("ROOT", null);
 	}
 	
 	/**

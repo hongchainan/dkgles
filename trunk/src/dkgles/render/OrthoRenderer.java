@@ -34,6 +34,12 @@ public final class OrthoRenderer
 		_initialized = true;
 	}
 	
+	public void render(GL10 gl, RenderQueue renderQueue)
+	{
+		beginRender(gl);
+		renderQueue.render(gl);
+		endRender(gl);
+	}
 	
 	public final void render(GL10 gl)
 	{

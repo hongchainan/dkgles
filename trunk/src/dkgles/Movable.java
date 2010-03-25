@@ -151,7 +151,7 @@ public class Movable
 	//TODO
 	public Movable removeChild(String name)
 	{
-		
+		return null;
 	}
 	
 	
@@ -170,6 +170,7 @@ public class Movable
 		
 		// force scene node write self transformation to drawable
 		_dirty = true;
+		_scene.root().updateTransformation(Transformation.identity(), false);
 	}
 	
 	

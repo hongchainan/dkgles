@@ -81,7 +81,7 @@ public class UIManager
 	
 	private UIManager()
 	{
-		_root = new Movable("UIROOT");
+		_root = new Movable("UIROOT", null);
 		_touchables = new ArrayList<Touchable>();
 		_renderQueue = new RenderQueue("FOO", 3);
 		
