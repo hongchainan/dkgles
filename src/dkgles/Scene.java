@@ -1,11 +1,15 @@
 package dkgles;
 
+import android.util.Log;
+import dkgles.render.RenderQueue;
+
 public class Scene
 {
-	public Scene(String name)
+	public Scene(String name, RenderQueue renderQueue)
 	{
 		_name = name;
 		_root = new Movable("Root in " + _name, this);
+		attachRenderQueue(renderQueue);
 	}
 	
 	
@@ -15,7 +19,7 @@ public class Scene
 		_renderQueue = renderQueue;
 	}
 	
-	public void getRenderQueue()
+	public RenderQueue getRenderQueue()
 	{
 		return _renderQueue;
 	}
