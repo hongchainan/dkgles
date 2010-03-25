@@ -12,10 +12,11 @@ public class Movable
 	
 	
 	
-	public Movable(String name)
+	public Movable(String name, Scene scene)
 	{
 		_name = name;
 		_parent = null;
+		_scene = scene;
 		_childList = new ArrayList<Movable>();
 		_localTransformation = new Transformation();
 		_worldTransformationCache = new Transformation();
@@ -142,9 +143,15 @@ public class Movable
 	 */
 	public Movable createChild(String name)
 	{
-		Movable child = new Movable(name);
+		Movable child = new Movable(name, _scene);
 		addChild(child);
 		return child;
+	}
+	
+	//TODO
+	public Movable removeChild(String name)
+	{
+		
 	}
 	
 	
@@ -158,6 +165,11 @@ public class Movable
 	public void setDrawable(Drawable drawable)
 	{
 		_drawable = drawable;
+		
+		_scene.getRenderQueue().addDrawble(drawable);
+		
+		// force scene node write self transformation to drawable
+		_dirty = true;
 	}
 	
 	
@@ -196,4 +208,5 @@ public class Movable
 	private List<Movable> 	_childList;
 	private Movable			_parent;
 	private Drawable		_drawable;
+	private Scene			_scene;
 }
