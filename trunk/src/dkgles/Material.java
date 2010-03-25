@@ -10,15 +10,34 @@ public class Material
 		_red = _green = _blue = _alpha = 1.0f;
 	}
 	
-	
 	public void red(float val)
 	{
 		_red = val;
 	}
 	
-	public void bindTexture(Texture texture)
+	public float red()
 	{
-		_texture = texture;
+		return _red;
+	}
+	
+	public void green(float val)
+	{
+		_green = val;	
+	}
+	
+	public float green()
+	{
+		return _green;
+	}
+	
+	public void blue(float val)
+	{
+		_blue = val;
+	}
+	
+	public float blue()
+	{
+		return _blue;
 	}
 	
 	/**
@@ -29,6 +48,16 @@ public class Material
 		_alpha = val;
 	}
 	
+	public float alpha()
+	{
+		return _alpha;
+	}
+	
+	public void bindTexture(Texture texture)
+	{
+		_texture = texture;
+	}
+	
 	public void apply(GL10 gl)
 	{
 		gl.glColor4f(_red, _green, _blue, _alpha);
@@ -36,6 +65,16 @@ public class Material
 		{
 			_texture.bind(gl);
 		}
+	}
+	
+	public String name()
+	{
+		return _name;
+	}
+	
+	public String toString()
+	{
+		return _name;
 	}
 	
 	private float _red;
