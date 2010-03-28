@@ -80,6 +80,7 @@ public class TextureManager
 			}
 			
 			_listeners.put(rsc_id, listener);
+			_texLoaded = false;
 			
 			// issue a queued event to Renderer Thread
 			_glSurfaceView.queueEvent(new Runnable()
@@ -131,6 +132,18 @@ public class TextureManager
 		{
 			Log.e(TAG, "catch a GLException:" + e.getMessage());
 		}
+		
+		/*while (!_texLoaded)
+		{
+			try
+			{
+				Thread.sleep(1);
+			}
+			catch (InterruptedException e)
+			{
+				
+			}
+		}*/
 	}
 	
 	public synchronized void release(final int rsc_id)
@@ -212,6 +225,7 @@ public class TextureManager
 	private GL10 			_gl;
 	private GLSurfaceView	_glSurfaceView;
 	private boolean 		_initialized;
+	private boolean 		_texLoaded;
 	
 	private HashMap<Integer, Texture> 		_textures;
 	private HashMap<Integer, EventListener>	_listeners;
@@ -259,6 +273,7 @@ public class TextureManager
 	        		{
 	        			listener.onTextureLoaded(name, rsc_id);
 	        		}
+	        		_texLoaded = true;
 	        		Log.v(TAG, "create texture: " + t);
 	        		break;
 	        	case GL_TEXTURE_DELETION:
