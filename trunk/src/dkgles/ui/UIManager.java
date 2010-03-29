@@ -22,20 +22,32 @@ public class UIManager
 		return _instance;
 	}
 	
-	public Touchable createTouchable(String name, float width, float height, Material material)
+		
+	public Touchable createTouchable(String name, float width, float height, Material material, Movable node)
 	{
 		Touchable t = new Touchable(name, width, height, material);
-		
 		addTouchable(t);
-		_renderQueue.addDrawble(t);
-	
+		
+		if (node!=null)
+		{
+			node.setDrawable(t);	
+		}
+		
 		return t;
 	}
+	
+	
+	public void render(GL10 gl)
+	{
+		_orthoRenderer.render(gl, _scene.getRenderQueue());	
+	}
+	
 	
 	public void addTouchable(Touchable touchable)
 	{
 		_touchables.add(touchable);
 	}
+	
 	
 	public void touch(float x, float y)
 	{
@@ -49,7 +61,7 @@ public class UIManager
 			if (touchable.hit(_x, _y))
 			{
 				ServiceManager.instance().vibrator().vibrate(100);
-				touchable.onTouch();
+				touchable.touch();
 			}
 		}
 	}
@@ -70,32 +82,26 @@ public class UIManager
 	public void onSize(float width, float height)
 	{
 		Log.v(CLASS_TAG, "onSize Event" + width + ", " + height);
-		_width = width;
+		_width	= width;
 		_height = height;
 	}
 	
 	public Movable root()
 	{
-		return _root;
+		return _scene.root();
 	}
 	
 	private UIManager()
 	{
-		_root = new Movable("UIROOT", null);
 		_touchables = new ArrayList<Touchable>();
-		_renderQueue = new RenderQueue("FOO", 3);
-		
-		OrthoRenderer.instance().setRenderQueue(_renderQueue);
-		
+		_scene 		= new Scene("UIScene", new RenderQueue("UIRenderQueue", 5));
 	}
 	
-	private RenderQueue		_renderQueue;
-	
-	private static UIManager _instance;
+	private Scene					_scene;
 	private ArrayList<Touchable> 	_touchables;
 	private float _width;
 	private float _height;
-	private Movable _root;
 	
+	private static UIManager 		_instance;
 	private static final String CLASS_TAG = "UIManager";
 }

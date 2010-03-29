@@ -7,15 +7,37 @@ import dkgles.primitive.Rectangle;
 
 public class Touchable extends Rectangle
 {
+	public interface ITouchEventHandler
+	{
+		public void touch(final int id);
+		public void unTouch(final int id);
+		public void enable(final boolean b);
+	}
+	
 	public Touchable(String name, float width, float height, Material material)
 	{
 		super(name, width, height, material);
 		_position = new float[3];
+		_handler = GetNullTouchEventHandler();
+	}
+	
+	public void bindTouchEventHandler(ITouchEventHandler handler)
+	{
+		if (handler!=null)
+		{
+			_handler = handler;
+		}
+		else
+		{
+			_handler = GetNullTouchEventHandler();
+		}
 	}
 	
 	public void enable(boolean val)
 	{
 		_enable = val;
+		_handler.enable(_enable);
+		
 	}
 	
 	public boolean enable()
@@ -42,14 +64,17 @@ public class Touchable extends Rectangle
 		return true;
 	}
 	
-	public boolean touch()
+	public void touch()
 	{
-		return _touched;
+		if (_enable)
+		_handler.touch(0);
+		Log.v(TAG, _name + " touch!!");
 	}
 	
-	public void untouch()
+	public void unTouch()
 	{
-		
+		_handler.unTouch(0);
+		Log.v(TAG, _name + " untouch!!");
 	}
 	
 	//@override from Drawable
@@ -59,14 +84,38 @@ public class Touchable extends Rectangle
 		worldTransformation.getTranslation(_position);
 	}
 	
-	public void onTouch()
+	private static ITouchEventHandler GetNullTouchEventHandler()
 	{
-		Log.v(TAG, _name + " touch!!");
+		if (_nilTouchEventHandler==null)
+		{
+			_nilTouchEventHandler = new NullTouchEventHandler();
+		}
+		return _nilTouchEventHandler;
 	}
 	
 	private final static String TAG = "Touchable";
 	private boolean _enable;
 	private boolean _touched;
+	private ITouchEventHandler _handler;
+	private static NullTouchEventHandler _nilTouchEventHandler;
 	
 	protected float[] _position;
+	
+	class NullTouchEventHandler implements ITouchEventHandler
+	{
+		public void touch(final int id)
+		{
+			
+		}
+		
+		public void unTouch(final int id)
+		{
+			
+		}
+		
+		public void enable(final boolean b)
+		{
+			
+		}
+	}
 }
