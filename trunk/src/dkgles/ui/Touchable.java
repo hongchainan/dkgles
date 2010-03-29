@@ -19,6 +19,7 @@ public class Touchable extends Rectangle
 		super(name, width, height, material);
 		_position = new float[3];
 		_handler = _nilTouchEventHandler;
+		_enable = true;
 	}
 	
 	public void bindTouchEventHandler(ITouchEventHandler handler)
@@ -64,16 +65,27 @@ public class Touchable extends Rectangle
 		return true;
 	}
 	
+	public boolean beTouched()
+	{
+		return _touched; 
+	}
+	
 	public synchronized void touch()
 	{
-		if (_enable)
+		if (!_enable)
+			return;
+		
+		_touched = true;
 		_handler.touch(0);
 		Log.v(TAG, _name + " touch!!");
 	}
 	
 	public synchronized void unTouch()
 	{
+		if (!_enable)
+			return;
 		_handler.unTouch(0);
+		_touched = false;
 		Log.v(TAG, _name + " untouch!!");
 	}
 	

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 import dkgles.Material;
 import dkgles.Movable;
 import dkgles.Scene;
@@ -13,7 +16,7 @@ import dkgles.android.wrapper.ServiceManager;
 import dkgles.render.OrthoRenderer;
 import dkgles.render.RenderQueue;
 
-public class UIManager
+public class UIManager implements OnTouchListener
 {
 	
 	public static UIManager instance()
@@ -60,7 +63,7 @@ public class UIManager
 	
 	public void touch(float x, float y)
 	{
-		float _x = (x - _width/2)/ _height;
+		/*float _x = (x - _width/2)/ _height;
 		float _y = -(y - _height/2) / _height;
 		
 		Log.d(CLASS_TAG, "touch:" + _x + ", " + _y);
@@ -72,19 +75,60 @@ public class UIManager
 				ServiceManager.instance().vibrator().vibrate(100);
 				touchable.touch();
 			}
-		}
+		}*/
 	}
 	
-	
-	public void untouch(float x, float y)
+	/**
+	 * Called by Android View.onTocch framework
+	 */
+	public boolean onTouch(View v, MotionEvent event)
 	{
-		for (Touchable touchable : _touchables)
+		float x = transformX(event.getX());
+		float y = transformY(event.getY());
+		int action = event.getAction();
+		
+		if (action == MotionEvent.ACTION_DOWN)
 		{
-			/*if (touchable.touch())
+			Log.v(CLASS_TAG, "action down!!" + x + ", " + y);
+			
+			for (Touchable touchable : _touchables)
 			{
-				touchable.untouch();
-			}*/
+				if (touchable.hit(x, y))
+				{
+					touchable.touch();
+					ServiceManager.instance().vibrator().vibrate(50);
+				}
+			}
 		}
+		else if (action == MotionEvent.ACTION_UP)
+		{
+			Log.v(CLASS_TAG, "action up");
+			
+			for (Touchable touchable : _touchables)
+			{
+				if (touchable.beTouched())
+				{
+					touchable.unTouch();
+				}
+				
+				/*if (touchable.hit(x, y))
+				{
+					touchable.unTouch();
+				}*/
+			}
+		}
+		
+		return false;
+	}
+	
+	private float transformX(float x)
+	{
+		return (x / _height) - _halfAsr;
+	}
+	
+	private float transformY(float y)
+	{
+		return 0.5f - (y / _height);
 	}
 	
 	
@@ -93,6 +137,7 @@ public class UIManager
 		Log.v(CLASS_TAG, "onSize Event" + width + ", " + height);
 		_width	= width;
 		_height = height;
+		_halfAsr = (_width / _height)/2.0f;
 	}
 	
 	public Movable root()
@@ -104,13 +149,16 @@ public class UIManager
 	{
 		_touchables = new ArrayList<Touchable>();
 		_scene 		= new Scene("UIScene", new RenderQueue("UIRenderQueue", 5));
+		_halfAsr = 0.5f;
 	}
 	
 	private Scene					_scene;
 	private ArrayList<Touchable> 	_touchables;
 	private float _width;
 	private float _height;
+	private float _halfAsr;	// Half value of aspect ratio
 	
 	private static UIManager 		_instance;
 	private static final String CLASS_TAG = "UIManager";
+	
 }
