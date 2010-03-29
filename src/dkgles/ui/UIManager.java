@@ -2,9 +2,12 @@ package dkgles.ui;
 
 import java.util.ArrayList;
 
+import javax.microedition.khronos.opengles.GL10;
+
 import android.util.Log;
 import dkgles.Material;
 import dkgles.Movable;
+import dkgles.Scene;
 import dkgles.android.wrapper.ServiceManager;
 import dkgles.render.OrthoRenderer;
 import dkgles.render.RenderQueue;
@@ -39,7 +42,7 @@ public class UIManager
 	
 	public void render(GL10 gl)
 	{
-		_orthoRenderer.render(gl, _scene.getRenderQueue());	
+		OrthoRenderer.instance().render(gl, _scene.getRenderQueue());	
 	}
 	
 	
@@ -71,10 +74,10 @@ public class UIManager
 	{
 		for (Touchable touchable : _touchables)
 		{
-			if (touchable.touch())
+			/*if (touchable.touch())
 			{
 				touchable.untouch();
-			}
+			}*/
 		}
 	}
 	

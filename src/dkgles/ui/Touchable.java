@@ -18,7 +18,7 @@ public class Touchable extends Rectangle
 	{
 		super(name, width, height, material);
 		_position = new float[3];
-		_handler = GetNullTouchEventHandler();
+		_handler = _nilTouchEventHandler;
 	}
 	
 	public void bindTouchEventHandler(ITouchEventHandler handler)
@@ -29,7 +29,7 @@ public class Touchable extends Rectangle
 		}
 		else
 		{
-			_handler = GetNullTouchEventHandler();
+			_handler = _nilTouchEventHandler;
 		}
 	}
 	
@@ -64,14 +64,14 @@ public class Touchable extends Rectangle
 		return true;
 	}
 	
-	public void touch()
+	public synchronized void touch()
 	{
 		if (_enable)
 		_handler.touch(0);
 		Log.v(TAG, _name + " touch!!");
 	}
 	
-	public void unTouch()
+	public synchronized void unTouch()
 	{
 		_handler.unTouch(0);
 		Log.v(TAG, _name + " untouch!!");
@@ -84,38 +84,30 @@ public class Touchable extends Rectangle
 		worldTransformation.getTranslation(_position);
 	}
 	
-	private static ITouchEventHandler GetNullTouchEventHandler()
-	{
-		if (_nilTouchEventHandler==null)
-		{
-			_nilTouchEventHandler = new NullTouchEventHandler();
-		}
-		return _nilTouchEventHandler;
-	}
-	
 	private final static String TAG = "Touchable";
 	private boolean _enable;
 	private boolean _touched;
 	private ITouchEventHandler _handler;
-	private static NullTouchEventHandler _nilTouchEventHandler;
+	private static NilTouchEventHandler _nilTouchEventHandler = new NilTouchEventHandler();
 	
 	protected float[] _position;
 	
-	class NullTouchEventHandler implements ITouchEventHandler
+}
+
+class NilTouchEventHandler implements Touchable.ITouchEventHandler
+{
+	public void touch(final int id)
 	{
-		public void touch(final int id)
-		{
-			
-		}
 		
-		public void unTouch(final int id)
-		{
-			
-		}
+	}
+	
+	public void unTouch(final int id)
+	{
 		
-		public void enable(final boolean b)
-		{
-			
-		}
+	}
+	
+	public void enable(final boolean b)
+	{
+		
 	}
 }
