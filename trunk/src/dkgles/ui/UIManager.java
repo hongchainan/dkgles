@@ -8,6 +8,7 @@ import android.util.Log;
 import dkgles.Material;
 import dkgles.Movable;
 import dkgles.Scene;
+import dkgles.Transformation;
 import dkgles.android.wrapper.ServiceManager;
 import dkgles.render.OrthoRenderer;
 import dkgles.render.RenderQueue;
@@ -43,6 +44,11 @@ public class UIManager
 	public void render(GL10 gl)
 	{
 		OrthoRenderer.instance().render(gl, _scene.getRenderQueue());	
+	}
+	
+	public void update()
+	{
+		_scene.root().updateTransformation(Transformation.identity(), false);
 	}
 	
 	
