@@ -10,6 +10,13 @@ public class Material
 		_red = _green = _blue = _alpha = 1.0f;
 	}
 	
+	public void rgb(float r, float g, float b)
+	{
+		_red = r;
+		_green = g;
+		_blue = b;
+	}
+	
 	public void red(float val)
 	{
 		_red = val;

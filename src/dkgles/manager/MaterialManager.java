@@ -7,6 +7,9 @@ import dkgles.Texture;
 
 public class MaterialManager implements TextureManager.EventListener
 {
+	
+	public final static int BLACK_ID = 0;
+	
 	public static MaterialManager instance()
 	{
 		if (_instance==null)
