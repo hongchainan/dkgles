@@ -6,7 +6,7 @@ public class Box extends Mesh
 {
 	public Box(String name, float width, float height, float depth)
 	{
-		super(name);
+		super(name, 1);
 		initVerticesBuf(width, height, depth);
 	}
 	
@@ -45,8 +45,8 @@ public class Box extends Mesh
             3, 1, 2,
 		};
  
-        setIndices(indices);
-        setVertices(vertices);
+        //setIndices(indices);
+        //setVertices(vertices);
 	}
 	
 	

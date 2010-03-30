@@ -37,7 +37,7 @@ public class Texture
 		return _name + " gid: " + _gid;
 	}
 	
-	public static DummyTexture GetDummyTexture()
+	public static Texture GetDummyTexture()
 	{
 		return _dummy;
 	}
@@ -47,7 +47,7 @@ public class Texture
 	
 	private final static Texture _dummy = new DummyTexture();
 	private final static String TAG = "Texture";
-	private final static int INVALID_ID = -1;
+	public 	final static int INVALID_ID = -1;
 }
 
 class DummyTexture extends Texture

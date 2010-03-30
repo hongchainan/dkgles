@@ -7,7 +7,7 @@
 	 
 	 public Grid(String name, float width, float height, int width_segment, int height_segment)
 	 {
-		 super(name);
+		 super(name, 1);
 		 
 		 _width = width;
 		 _height = height;
@@ -44,7 +44,7 @@
              }
          }
          
-         setVertices(vertices);
+         //setVertices(vertices);
 	 }
 	 
 	 
@@ -75,7 +75,7 @@
 			 }
 		 }
 		 
-		 setIndices(indices); 
+		 //setIndices(indices); 
 	 }
 	 
 	 private void _initTexcoordBuffer()
@@ -100,7 +100,7 @@
 			 }
 		 }
 		 
-		 setTexcoords(texcoords);
+		 //setTexcoords(texcoords);
 	 }
 	 
 	 
