@@ -1,35 +1,26 @@
 package dkgles.primitive;
 
+import dkgles.Material;
+import dkgles.SubMesh;
 import javax.microedition.khronos.opengles.GL10;
 
-import dkgles.Material;
-import dkgles.Mesh;
 
 public class Rectangle extends Mesh
 {
 	public Rectangle(String name, float width, float height, Material material)
 	{
-		super(name);
+		super(name, 1);
 		
-		_width = width;
+		_width 	= width;
 		_height = height;
-		_material = material;
+		_subMesh = new SubMesh("SubMesh_" + name, SubMesh.DRAW_ARRAY, material);
+		setSubMesh(0, _subMesh);
 		
-		initVerticesBuffer();
-		initTexcoordsBuffer();
+		initVerticesBuffer(_subMesh);
+		initTexcoordsBuffer(_subMesh);
 	}
 	
-	
-	public void renderImpl(GL10 gl)
-	{
-		if (_material != null)
-		{
-			_material.apply(gl);
-		}
-		renderByDrawArray(gl, 4);
-	}
-	
-	private void initVerticesBuffer()
+	private void initVerticesBuffer(SubMesh sm)
 	{
 		float hx = _width / 2;
 		float hy = _height / 2;
@@ -41,11 +32,11 @@ public class Rectangle extends Mesh
 				 hx, -hy, 0
 		};
 		
-		setVertices(vertices);	                             
+		sm.setVertices(vertices);	                             
 	}
 	
 	
-	private void initTexcoordsBuffer()
+	private void initTexcoordsBuffer(SubMesh sm)
 	{
 		float[] texcoords = new float[]{
 				0.0f, 0.0f,
@@ -54,11 +45,10 @@ public class Rectangle extends Mesh
 				1.0f, 1.0f
 		};
 		
-		setTexcoords(texcoords);
+		sm.setTexcoords(texcoords);
 	}
 	
-	
-	protected Material _material;
-	protected float _width;
-	protected float _height;
+	protected SubMesh	_subMesh;
+	protected float 	_width;
+	protected float 	_height;
 }

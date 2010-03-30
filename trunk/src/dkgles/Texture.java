@@ -37,10 +37,33 @@ public class Texture
 		return _name + " gid: " + _gid;
 	}
 	
+	public static DummyTexture GetDummyTexture()
+	{
+		return _dummy;
+	}
+	
 	private int 	_gid;// GL texture ID
 	private final String _name;
 	
+	private final static Texture _dummy = new DummyTexture();
 	private final static String TAG = "Texture";
 	private final static int INVALID_ID = -1;
+}
+
+class DummyTexture extends Texture
+{
+	DummyTexture()
+	{
+		super("TEX_DUMMY", Texture.INVALID_ID);
+	}
 	
+	public void bind(GL10 gl)
+	{
+		// do nothing
+	}
+	
+	public void release(GL10 gl)
+	{
+		// do nothing
+	}
 }
