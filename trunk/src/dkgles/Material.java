@@ -76,6 +76,7 @@ public class Material
 		}
 		else
 		{
+			Log.v("TAG", _name + "bind a dummy texture");
 			_texture = Texture.GetDummyTexture();
 		}
 	}

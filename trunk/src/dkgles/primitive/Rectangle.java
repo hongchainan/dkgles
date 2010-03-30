@@ -16,11 +16,11 @@ public class Rectangle extends Mesh
 		_subMesh = new SubMesh("SubMesh_" + name, SubMesh.DRAW_ARRAY, material);
 		setSubMesh(0, _subMesh);
 		
-		initVerticesBuffer(_subMesh);
-		initTexcoordsBuffer(_subMesh);
+		initVerticesBuffer();
+		initTexcoordsBuffer();
 	}
 	
-	private void initVerticesBuffer(SubMesh sm)
+	private void initVerticesBuffer()
 	{
 		float hx = _width / 2;
 		float hy = _height / 2;
@@ -32,11 +32,11 @@ public class Rectangle extends Mesh
 				 hx, -hy, 0
 		};
 		
-		sm.setVertices(vertices);	                             
+		_subMesh.setVertices(vertices);	                             
 	}
 	
 	
-	private void initTexcoordsBuffer(SubMesh sm)
+	private void initTexcoordsBuffer()
 	{
 		float[] texcoords = new float[]{
 				0.0f, 0.0f,
@@ -45,7 +45,7 @@ public class Rectangle extends Mesh
 				1.0f, 1.0f
 		};
 		
-		sm.setTexcoords(texcoords);
+		_subMesh.setTexcoords(texcoords);
 	}
 	
 	protected SubMesh	_subMesh;
