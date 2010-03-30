@@ -12,6 +12,11 @@ public class Scene
 		attachRenderQueue(renderQueue);
 	}
 	
+	public void bindCamera(Camera camera)
+	{
+		_camera = camera;
+	}
+	
 	
 	public void attachRenderQueue(RenderQueue renderQueue)
 	{
@@ -37,6 +42,7 @@ public class Scene
 	
 	private RenderQueue		_renderQueue;
 	private Movable			_root;
+	private Camera 			_camera;
 	private final String 	_name;
 	private final static String TAG = "Scene";
 }
