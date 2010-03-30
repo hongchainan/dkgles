@@ -2,6 +2,8 @@ package dkgles;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.util.Log;
+
 public class Material
 {
 	public Material(String name)
@@ -97,7 +99,7 @@ public class Material
 		return _name;
 	}
 	
-	public static GetDummyMaterial()
+	public static Material GetDummyMaterial()
 	{
 		return _dummy;
 	}
@@ -115,6 +117,12 @@ public class Material
 
 class DummyMaterial extends Material
 {
+	public DummyMaterial(String name)
+	{
+		super(name);
+		// TODO Auto-generated constructor stub
+	}
+
 	public void apply(GL10 gl)
 	{
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

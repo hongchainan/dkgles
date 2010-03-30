@@ -7,6 +7,8 @@ import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.util.Log;
+
 public class SubMesh
 {
 	public final static int DRAW_ARRAY 		= 0;
@@ -73,7 +75,7 @@ public class SubMesh
 
 abstract class RenderImpl
 {
-	public void render(GL10 gl);
+	public abstract void render(GL10 gl);
 	
 	public void setTexcoords(float[] texcoords)
 	{
@@ -119,7 +121,7 @@ abstract class RenderImpl
 		setIndicesBuffer(idxBuf);
   	}
 	
-	protected void enableClientState((GL10 gl)
+	protected void enableClientState(GL10 gl)
 	{
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
@@ -186,6 +188,7 @@ class DrawArrayImpl extends RenderImpl
 	private FloatBuffer 	_verticesBuffer;
 	private FloatBuffer 	_texcoordsBuffer;
 	private int	_vcount;
+	private final static String TAG = "DrawArrayImpl";
 }
 
 class DrawElementImpl extends RenderImpl
@@ -216,7 +219,7 @@ class DrawElementImpl extends RenderImpl
   	
   	public FloatBuffer getTextureBuffer()
   	{
-  		return _verticesBuffer;
+  		return _texcoordsBuffer;
   	}
   	
   	public FloatBuffer getVerticeBuffer()

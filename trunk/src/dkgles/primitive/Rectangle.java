@@ -1,8 +1,8 @@
 package dkgles.primitive;
 
 import dkgles.Material;
+import dkgles.Mesh;
 import dkgles.SubMesh;
-import javax.microedition.khronos.opengles.GL10;
 
 
 public class Rectangle extends Mesh
