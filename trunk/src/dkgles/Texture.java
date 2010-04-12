@@ -20,6 +20,11 @@ public class Texture
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, _gid);
 	}
 	
+	public String name()
+	{
+		return _name;
+	}
+	
 	public void release(GL10 gl)
 	{
 		int [] id = new int[1];

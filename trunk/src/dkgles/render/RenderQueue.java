@@ -1,17 +1,23 @@
 package dkgles.render;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import android.util.Log;
+import dkgles.Camera;
 import dkgles.Drawable;
 
-public class RenderQueue
+public abstract class RenderQueue implements Comparable<RenderQueue>
 {
-	public RenderQueue(String name, int count)
+	public final static int UI_LAYER = 100;
+	public final static int POST_EFFECT_LAYER = 1000;
+	
+	public RenderQueue(final String name, int count, int layer)
 	{
 		_name = name;
+		_layer = layer;
 		_groups = new Group[count];
 		
 		for (int i=0;i<count;i++)
@@ -20,6 +26,45 @@ public class RenderQueue
 		}
 		
 		_groupCount = count;
+		_visible = true;
+			
+		synchronized(RenderQueue.class)
+		{
+			_renderQueueList.add(this);
+			Collections.sort(_renderQueueList);
+		}
+	}
+	
+	public void release()
+	{
+		synchronized(RenderQueue.class)
+		{
+			_renderQueueList.remove(this);
+			Collections.sort(_renderQueueList);
+		}
+	}
+	
+	public int compareTo(RenderQueue another)
+	{
+		return _layer - another._layer;
+	}
+	
+	public void bindCamera(Camera camera)
+	{
+		_camera = camera;
+	}
+	
+	public synchronized void visibility(boolean b)
+	{
+		_visible = b;
+	}
+	
+	public synchronized static void renderAll(GL10 gl)
+	{
+		for (RenderQueue r : _renderQueueList)
+		{
+			r.render(gl);
+		}
 	}
 	
 	public synchronized void addDrawble(Drawable drawable)
@@ -54,16 +99,20 @@ public class RenderQueue
 	 * 
 	 * @param gl
 	 */
-	public synchronized void render(GL10 gl)
+	public void render(GL10 gl)
 	{
-		for (Group g : _groups)
+		if (!_visible)
+			return;
+		
+		if (_camera!=null)
 		{
-			if (g!=null)
-			{
-				g.render(gl);
-			}
+			gl.glLoadMatrixf(_camera.viewMatrix(), 0);
 		}
+		
+		renderImpl(gl);
 	}
+	
+	protected abstract void renderImpl(GL10 gl);
 	
 	public String toString()
 	{
@@ -110,8 +159,12 @@ public class RenderQueue
 		private ArrayList<Drawable> 	_drawables; 
 	}
 	
+	static ArrayList<RenderQueue> _renderQueueList = new ArrayList<RenderQueue>();
+	protected boolean _visible;
+	Camera	_camera;
 	private int 	_groupCount;
-	private Group[]	_groups;
+	int _layer;
+	protected Group[]	_groups;
 	private final String _name;
 	private final static String TAG = "RenderQueue";
 }

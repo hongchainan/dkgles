@@ -164,7 +164,7 @@ public class TextureManager
             	
             	Message msg = new Message();
     			msg.what = GL_TEXTURE_DELETION;
-    			msg.obj = t;
+    			msg.obj = t.name();
     			msg.arg1 = rsc_id;
     			_handler.sendMessage(msg);
             }
@@ -280,7 +280,7 @@ public class TextureManager
 	        		name = (String)msg.obj;
 	        		rsc_id = msg.arg1;
 	        		
-	        		listener = _listeners.get(msg.arg1);
+	        		listener = _listeners.get(rsc_id);
 	        		
 	        		if (listener!=null)
 	        		{

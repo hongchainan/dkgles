@@ -2,6 +2,7 @@ package dkgles.manager;
 
 import java.util.HashMap;
 
+import android.util.Log;
 import dkgles.Material;
 import dkgles.Texture;
 
@@ -31,8 +32,8 @@ public class MaterialManager implements TextureManager.EventListener
 	 */
 	public void releaseAll()
 	{
-		//TODO
 		_materials.clear();
+		_waitedTexs.clear();
 	}
 	
 	
@@ -77,9 +78,9 @@ public class MaterialManager implements TextureManager.EventListener
 		return id;
 	}
 	
-	public void onTextureDeleted(String name, int rscId) {
-		// TODO Auto-generated method stub
-		
+	public void onTextureDeleted(String name, int rscId)
+	{
+		Log.v(TAG, "onTextureDeleted:" + name);
 	}
 
 	public void onTextureLoaded(String name, int rscId)
@@ -90,6 +91,7 @@ public class MaterialManager implements TextureManager.EventListener
 		if (m!=null)
 		{
 			m.bindTexture(TextureManager.instance().get(rscId));
+			Log.v(TAG, m.name() + " bind texture:" + name);
 		}
 	}
 	
@@ -102,6 +104,6 @@ public class MaterialManager implements TextureManager.EventListener
 	private HashMap<String, Integer>	_waitedTexs;
 	private HashMap<Integer, Material> _materials;
 	private static MaterialManager _instance;
-	private final static String TAG = "MATERIAL_MANAGER";
+	private final static String TAG = "MaterialManager";
 
 }

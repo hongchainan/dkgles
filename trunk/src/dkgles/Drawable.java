@@ -48,13 +48,13 @@ public abstract class Drawable
 	}
 	
 	
-	public void setWorldTransformation(Transformation worldTransformation)
+	public synchronized void setWorldTransformation(Transformation worldTransformation)
 	{
 		_worldTransformation = worldTransformation;
 	}
 	
 	
-	public void render(GL10 gl)
+	public synchronized void render(GL10 gl)
 	{
 		if (!_visible)
 			return;
