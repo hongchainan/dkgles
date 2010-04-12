@@ -2,8 +2,6 @@ package dkgles.ui;
 
 import java.util.ArrayList;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,25 +9,12 @@ import android.view.View.OnTouchListener;
 import dkgles.Material;
 import dkgles.Movable;
 import dkgles.Scene;
-import dkgles.Transformation;
 import dkgles.android.wrapper.ServiceManager;
-import dkgles.render.OrthoRenderer;
+import dkgles.render.OrthoRenderQueue;
 import dkgles.render.RenderQueue;
 
-public class UIManager implements OnTouchListener
-{
-	
-	public static UIManager instance()
-	{	
-		if (_instance==null)
-		{
-			_instance = new UIManager();
-		}
-		
-		return _instance;
-	}
-	
-		
+public class UIManager extends Scene implements OnTouchListener
+{	
 	public Touchable createTouchable(String name, float width, float height, Material material, Movable node)
 	{
 		Touchable t = new Touchable(name, width, height, material);
@@ -42,18 +27,6 @@ public class UIManager implements OnTouchListener
 		
 		return t;
 	}
-	
-	
-	public void render(GL10 gl)
-	{
-		OrthoRenderer.instance().render(gl, _scene.getRenderQueue());	
-	}
-	
-	public void update()
-	{
-		_scene.root().updateTransformation(Transformation.identity(), false);
-	}
-	
 	
 	public void addTouchable(Touchable touchable)
 	{
@@ -140,25 +113,32 @@ public class UIManager implements OnTouchListener
 		_halfAsr = (_width / _height)/2.0f;
 	}
 	
-	public Movable root()
-	{
-		return _scene.root();
+	
+	
+	public static UIManager instance()
+	{	
+		if (_instance==null)
+		{
+			_instance = new UIManager();
+		}
+		
+		return _instance;
 	}
 	
 	private UIManager()
 	{
+		super("UIScene", new OrthoRenderQueue("UIRenderQueue", 5, RenderQueue.UI_LAYER));
 		_touchables = new ArrayList<Touchable>();
-		_scene 		= new Scene("UIScene", new RenderQueue("UIRenderQueue", 5));
 		_halfAsr = 0.5f;
 	}
 	
-	private Scene					_scene;
-	private ArrayList<Touchable> 	_touchables;
-	private float _width;
-	private float _height;
-	private float _halfAsr;	// Half value of aspect ratio
 	
-	private static UIManager 		_instance;
-	private static final String CLASS_TAG = "UIManager";
+	ArrayList<Touchable> 	_touchables;
+	float _width;
+	float _height;
+	float _halfAsr;	// Half value of aspect ratio
+	
+	static UIManager	_instance;
+	static final String CLASS_TAG = "UIManager";
 	
 }

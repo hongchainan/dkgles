@@ -53,7 +53,7 @@ public final class OrthoRenderer
 		_renderQueue.render(gl);
 	}
 	
-	private final void beginRender(GL10 gl)
+	public final void beginRender(GL10 gl)
 	{
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glPushMatrix();
@@ -63,7 +63,7 @@ public final class OrthoRenderer
 		gl.glLoadIdentity();
 	}
 	
-	private void endRender(GL10 gl)
+	public void endRender(GL10 gl)
 	{
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glPopMatrix();

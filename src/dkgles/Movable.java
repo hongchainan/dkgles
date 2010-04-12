@@ -180,7 +180,7 @@ public class Movable
 	}
 	
 	
-	public void updateTransformation(Transformation parentTransformation, boolean parentDirty)
+	public synchronized void updateTransformation(Transformation parentTransformation, boolean parentDirty)
 	{
 		if (_dirty||parentDirty)
 		{
@@ -189,7 +189,6 @@ public class Movable
 			if (_drawable != null)
 			{
 				_drawable.setWorldTransformation(_worldTransformationCache);
-				//_drawable.render();
 			}
 		}
 			
