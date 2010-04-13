@@ -1,33 +1,88 @@
 package dkgles;
 
+import dkgles.render.RenderQueue;
+
 public class SceneManager
 {
-	
-	private SceneManager()
+	/**
+	 * Create a scene
+	 * @param name
+	 * @param renderQueue
+	 * @return scene ID
+	 */
+	public int create(String name, RenderQueue renderQueue)
 	{
-		_root = new Movable("ROOT", null);
+		Scene s = new Scene(name, renderQueue);
+		return register(s);
 	}
 	
-	/**
-	 * Get root reference;
-	 * @return root
-	 */
-	public Movable root()
+	public int register(Scene scene)
 	{
-		return _root;
+		for (int i=0;i<MAX_SCENE;i++)
+		{
+			if (_scenes[i]==null)
+			{
+				_scenes[i] = scene;
+				return i;
+			}
+		}
+		
+		return -1;
+		
+	}
+	
+	public Scene get(int id)
+	{
+		return _scenes[id];
+	}
+	
+	public void release(int id)
+	{
+		if (_scenes[id]==null)
+			return;
+		
+		_scenes[id].release();
+		_scenes[id] = null;
+	}
+	
+	public void update()
+	{
+		for (int i=0;i<MAX_SCENE;i++)
+		{
+			if (_scenes[i]!=null)
+			{
+				_scenes[i].update();
+			}
+		}
+	}
+	
+	public void releaseAll()
+	{
+		for (int i=0;i<MAX_SCENE;i++)
+		{
+			release(i);
+		}
+	}
+	
+	protected void finalize()
+	{
+		releaseAll();
 	}
 	
 	public static SceneManager instance()
 	{
-		if (_instance==null)
-		{
-			_instance = new SceneManager();
-		}
-		
 		return _instance;
 	}
 	
-	private Movable _root;
 	
-	private static SceneManager _instance;
+	SceneManager()
+	{
+		_scenes = new Scene[MAX_SCENE];
+	}
+	
+	Scene[]	_scenes;
+	
+	public static final int MAX_SCENE = 8;
+	
+	static SceneManager _instance = new SceneManager();
 }

@@ -14,10 +14,10 @@ public class Scene
 		_root = new Movable("Root in " + _name, this);
 		attachRenderQueue(renderQueue);
 		
-		synchronized(Scene.class)
-		{
-			_sceneList.add(this);
-		}
+		//synchronized(Scene.class)
+		//{
+		//	_sceneList.add(this);
+		//}
 	}
 	
 	public void release()
@@ -25,10 +25,10 @@ public class Scene
 		visibility(false);
 		_renderQueue.release();
 		
-		synchronized(Scene.class)
-		{		
-			_sceneList.remove(this);
-		}
+		//synchronized(Scene.class)
+		//{		
+//			_sceneList.remove(this);
+	//	}
 	}
 
 	public void bindCamera(Camera camera)
@@ -67,7 +67,7 @@ public class Scene
 	{
 		return "Scene: " + _name;
 	}
-	
+	/*
 	public synchronized static void updateAll()
 	{
 		try
@@ -84,13 +84,9 @@ public class Scene
 			// java.lang.IllegalStateException   
 	        e.printStackTrace();   
 	    }   
-		/*for (Scene s : _sceneList)
-		{
-			s.update();
-		}*/
-	}
+	}*/
 	
-	static ArrayList<Scene>	_sceneList = new ArrayList<Scene>();
+	//static ArrayList<Scene>	_sceneList = new ArrayList<Scene>();
 	
 	private RenderQueue		_renderQueue;
 	private Movable			_root;
