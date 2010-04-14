@@ -5,6 +5,10 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLException;
 import android.util.Log;
 
+/**
+ *Abstract Drawable class
+ *@author doki lin
+ */
 public abstract class Drawable
 {
 	
@@ -13,17 +17,6 @@ public abstract class Drawable
 		_name = name;
 		_visible = true;
 		_groupID = 0;
-	}
-	
-	
-	public void show()
-	{
-		_visible = true;
-	}
-	
-	public void hide()
-	{
-		_visible = false;
 	}
 	
 	/**
@@ -41,19 +34,29 @@ public abstract class Drawable
 	{
 		return _groupID;
 	}
+
+	public void visibility(boolean val)
+	{
+		_visible = val;
+	}
 	
 	public boolean visible()
 	{
 		return _visible;
 	}
 	
-	
+	/**
+	 * Usually called in GameThread
+	 * To avoid race condition between GameThread and GLThread
+	 */
 	public synchronized void setWorldTransformation(Transformation worldTransformation)
 	{
 		_worldTransformation = worldTransformation;
 	}
 	
-	
+	/**
+	 *Should always called in GLThread
+	 */
 	public synchronized void render(GL10 gl)
 	{
 		if (!_visible)
@@ -84,6 +87,6 @@ public abstract class Drawable
 	protected int				_groupID;
 	protected String 			_name;
 	protected Transformation 	_worldTransformation;
-	private static final String TAG = "Drawable";
+	static final String TAG = "Drawable";
 	
 }

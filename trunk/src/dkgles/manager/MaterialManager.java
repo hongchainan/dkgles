@@ -6,83 +6,131 @@ import android.util.Log;
 import dkgles.Material;
 import dkgles.Texture;
 
+/**
+ *Usage:
+ *	int texID = R.drawable.my_texture
+ *	int mid = MaterialManager.instance().create("MAT_NAME", "TEX_NAME", texID);
+ *	Material m = MaterialManager.instance().get(mid);
+ *	MaterialManager.instance().destroy(mid);
+ */
 public class MaterialManager implements TextureManager.EventListener
 {
 	
 	public final static int BLACK_ID = 0;
 	
-	public static MaterialManager instance()
-	{
-		if (_instance==null)
-		{
-			_instance = new MaterialManager();
-		}
-		
-		return _instance;
-	}
-	
-	private MaterialManager()
-	{
-		_materials = new HashMap<Integer, Material>();
-		_waitedTexs = new HashMap<String, Integer>();
-	}
 	
 	/**
-	 * release all material resources
-	 */
-	public void releaseAll()
-	{
-		_materials.clear();
-		_waitedTexs.clear();
-	}
-	
-	
-	/**
-	 * return material ID
+	 * Create a material and return material ID
+	 *@param name a human readable string for debugging
+	 *@param texture A texture that can bind to or a null reference if you need flat color only.
 	 */
 	public int create(String name, Texture texture)
 	{
-		Material m = new Material(name);
+		Material material = new Material(name);
 		m.bindTexture(texture);
+		return register(material);
+	}
+
+	/**
+	 *An utility let you create material and texture at sametime
+	 *This method is equal to:
+	 *	TextureManager.instance().create(texName, rscId);
+	 *	MaterialManager.instance().create(matName, TextureManager.instance().get(rscId));
+	 *@param name A human readable name for material
+	 *@param texName name for texture
+	 *@param rscID resource ID for texture
+	 */
+	public int create(final String name, final String texName, final int rscId)
+	{
+		Material material = new Material(name);
+		_waitedTexs.put(texName, id);
+		TextureManager.instance().create(texName, rscId, this);
 		
-		int id = 0;
-		while (_materials.containsKey(id))
+		return register(material);
+	}
+
+	/**
+	 *Register a material object and return its ID
+	 */
+	public int register(Material material)
+	{
+		for (int i=0;i<MAX_MATERIALS;i++)
 		{
-			id++;
+			if (_materials[i]==null)
+			{
+				_materials[i] = material;
+				return i;
+			}
 		}
-		
-		_materials.put(id, m);
-		return id;
+		return -1;
+	}
+
+	/**
+	 *Get material by given ID
+	 */
+	public Material get(int mid)
+	{
+		return _materials[mid];
+	}
+
+	/**
+	 *Destroy material by given id
+	 */
+	public void destroy(int mid)
+	{
+		if (_materials[mid]!=null)
+		{
+			_materials[mid].release();
+			_materials[mid] = null;
+		}
+	}
+
+	/**
+	 *Release material manager
+	 */
+	public void release()
+	{
+		for (Material m : _materials)
+		{
+			if (m!=null)
+			{
+				m.release();
+			}
+		}
+
+		_materials = null;
 	}
 	
+	/**
+	 *@deprecated
+	 */
 	private int findKey()
 	{
-		int id = 0;
-		while (_materials.containsKey(id))
-		{
-			id++;
-		}
+		//int id = 0;
+		//while (_materials.containsKey(id))
+		//{
+		//	id++;
+		//}
 		
-		return id;
+		return 0;
 	}
 	
-	public int create(final String name, final String texName, final int rsc_id)
-	{
-		Material m = new Material(name);
-		int id = findKey();
-		_materials.put(id, m);
-		_waitedTexs.put(texName, id);
-		
-		TextureManager.instance().create(texName, rsc_id, this);
-		
-		return id;
-	}
 	
+	/**
+	 *@see TextureManager.EventListener
+	 *@see TextureManager#create
+	 */
+	@override
 	public void onTextureDeleted(String name, int rscId)
 	{
 		Log.v(TAG, "onTextureDeleted:" + name);
 	}
 
+	/**
+	 *@see TextureManager.EventListener
+	 *@see TextureManager#create
+	 */
+	@override
 	public void onTextureLoaded(String name, int rscId)
 	{
 		Integer key = _waitedTexs.get(name);
@@ -94,16 +142,26 @@ public class MaterialManager implements TextureManager.EventListener
 			Log.v(TAG, m.name() + " bind texture:" + name);
 		}
 	}
-	
-	public Material get(int mid)
+
+	public static MaterialManager instance()
 	{
-		Material m = _materials.get(mid); 
-		return m;
+		return _instance;
+	}
+
+	MaterialManager()
+	{
+		_materials = new Material[MAX_MATERIALS];
+		_waitedTexs = new HashMap<String, Integer>();
 	}
 	
-	private HashMap<String, Integer>	_waitedTexs;
-	private HashMap<Integer, Material> _materials;
-	private static MaterialManager _instance;
-	private final static String TAG = "MaterialManager";
+	
+
+	public final static int MAX_MATERIALS = 16;
+	
+	Material[] _materials;
+	
+	HashMap<String, Integer>	_waitedTexs;
+	static MaterialManager _instance = new MaterialManager();
+	final static String TAG = "MaterialManager";
 
 }

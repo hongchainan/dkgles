@@ -17,6 +17,17 @@ import android.os.Message;
 import android.util.Log;
 import dkgles.Texture;
 
+/**
+ *Use resource id (i.e. R.drawable.my_texture) as refer key
+ *Usage:
+ *	int TexID = R.drawable.my_texture;
+ *	TextureManager.instance().create("MY_TEXTURE", TexID, null);
+ *	Texture t = TextureManager.instance().get(TexID);
+ *	TextureManager.instance().destroy(TexID);
+ *TODO:
+ *	Make sure local event handler stay in UI Thread
+ *@author doki lin
+ */
 public class TextureManager
 {
 	public static TextureManager instance()
@@ -29,21 +40,36 @@ public class TextureManager
 		return _instance;
 	}
 	
+	/**
+	 *Set GL context
+	 */
 	public void setGL(GL10 gl)
 	{
 		_gl = gl;
 	}
 	
+	/**
+	 *Set GLSurfaceView. Since we have to schedual jobs to GLThreads
+	 *See: http://developer.android.com/reference/android/opengl/GLSurfaceView.html#queueEvent(java.lang.Runnable)
+	 *@see create
+	 *@see destroy
+	 */
 	public void setGLSurfaceView(GLSurfaceView glSurfaceView)
 	{
 		_glSurfaceView = glSurfaceView;
 	}
 	
+	/**
+	 *Set context reference
+	 */
 	public void setContext(Context context)
 	{
 		_context = context;
 	}
 	
+	/**
+	 *@deprecated
+	 */
 	public synchronized void initialize(Context context, GL10 gl)
 	{
 		_context = context;
@@ -51,13 +77,20 @@ public class TextureManager
 		_initialized = true;
 	}
 	
+	/**
+	 *@deprecated
+	 */
 	public boolean initialized()
 	{
 		return _initialized;
 	}
 	
 	/**
-	 *
+	 *Create a texture resource
+	 *Note: this operation is asynchronous. if you want to know whether the texture is ready, provide TextureManager.EventListener
+	 *@param name texture name for debugging issue
+	 *@param rsc_id resource id, EX: R.id.my_texture
+	 *@param listener if you want to know whether the texture you request is ready for use. or you can set it to null if you don't care
 	 */
 	public synchronized void create(final String name, final int rsc_id, final EventListener listener)
 	{
@@ -79,50 +112,13 @@ public class TextureManager
 				return;
 			}
 			
-			_listeners.put(rsc_id, listener);
-			_texLoaded = false;
+			if (listener!=null)
+			{
+				_listeners.put(rsc_id, listener);
+			}
 			
 			// issue a queued event to Renderer Thread
-			_glSurfaceView.queueEvent(new Runnable()
-			{
-                public void run()
-                {
-                	int[] id = new int[1];
-        			_gl.glEnable(GL10.GL_TEXTURE_2D);
-        			_gl.glGenTextures(1, id, 0);
-        			
-        			if (id[0]==0)
-        			{
-        				Log.e(TAG, "GL gens invalid id for:" + name);
-        				return;
-        			}
-        	        
-        			// 	Set default parameters
-        			_gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
-
-        			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
-        	                GL10.GL_LINEAR);
-        			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
-        	                GL10.GL_LINEAR);
-        			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
-        	        		GL10.GL_REPEAT);
-        			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
-        	        		GL10.GL_REPEAT);
-        			_gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE,
-        	        		GL10.GL_MODULATE);
-        	        
-        			GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-        			bitmap.recycle();
-        			
-        			// notify job is done
-        			Message msg = new Message();
-        			msg.what = GL_TEXTURE_GENERATION;
-        			msg.arg1 = rsc_id;
-        			msg.arg2 = id[0];
-        			msg.obj = name;
-        			_handler.sendMessage(msg);
-                }
-            });//End of queueEvnet of Surface View	 			
+			_glSurfaceView.queueEvent(new GLCreateTextureRequest(name, rscId, bitmap));	 			
 		}
 		catch(Resources.NotFoundException e)
 		{
@@ -133,44 +129,25 @@ public class TextureManager
 			Log.e(TAG, "catch a GLException:" + e.getMessage());
 		}
 		
-		/*while (!_texLoaded)
-		{
-			try
-			{
-				Thread.sleep(1);
-			}
-			catch (InterruptedException e)
-			{
-				
-			}
-		}*/
 	}
+
 	
-	public synchronized void release(final int rsc_id)
+	/**
+	 *Destroy texture by given resource ID
+	 */
+	public synchronized void destroy(final int rscId)
 	{
 		final Texture t = _textures.remove(rsc_id);
 		
 		if (t==null)
 			return;
-		
-		final int [] id = new int[1];
-		id[0] = t.glID();
-		
-		_glSurfaceView.queueEvent(new Runnable()
-		{
-            public void run()
-            {
-            	_gl.glDeleteTextures(1, id, 0);
-            	
-            	Message msg = new Message();
-    			msg.what = GL_TEXTURE_DELETION;
-    			msg.obj = t.name();
-    			msg.arg1 = rsc_id;
-    			_handler.sendMessage(msg);
-            }
-		});
+			
+		_glSurfaceView.queueEvent(new GLDeleteTextureRequest(t, rscId));
 	}
 	
+	/**
+	 *@deprecated
+	 */
 	public synchronized void releaseAll()
 	{
 		Log.v(TAG, "releaseAll()");
@@ -187,14 +164,16 @@ public class TextureManager
 		_textures.clear();
 	}
 	
-	
+	/**
+	 *Retrive texture by given resource ID
+	 */
 	public synchronized Texture get(int rsc_id)
 	{
 		return _textures.get(rsc_id);
 	}
 	
 	
-	private TextureManager()
+	TextureManager()
 	{
 		_textures 	= new HashMap<Integer, Texture>();
 		_listeners 	= new HashMap<Integer, EventListener>();
@@ -202,6 +181,9 @@ public class TextureManager
 		
 	}
 	
+	/**
+	 *Called by GC
+	 */
 	protected void finalize() throws Throwable 
 	{
 		Log.v(TAG, "finalize()");
@@ -216,25 +198,108 @@ public class TextureManager
 	    }
 	}
 	
-	private final static int GL_TEXTURE_GENERATION 	= 0;
-	private final static int GL_TEXTURE_DELETION 	= 1;
+	final static int GL_TEXTURE_GENERATION 	= 0;
+	final static int GL_TEXTURE_DELETION 	= 1;
 	
-	private TextureManagerHandler	_handler;
+	TextureManagerHandler	_handler;
 	
-	private Context			_context;
-	private GL10 			_gl;
-	private GLSurfaceView	_glSurfaceView;
-	private boolean 		_initialized;
-	private boolean 		_texLoaded;
+	Context		_context;
+	GL10 		_gl;
+	GLSurfaceView	_glSurfaceView;
+
+	// deprecated
+	boolean 		_initialized;
+	boolean 		_texLoaded;
 	
-	private HashMap<Integer, Texture> 		_textures;
-	private HashMap<Integer, EventListener>	_listeners;
+	//	
+	HashMap<Integer, Texture> 		_textures;
+	HashMap<Integer, EventListener>	_listeners;
 	
-	private static TextureManager _instance;
-	private final static String TAG = "TextureManager";
+	static TextureManager _instance;
+	final static String TAG = "TextureManager";
+
+	/**
+	 */
+	class GLCreateTextureRequest implements Runnable
+	{
+		GLCreateTextureRequest(final String name, final Bitmap bitmap, int rscId)
+		{
+			_name = name;
+			_bitmap = bitmap;
+			_rscId = rscId;
+		}
+
+		public void run()
+                {
+	               	int[] id = new int[1];
+       			_gl.glEnable(GL10.GL_TEXTURE_2D);
+			_gl.glGenTextures(1, id, 0);
+        			
+       			if (id[0]==0)
+       			{
+       				Log.e(TAG, "GL gens invalid id for:" + name);
+       				return;
+       			}
+        	        
+       			// Set default parameters
+       			_gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
+
+       			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
+	       	                GL10.GL_LINEAR);
+       			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
+	       	                GL10.GL_LINEAR);
+       			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
+       	        		GL10.GL_REPEAT);
+       			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
+       	        		GL10.GL_REPEAT);
+       			_gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE,
+       	        		GL10.GL_MODULATE);
+        	        
+        		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+        		bitmap.recycle();
+        			
+        		// notify job is done
+        		Message msg = new Message();
+        		msg.what = GL_TEXTURE_GENERATION;
+        		msg.arg1 = rsc_id;
+        		msg.arg2 = id[0];
+        		msg.obj = name;
+        		_handler.sendMessage(msg);
+                }
+
+		final String 	_name;
+		final Bitmap	_bitmap;
+		final int	_rscId;
+	}
+
+	/**/
+	class GLDeleteTextureRequest implements Runnable
+	{
+		public GLDeleteTextureRequest(final Texture texture, int rscId)
+		{
+			_texture = texture;
+			_rscId = rscId;
+		}
+	
+		public void run()
+        	{
+			int[] id = new int[1];
+			id[0] = _texture.glID();
+        		_gl.glDeleteTextures(1, id, 0);
+            	
+			Message msg = new Message();
+    			msg.what = GL_TEXTURE_DELETION;
+    			msg.obj = _texture.name();
+    			msg.arg1 = _rscId;
+    			_handler.sendMessage(msg);
+            	}
+
+		final Texture _texture;
+		int _rscId;
+	}
 	
 	/**
-	 * 
+	 * A listener used to notify whether texture created or deleted
 	 * @author doki
 	 *
 	 */
