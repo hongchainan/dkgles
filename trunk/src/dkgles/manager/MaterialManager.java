@@ -120,7 +120,7 @@ public class MaterialManager implements TextureManager.EventListener
 	 *@see TextureManager.EventListener
 	 *@see TextureManager#create
 	 */
-	@override
+	//@override
 	public void onTextureDeleted(String name, int rscId)
 	{
 		Log.v(TAG, "onTextureDeleted:" + name);
@@ -130,11 +130,11 @@ public class MaterialManager implements TextureManager.EventListener
 	 *@see TextureManager.EventListener
 	 *@see TextureManager#create
 	 */
-	@override
+	//@override
 	public void onTextureLoaded(String name, int rscId)
 	{
 		Integer key = _waitedTexs.get(name);
-		Material m = _materials.get(key);
+		Material m = _materials[key];
 		
 		if (m!=null)
 		{

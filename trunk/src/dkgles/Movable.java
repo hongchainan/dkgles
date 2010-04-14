@@ -24,7 +24,7 @@ public class Movable
 		_name = name;
 		_parent = parent;
 		_scene = scene;
-		_childList = new ArrayList<Movable>();
+		_children = new ArrayList<Movable>();
 		_localTransformation = new Transformation();
 		_worldTransformationCache = new Transformation();
 	}
@@ -185,11 +185,13 @@ public class Movable
 		}
 	}
 	
-	
+	/**
+	 *@deprecated
+	 */
 	public void addChild(Movable child)
 	{
 		child.setParent(this);
-		_childList.add(child);
+		_children.add(child);
 	}
 	
 	/**

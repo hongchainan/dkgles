@@ -20,7 +20,7 @@ public class Scene
 	public Scene(String name, RenderQueue renderQueue)
 	{
 		_name = name;
-		_root = new Movable("Root in " + _name, this);
+		_root = new Movable("Root in " + _name, null, this);
 		attachRenderQueue(renderQueue);
 	}
 	

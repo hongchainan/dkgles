@@ -18,6 +18,12 @@ public abstract class Drawable
 		_visible = true;
 		_groupID = 0;
 	}
+
+	
+	public void release()
+	{
+		//TODO
+	}
 	
 	/**
 	 * Set render group id

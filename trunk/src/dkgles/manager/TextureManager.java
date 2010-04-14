@@ -92,29 +92,29 @@ public class TextureManager
 	 *@param rsc_id resource id, EX: R.id.my_texture
 	 *@param listener if you want to know whether the texture you request is ready for use. or you can set it to null if you don't care
 	 */
-	public synchronized void create(final String name, final int rsc_id, final EventListener listener)
+	public synchronized void create(final String name, final int rscId, final EventListener listener)
 	{
 		if (_textures.containsKey(rsc_id))
 		{
-			Log.v(TAG, "found exist texture, name" + name + ",id: " + rsc_id);
+			Log.v(TAG, "found exist texture, name" + name + ",id: " + rscId);
 			return;
 		}
 		
 		try
 		{
 			final Bitmap bitmap = BitmapFactory.decodeStream(
-					_context.getResources().openRawResource(rsc_id));
+					_context.getResources().openRawResource(rscId));
 			
 			// may decode fail
 			if (bitmap==null)
 			{
-				Log.e(TAG, "failed to decode bitmap: " + rsc_id);
+				Log.e(TAG, "failed to decode bitmap: " + rscId);
 				return;
 			}
 			
 			if (listener!=null)
 			{
-				_listeners.put(rsc_id, listener);
+				_listeners.put(rscId, listener);
 			}
 			
 			// issue a queued event to Renderer Thread
@@ -122,7 +122,7 @@ public class TextureManager
 		}
 		catch(Resources.NotFoundException e)
 		{
-			Log.e(TAG, "resource not found, id: " + rsc_id);
+			Log.e(TAG, "resource not found, id: " + rscid);
 		}
 		catch(GLException e)
 		{
@@ -255,15 +255,15 @@ public class TextureManager
        			_gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE,
        	        		GL10.GL_MODULATE);
         	        
-        		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-        		bitmap.recycle();
+        		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, _bitmap, 0);
+        		_bitmap.recycle();
         			
         		// notify job is done
         		Message msg = new Message();
         		msg.what = GL_TEXTURE_GENERATION;
-        		msg.arg1 = rsc_id;
+        		msg.arg1 = _rscId;
         		msg.arg2 = id[0];
-        		msg.obj = name;
+        		msg.obj = _name;
         		_handler.sendMessage(msg);
                 }
 

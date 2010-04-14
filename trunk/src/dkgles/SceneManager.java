@@ -26,7 +26,7 @@ public class SceneManager
 	public int register(Scene scene)
 	{
 
-		for (int i=0;i<MAX_SCENE;i++)
+		for (int i=0;i<MAX_SCENES;i++)
 		{
 			if (_scenes[i]==null)
 			{
@@ -66,7 +66,7 @@ public class SceneManager
 	 */
 	public void removeAll()
 	{
-		for (int i=0;i<MAX_SCENE;i++)
+		for (int i=0;i<MAX_SCENES;i++)
 		{
 			remove(i);
 		}
@@ -85,7 +85,7 @@ public class SceneManager
 	 */
 	public void update()
 	{
-		for (int i=0;i<MAX_SCENE;i++)
+		for (int i=0;i<MAX_SCENES;i++)
 		{
 			if (_scenes[i]!=null)
 			{
@@ -100,7 +100,7 @@ public class SceneManager
 	 */
 	protected void finalize()
 	{
-		releaseAll();
+		release();
 	}
 	
 	public static SceneManager instance()
