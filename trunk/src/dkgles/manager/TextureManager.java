@@ -94,7 +94,7 @@ public class TextureManager
 	 */
 	public synchronized void create(final String name, final int rscId, final EventListener listener)
 	{
-		if (_textures.containsKey(rsc_id))
+		if (_textures.containsKey(rscId))
 		{
 			Log.v(TAG, "found exist texture, name" + name + ",id: " + rscId);
 			return;
@@ -118,11 +118,11 @@ public class TextureManager
 			}
 			
 			// issue a queued event to Renderer Thread
-			_glSurfaceView.queueEvent(new GLCreateTextureRequest(name, rscId, bitmap));	 			
+			_glSurfaceView.queueEvent(new GLCreateTextureRequest(name, bitmap, rscId));	 			
 		}
 		catch(Resources.NotFoundException e)
 		{
-			Log.e(TAG, "resource not found, id: " + rscid);
+			Log.e(TAG, "resource not found, id: " + rscId);
 		}
 		catch(GLException e)
 		{
@@ -137,7 +137,7 @@ public class TextureManager
 	 */
 	public synchronized void destroy(final int rscId)
 	{
-		final Texture t = _textures.remove(rsc_id);
+		final Texture t = _textures.remove(rscId);
 		
 		if (t==null)
 			return;
@@ -230,42 +230,37 @@ public class TextureManager
 		}
 
 		public void run()
-                {
-	               	int[] id = new int[1];
-       			_gl.glEnable(GL10.GL_TEXTURE_2D);
+		{
+			int[] id = new int[1];
+       		_gl.glEnable(GL10.GL_TEXTURE_2D);
 			_gl.glGenTextures(1, id, 0);
         			
-       			if (id[0]==0)
-       			{
-       				Log.e(TAG, "GL gens invalid id for:" + name);
-       				return;
-       			}
+       		if (id[0]==0)
+       		{
+       			Log.e(TAG, "GL gens invalid id for:" + _name);
+       			return;
+       		}
         	        
-       			// Set default parameters
-       			_gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
+       		// Set default parameters
+       		_gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
 
-       			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
-	       	                GL10.GL_LINEAR);
-       			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
-	       	                GL10.GL_LINEAR);
-       			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
-       	        		GL10.GL_REPEAT);
-       			_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
-       	        		GL10.GL_REPEAT);
-       			_gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE,
-       	        		GL10.GL_MODULATE);
+       		_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+       		_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+       		_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT);
+       		_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,	GL10.GL_REPEAT);
+       		_gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE);
         	        
-        		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, _bitmap, 0);
-        		_bitmap.recycle();
+        	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, _bitmap, 0);
+        	_bitmap.recycle();
         			
-        		// notify job is done
-        		Message msg = new Message();
-        		msg.what = GL_TEXTURE_GENERATION;
-        		msg.arg1 = _rscId;
-        		msg.arg2 = id[0];
-        		msg.obj = _name;
-        		_handler.sendMessage(msg);
-                }
+        	// notify job is done
+        	Message msg = new Message();
+        	msg.what = GL_TEXTURE_GENERATION;
+        	msg.arg1 = _rscId;
+        	msg.arg2 = id[0];
+        	msg.obj = _name;
+        	_handler.sendMessage(msg);
+		}
 
 		final String 	_name;
 		final Bitmap	_bitmap;
@@ -282,18 +277,18 @@ public class TextureManager
 		}
 	
 		public void run()
-        	{
+		{
 			int[] id = new int[1];
 			id[0] = _texture.glID();
-        		_gl.glDeleteTextures(1, id, 0);
+        	_gl.glDeleteTextures(1, id, 0);
             	
 			Message msg = new Message();
-    			msg.what = GL_TEXTURE_DELETION;
-    			msg.obj = _texture.name();
-    			msg.arg1 = _rscId;
-    			_handler.sendMessage(msg);
-            	}
-
+    		msg.what = GL_TEXTURE_DELETION;
+    		msg.obj = _texture.name();
+    		msg.arg1 = _rscId;
+    		_handler.sendMessage(msg);
+		}
+		
 		final Texture _texture;
 		int _rscId;
 	}

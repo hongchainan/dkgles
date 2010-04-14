@@ -27,7 +27,7 @@ public class MaterialManager implements TextureManager.EventListener
 	public int create(String name, Texture texture)
 	{
 		Material material = new Material(name);
-		m.bindTexture(texture);
+		material.bindTexture(texture);
 		return register(material);
 	}
 
@@ -43,10 +43,11 @@ public class MaterialManager implements TextureManager.EventListener
 	public int create(final String name, final String texName, final int rscId)
 	{
 		Material material = new Material(name);
+		int id = register(material); 
 		_waitedTexs.put(texName, id);
 		TextureManager.instance().create(texName, rscId, this);
 		
-		return register(material);
+		return id;
 	}
 
 	/**
