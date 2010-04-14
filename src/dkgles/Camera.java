@@ -12,7 +12,7 @@ public class Camera extends Movable
 	
 	public Camera(String name, Scene scene)
 	{
-		super(name, scene);
+		super(name, null, scene);
 		_nearPlane = 0.1f;
 		_farPlane = 10000.0f;
 		_fov = 45.0f;
