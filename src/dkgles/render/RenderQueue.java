@@ -26,6 +26,13 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 		}
 		
 		_groupCount = count;
+
+		_renderQueueList.add(this);
+	}
+
+	public void release()
+	{
+		_renderQueueList.remove(this);
 		_visible = true;
 			
 		synchronized(RenderQueue.class)
@@ -118,6 +125,10 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 	{
 		return _name;
 	}
+
+	static List<RenderQueue> _renderQueueList = new List<RenderQueue>();
+
+	
 	
 	class Group
 	{

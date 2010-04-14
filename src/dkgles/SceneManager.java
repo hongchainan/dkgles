@@ -4,6 +4,7 @@ import dkgles.render.RenderQueue;
 
 public class SceneManager
 {
+	final static int MAX_SCENE = 10;
 	/**
 	 * Create a scene
 	 * @param name
@@ -18,6 +19,7 @@ public class SceneManager
 	
 	public int register(Scene scene)
 	{
+
 		for (int i=0;i<MAX_SCENE;i++)
 		{
 			if (_scenes[i]==null)
@@ -30,12 +32,14 @@ public class SceneManager
 		return -1;
 		
 	}
+
 	
 	public Scene get(int id)
 	{
 		return _scenes[id];
 	}
 	
+
 	public void release(int id)
 	{
 		if (_scenes[id]==null)
@@ -72,8 +76,8 @@ public class SceneManager
 	public static SceneManager instance()
 	{
 		return _instance;
+
 	}
-	
 	
 	SceneManager()
 	{

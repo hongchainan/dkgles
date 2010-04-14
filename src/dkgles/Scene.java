@@ -6,57 +6,98 @@ import java.util.Iterator;
 import android.util.Log;
 import dkgles.render.RenderQueue;
 
+
+/**
+ *@autohor doki
+ *
+ */
 public class Scene
 {
+	/**
+	 *@param name A human readable string for debugging.
+	 *@param renderQueue used to place drawables in this scene.
+	 */
 	public Scene(String name, RenderQueue renderQueue)
 	{
 		_name = name;
 		_root = new Movable("Root in " + _name, this);
 		attachRenderQueue(renderQueue);
-		
-		//synchronized(Scene.class)
-		//{
-		//	_sceneList.add(this);
-		//}
 	}
 	
+	/**
+	 *Release self
+	 */
 	public void release()
 	{
 		visibility(false);
 		_renderQueue.release();
-		
-		//synchronized(Scene.class)
-		//{		
-//			_sceneList.remove(this);
-	//	}
+		_root.release();
+
+		_renderQueue = null;
+		_root = null;
 	}
 
+	/**
+	 *
+	 */
 	public void bindCamera(Camera camera)
 	{
 		_renderQueue.bindCamera(camera);
 	}
+
 	
+	/**
+	 *Called by GC
+	 */
+	protected void finalize() throws Throwable 
+	{
+		try
+		{
+			release();
+		}
+		finally
+		{
+			super.finalize();
+		}
+	}
+	
+	/**
+	 *Set visibility of this scene
+	 *@param val true for visible and otherwise.
+	 */
 	public void visibility(boolean b)
 	{
 		_renderQueue.visibility(b);
 	}
 	
+	/**
+	 *@param renderQueue used to place drawables in this scene
+	 */
 	public void attachRenderQueue(RenderQueue renderQueue)
 	{
 		Log.v(TAG, "attach render queue:" + renderQueue);
 		_renderQueue = renderQueue;
 	}
 	
+	/**
+	 *@return current render queue
+	 */
 	public RenderQueue getRenderQueue()
 	{
 		return _renderQueue;
 	}
 	
+	/**
+	 *@return root
+	 */
 	public Movable root()
 	{
 		return _root;
 	}
 	
+	/**
+	 *Update scene graph
+	 */
 	public synchronized void update()
 	{
 		_root.updateTransformation(Transformation.identity(), false);
@@ -67,30 +108,11 @@ public class Scene
 	{
 		return "Scene: " + _name;
 	}
-	/*
-	public synchronized static void updateAll()
-	{
-		try
-		{   
-			Iterator<Scene> iterator = _sceneList.iterator();   
-	        while (iterator.hasNext())
-	        {   
-	        	Scene s = (Scene)iterator.next();
-	        	s.update();
-	        }  
-	    }
-		catch (Exception e)
-	    {   
-			// java.lang.IllegalStateException   
-	        e.printStackTrace();   
-	    }   
-	}*/
 	
-	//static ArrayList<Scene>	_sceneList = new ArrayList<Scene>();
 	
-	private RenderQueue		_renderQueue;
-	private Movable			_root;
-	private Camera 			_camera;
-	private final String 	_name;
-	private final static String TAG = "Scene";
+	RenderQueue		_renderQueue;
+	Movable			_root;
+	Camera 			_camera;
+	final String 	_name;
+	final static String TAG = "Scene";
 }
