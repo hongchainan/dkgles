@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class SubMesh
 {
-	public final static int DRAW_ARRAY 		= 0;
+	public final static int DRAW_ARRAY 	= 0;
 	public final static int DRAW_ELEMENT 	= 1;
 	
 	
