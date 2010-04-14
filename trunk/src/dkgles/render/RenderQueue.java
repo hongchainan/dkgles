@@ -9,15 +9,26 @@ import android.util.Log;
 import dkgles.Camera;
 import dkgles.Drawable;
 
+/**
+ * RenderQueue is handled by Scene Object. End user should not operate them directly.
+ */
 public abstract class RenderQueue implements Comparable<RenderQueue>
 {
 	public final static int UI_LAYER = 100;
 	public final static int POST_EFFECT_LAYER = 1000;
 	
+	/**
+	 *@param name name for RenderQueue
+	 *@param count number of group count
+	 *@param layer layer depth
+	 */
 	public RenderQueue(final String name, int count, int layer)
 	{
 		_name = name;
 		_layer = layer;
+		_groupCount = count;
+		_visible = true;
+		
 		_groups = new Group[count];
 		
 		for (int i=0;i<count;i++)
@@ -25,25 +36,27 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 			_groups[i] = new Group(i);
 		}
 		
-		_groupCount = count;
-
-		_renderQueueList.add(this);
-	}
-
-	public void release()
-	{
-		_renderQueueList.remove(this);
-		_visible = true;
-			
 		synchronized(RenderQueue.class)
 		{
 			_renderQueueList.add(this);
 			Collections.sort(_renderQueueList);
 		}
 	}
-	
+
+	/**
+	 * Release this render queue
+	 */
 	public void release()
 	{
+
+		for (int i=0;i<_groupCount;i++)
+		{
+			_groups[i].release();
+			_groups[i] = null;
+		}
+
+		_groups = null;		
+
 		synchronized(RenderQueue.class)
 		{
 			_renderQueueList.remove(this);
@@ -51,16 +64,25 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 		}
 	}
 	
+	/**
+	 * Used in sort function
+	 */
 	public int compareTo(RenderQueue another)
 	{
 		return _layer - another._layer;
 	}
 	
+	/**
+	 *@deprecated
+	 */
 	public void bindCamera(Camera camera)
 	{
 		_camera = camera;
 	}
 	
+	/**
+	 *Set visibility
+	 */
 	public synchronized void visibility(boolean b)
 	{
 		_visible = b;
@@ -74,6 +96,9 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 		}
 	}
 	
+	/**
+	 *Add drawable to this render queue
+	 */
 	public synchronized void addDrawble(Drawable drawable)
 	{
 		int id = drawable.groupID();
@@ -91,7 +116,7 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 	}
 	
 	/**
-	 * 
+	 * Remove drawables
 	 * @param drawable
 	 */
 	public synchronized void removeDrawable(Drawable drawable)
@@ -103,7 +128,7 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 	}
 	
 	/**
-	 * 
+	 * Called in GLThread
 	 * @param gl
 	 */
 	public void render(GL10 gl)
@@ -129,7 +154,9 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 	static List<RenderQueue> _renderQueueList = new List<RenderQueue>();
 
 	
-	
+	/**
+	 * Group can hava arbitrary number of drawables
+	 */
 	class Group
 	{
 		public Group(int id)
@@ -166,16 +193,16 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 			}
 		}
 		
-		private int						_id;
-		private ArrayList<Drawable> 	_drawables; 
+		int	_id;
+		ArrayList<Drawable> 	_drawables; 
 	}
 	
 	static ArrayList<RenderQueue> _renderQueueList = new ArrayList<RenderQueue>();
 	protected boolean _visible;
 	Camera	_camera;
-	private int 	_groupCount;
+	int 	_groupCount;
 	int _layer;
 	protected Group[]	_groups;
-	private final String _name;
-	private final static String TAG = "RenderQueue";
+	final String _name;
+	final static String TAG = "RenderQueue";
 }
