@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import dkgles.math.MathUtils;
 
+/**
+ *@author doki lin
+ *TODO add synchronized modifier to let this class thread-safe
+ */
 public class Movable
 {
 	public static final int PARENT 	= 0;
@@ -11,11 +15,14 @@ public class Movable
 	
 	
 	
-	
-	public Movable(String name, Scene scene)
+	/**
+	 *@param name a human readable string for debugging
+	 *@param scene a scene that this movable stayin.
+	 */
+	public Movable(String name, Movable parent, Scene scene)
 	{
 		_name = name;
-		_parent = null;
+		_parent = parent;
 		_scene = scene;
 		_childList = new ArrayList<Movable>();
 		_localTransformation = new Transformation();
@@ -42,7 +49,7 @@ public class Movable
 		}
 		else
 		{
-			// throw exception
+			throw new IllegalArgumentException();
 		}
 		
 		_dirty = true;
@@ -61,7 +68,7 @@ public class Movable
 		}
 		else
 		{
-			// throw exception
+			throw new IllegalArgumentException();
 		}
 		
 		_dirty = true;
@@ -79,7 +86,6 @@ public class Movable
 		_localTransformation._matrix[12] = x;
 		_localTransformation._matrix[13] = y;
 		_localTransformation._matrix[14] = z;
-		
 		_dirty = true;
 	}
 	
@@ -91,13 +97,18 @@ public class Movable
 		_dirty = true;
 	}
 	
-	
+	/**
+	 *Move forward in local space
+	 *@param dist the distance to move
+	 */
 	public void moveForward(float dist)
 	{
 		translate(.0f, .0f, -dist, LOCAL);
 	}
 	
-	
+	/**
+	 *Move right in local space
+	 */
 	public void moveRight(float dist)
 	{
 		translate(dist, .0f, .0f, LOCAL);
@@ -143,7 +154,7 @@ public class Movable
 	 */
 	public Movable createChild(String name)
 	{
-		Movable child = new Movable(name, _scene);
+		Movable child = new Movable(name, this, _scene);
 		addChild(child);
 		return child;
 	}
@@ -153,6 +164,26 @@ public class Movable
 	{
 		return null;
 	}
+
+	/**
+	 *Release children and drawable
+	 */
+	public void release()
+	{
+		for (Movable m : _children)
+		{
+			m.release();
+		}
+
+		_children.clear();
+		_children = null;
+
+		if (_drawable!=null)
+		{
+			_drawable.release();
+			_drawable = null;
+		}
+	}
 	
 	
 	public void addChild(Movable child)
@@ -161,7 +192,10 @@ public class Movable
 		_childList.add(child);
 	}
 	
-	
+	/**
+	 *set drawable to this movable
+	 *@param drawable drawable object
+	 */
 	public void setDrawable(Drawable drawable)
 	{
 		_drawable = drawable;
@@ -174,12 +208,16 @@ public class Movable
 	}
 	
 	
-	private void setParent(Movable parent)
+	void setParent(Movable parent)
 	{
 		_parent = parent;
 	}
 	
-	
+	/**
+	 *Update world transformation by world = parent x local
+	 *@param parentTransformation transformation from parent node
+	 *@param parentDirty indicate if parent transformation is dirty since last update
+	 */
 	public synchronized void updateTransformation(Transformation parentTransformation, boolean parentDirty)
 	{
 		if (_dirty||parentDirty)
@@ -192,21 +230,32 @@ public class Movable
 			}
 		}
 			
-		for (Movable m : _childList)
+		for (Movable m : _children)
 		{
 			m.updateTransformation(_worldTransformationCache, _dirty);
 		}
 		
 		_dirty = false;
 	}
+
+	public String toString()
+	{
+		return _name;
+	}
+
+	protected void finalize()
+	{
+		release();
+	}
 	
 	protected Transformation	_localTransformation;
 	protected Transformation 	_worldTransformationCache;
-	protected boolean			_dirty;
+	protected boolean	_dirty;
 	
-	private String 			_name;
-	private List<Movable> 	_childList;
-	private Movable			_parent;
-	private Drawable		_drawable;
-	private Scene			_scene;
+	final String	_name;
+	
+	List<Movable> 	_children;
+	Movable		_parent;
+	Drawable	_drawable;
+	Scene		_scene;
 }

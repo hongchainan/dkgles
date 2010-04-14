@@ -4,12 +4,21 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.util.Log;
 
+/**
+ *@author doki lin
+ */
 public class Material
 {
 	public Material(String name)
 	{
 		_name = name;
 		rgba(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	public Material(String name, float r, float g, float b, float a)
+	{
+		_name = name;
+		rgba(r, g, b, a);
 	}
 	
 	public void rgb(float r, float g, float b)
@@ -83,6 +92,10 @@ public class Material
 		}
 	}
 	
+	/**
+	 *Apply this material to current render state
+	 *Should always called in GLThread
+	 */
 	public void apply(GL10 gl)
 	{
 		gl.glColor4f(_red, _green, _blue, _alpha);
@@ -98,21 +111,26 @@ public class Material
 	{
 		return _name;
 	}
+
+	public void release()
+	{
+		_texture = null;
+	}
 	
 	public static Material GetDummyMaterial()
 	{
 		return _dummy;
 	}
 	
-	private float _red;
-	private float _green;
-	private float _blue;
-	private float _alpha;
-	private Texture _texture;
-	private static DummyMaterial _dummy = new DummyMaterial("MAT_DUMMY");
+	float _red;
+	float _green;
+	float _blue;
+	float _alpha;
+	Texture _texture;
+	static DummyMaterial _dummy = new DummyMaterial("MAT_DUMMY");
 	
-	private final static String TAG = "Material";
-	private final String _name;
+	final static String TAG = "Material";
+	final String _name;
 }
 
 class DummyMaterial extends Material
@@ -120,7 +138,6 @@ class DummyMaterial extends Material
 	public DummyMaterial(String name)
 	{
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
 	public void apply(GL10 gl)
