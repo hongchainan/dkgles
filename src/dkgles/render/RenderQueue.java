@@ -2,6 +2,7 @@ package dkgles.render;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -150,9 +151,6 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 	{
 		return _name;
 	}
-
-	static List<RenderQueue> _renderQueueList = new List<RenderQueue>();
-
 	
 	/**
 	 * Group can hava arbitrary number of drawables
@@ -163,6 +161,11 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 		{
 			_id = id;
 			_drawables = new ArrayList<Drawable>();
+		}
+		
+		public void release()
+		{
+			
 		}
 		
 		public int id()
