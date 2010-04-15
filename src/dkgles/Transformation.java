@@ -112,7 +112,13 @@ public class Transformation implements Cloneable
 	
 	public Object clone() throws CloneNotSupportedException 
 	{
-		Transformation t 	= (Transformation)super.clone();
+		Transformation t = new Transformation();
+
+		for (int i=0;i<16;i++)
+		{
+			t._matrix[i] = _matrix[i];
+		}		
+		
 		return t;
 	}
 	
