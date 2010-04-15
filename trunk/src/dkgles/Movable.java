@@ -214,6 +214,16 @@ public class Movable
 	{
 		_parent = parent;
 	}
+
+	/**
+	 * Set transformation to Movable Object
+	 */
+	public synchronized void setTransformation(Transformation transformation)
+	{
+		// TODO use clone function
+		_localTransformation = transformation;
+		_dirty = true;
+	}
 	
 	/**
 	 *Update world transformation by world = parent x local
