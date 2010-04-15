@@ -221,7 +221,7 @@ public class Movable
 	public synchronized void setTransformation(Transformation transformation)
 	{
 		// TODO use clone function
-		_localTransformation = transformation;
+		_localTransformation = transformation.clone();
 		_dirty = true;
 	}
 	
