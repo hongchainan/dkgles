@@ -15,42 +15,74 @@ import dkgles.render.RenderQueue;
 
 public class UIManager extends Scene implements OnTouchListener
 {	
-	public Touchable createTouchable(String name, float width, float height, Material material, Movable node)
+	public int createTouchable(String name, float width, float height, Material material, Movable node)
 	{
-		Touchable t = new Touchable(name, width, height, material);
-		addTouchable(t);
+		Touchable touchable = new Touchable(name, width, height, material);
 		
 		if (node!=null)
 		{
-			node.setDrawable(t);	
+			node.setDrawable(touchable);	
 		}
 		
-		return t;
+		return register(touchable);
 	}
 	
+	/**
+	 * Register touchable
+	 * @param touchable
+	 * @return
+	 */
+	public int register(Touchable touchable)
+	{
+		for (int i=0;i<MAX_TOUCHABLES;i++)
+		{
+			if (_touchables[i]==null)
+			{
+				_touchables[i] = touchable;
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	/**
+	 * Get touchable by given id
+	 * @param id
+	 * @return
+	 */
+	public Touchable get(int id)
+	{
+		return _touchables[id];
+	}
+	
+	/**
+	 * Destroy touchable by given id
+	 * @param id
+	 */
+	public void destroy(int id)
+	{
+		if (_touchables[id]!=null)
+		{
+			_touchables[id].release();
+			_touchables[id] = null;
+		}
+	}
+	
+	public void destroyAll()
+	{
+		
+	}
+	
+	/**
+	 * @deprecated
+	 * @param touchable
+	 */
 	public void addTouchable(Touchable touchable)
 	{
-		_touchables.add(touchable);
+		//_touchables.add(touchable);
 	}
-	
-	
-	public void touch(float x, float y)
-	{
-		/*float _x = (x - _width/2)/ _height;
-		float _y = -(y - _height/2) / _height;
 		
-		Log.d(CLASS_TAG, "touch:" + _x + ", " + _y);
-		
-		for (Touchable touchable : _touchables)
-		{
-			if (touchable.hit(_x, _y))
-			{
-				ServiceManager.instance().vibrator().vibrate(100);
-				touchable.touch();
-			}
-		}*/
-	}
-	
 	/**
 	 * Called by Android View.onTocch framework
 	 */
@@ -63,13 +95,16 @@ public class UIManager extends Scene implements OnTouchListener
 		if (action == MotionEvent.ACTION_DOWN)
 		{
 			Log.v(CLASS_TAG, "action down!!" + x + ", " + y);
+			ServiceManager.instance().vibrator().vibrate(70);
 			
 			for (Touchable touchable : _touchables)
 			{
-				if (touchable.hit(x, y))
+				if (touchable!=null)
 				{
-					touchable.touch();
-					ServiceManager.instance().vibrator().vibrate(50);
+					if (touchable.hit(x, y))
+					{
+						touchable.touch();			
+					}
 				}
 			}
 		}
@@ -79,27 +114,35 @@ public class UIManager extends Scene implements OnTouchListener
 			
 			for (Touchable touchable : _touchables)
 			{
-				if (touchable.beTouched())
+				if (touchable!=null)
 				{
-					touchable.unTouch();
+					if (touchable.beTouched())
+					{
+						touchable.unTouch();
+					}
 				}
-				
-				/*if (touchable.hit(x, y))
-				{
-					touchable.unTouch();
-				}*/
 			}
 		}
 		
-		return false;
+		return true;
 	}
 	
-	private float transformX(float x)
+	/**
+	 * Internal use.
+	 * @param x
+	 * @return
+	 */
+	float transformX(float x)
 	{
 		return (x / _height) - _halfAsr;
 	}
 	
-	private float transformY(float y)
+	/**
+	 * Internal use
+	 * @param y
+	 * @return
+	 */
+	float transformY(float y)
 	{
 		return 0.5f - (y / _height);
 	}
@@ -117,28 +160,27 @@ public class UIManager extends Scene implements OnTouchListener
 	
 	public static UIManager instance()
 	{	
-		if (_instance==null)
-		{
-			_instance = new UIManager();
-		}
-		
 		return _instance;
 	}
 	
-	private UIManager()
+	UIManager()
 	{
 		super("UIScene", new OrthoRenderQueue("UIRenderQueue", 5, RenderQueue.UI_LAYER));
-		_touchables = new ArrayList<Touchable>();
+		//_touchables = new ArrayList<Touchable>();
+		_touchables = new Touchable[MAX_TOUCHABLES];
 		_halfAsr = 0.5f;
 	}
 	
+	public final static int MAX_TOUCHABLES = 8;
+	Touchable[]	_touchables;
 	
-	ArrayList<Touchable> 	_touchables;
+	
+	//ArrayList<Touchable> 	_touchables;
 	float _width;
 	float _height;
 	float _halfAsr;	// Half value of aspect ratio
 	
-	static UIManager	_instance;
+	static UIManager	_instance = new UIManager();
 	static final String CLASS_TAG = "UIManager";
 	
 }
