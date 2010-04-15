@@ -22,6 +22,10 @@ public class Touchable extends Rectangle
 		_enable = true;
 	}
 	
+	/**
+	 * Bind a touch event handler
+	 * @param handler
+	 */
 	public void bindTouchEventHandler(ITouchEventHandler handler)
 	{
 		if (handler!=null)
@@ -34,6 +38,10 @@ public class Touchable extends Rectangle
 		}
 	}
 	
+	/**
+	 * Enable/ Disable this touchable
+	 * @param val
+	 */
 	public void enable(boolean val)
 	{
 		_enable = val;
@@ -65,11 +73,19 @@ public class Touchable extends Rectangle
 		return true;
 	}
 	
+	/**
+	 * Query whether is it touched
+	 * @return
+	 */
 	public boolean beTouched()
 	{
 		return _touched; 
 	}
 	
+	/**
+	 * Should be called by UI manager always
+	 * Do not call it directly.
+	 */
 	public synchronized void touch()
 	{
 		if (!_enable)
@@ -80,6 +96,10 @@ public class Touchable extends Rectangle
 		Log.v(TAG, _name + " touch!!");
 	}
 	
+	/**
+	 * Should be called by UI manager always
+	 * Do not call it directly.
+	 */
 	public synchronized void unTouch()
 	{
 		if (!_enable)
@@ -96,16 +116,21 @@ public class Touchable extends Rectangle
 		worldTransformation.getTranslation(_position);
 	}
 	
-	private final static String TAG = "Touchable";
-	private boolean _enable;
-	private boolean _touched;
-	private ITouchEventHandler _handler;
-	private static NilTouchEventHandler _nilTouchEventHandler = new NilTouchEventHandler();
+	final static String TAG = "Touchable";
+	boolean _enable;
+	boolean _touched;
+	ITouchEventHandler _handler;
+	static NilTouchEventHandler _nilTouchEventHandler = new NilTouchEventHandler();
 	
 	protected float[] _position;
 	
 }
 
+/**
+ * A dummy touchable
+ * @author doki
+ *
+ */
 class NilTouchEventHandler implements Touchable.ITouchEventHandler
 {
 	public void touch(final int id)

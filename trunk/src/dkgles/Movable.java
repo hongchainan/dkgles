@@ -217,11 +217,12 @@ public class Movable
 
 	/**
 	 * Set transformation to Movable Object
+	 * @throws CloneNotSupportedException 
 	 */
-	public synchronized void setTransformation(Transformation transformation)
+	public synchronized void setTransformation(Transformation transformation) throws CloneNotSupportedException
 	{
 		// TODO use clone function
-		_localTransformation = transformation.clone();
+		_localTransformation = (Transformation) transformation.clone();
 		_dirty = true;
 	}
 	

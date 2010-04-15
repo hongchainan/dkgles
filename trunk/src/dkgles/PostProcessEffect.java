@@ -19,9 +19,9 @@ public class PostProcessEffect extends Scene
 		visibility(true);
 	}
 	
-	public synchronized void update()
+	public synchronized void updateSceneGraph()
 	{
-		super.update();
+		super.updateSceneGraph();
 		
 		if (_animation!=null)
 		{

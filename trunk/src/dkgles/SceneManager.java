@@ -83,13 +83,24 @@ public class SceneManager
 	/**
 	 *Update scenes
 	 */
-	public void update()
+	public void updateSceneGraph()
 	{
 		for (int i=0;i<MAX_SCENES;i++)
 		{
 			if (_scenes[i]!=null)
 			{
-				_scenes[i].update();
+				_scenes[i].updateSceneGraph();
+			}
+		}
+	}
+	
+	public void updateHandler(long deltaTime)
+	{
+		for (int i=0;i<MAX_SCENES;i++)
+		{
+			if (_scenes[i]!=null)
+			{
+				_scenes[i].updateHandler(deltaTime);
 			}
 		}
 	}

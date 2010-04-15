@@ -13,6 +13,11 @@ import dkgles.render.RenderQueue;
  */
 public class Scene
 {
+	public interface IHandler
+	{
+		public void update(long deltaTime);
+	}
+	
 	/**
 	 *@param name A human readable string for debugging.
 	 *@param renderQueue used to place drawables in this scene.
@@ -43,6 +48,11 @@ public class Scene
 	public void bindCamera(Camera camera)
 	{
 		_renderQueue.bindCamera(camera);
+	}
+	
+	public void bindHandler(IHandler handler)
+	{
+		_handler = handler;
 	}
 
 	
@@ -98,9 +108,17 @@ public class Scene
 	/**
 	 *Update scene graph
 	 */
-	public synchronized void update()
+	public synchronized void updateSceneGraph()
 	{
 		_root.updateTransformation(Transformation.identity(), false);
+	}
+	
+	public void updateHandler(long deltaTime)
+	{
+		if (_handler!=null)
+		{
+			_handler.update(deltaTime);
+		}
 	}
 	
 	
@@ -113,6 +131,7 @@ public class Scene
 	RenderQueue		_renderQueue;
 	Movable			_root;
 	Camera 			_camera;
+	IHandler		_handler;
 	final String 	_name;
 	final static String TAG = "Scene";
 }

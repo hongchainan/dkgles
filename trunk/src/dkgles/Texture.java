@@ -47,6 +47,10 @@ public class Texture
 		gl.glDeleteTextures(1, id, 0);
 	}
 	
+	/**
+	 * 
+	 * @return id for OpenGL
+	 */
 	public int glID()
 	{
 		return _gid;
