@@ -56,7 +56,7 @@ public class Movable
 	}
 	
 	
-	public void translate(float x, float y, float z, int space)
+	public synchronized void translate(float x, float y, float z, int space)
 	{
 		if (space == LOCAL)
 		{
@@ -89,7 +89,7 @@ public class Movable
 		_dirty = true;
 	}
 	
-	public void scale(float x, float y, float z)
+	public synchronized void scale(float x, float y, float z)
 	{
 		_localTransformation._matrix[0] = x;
 		_localTransformation._matrix[5] = y;
