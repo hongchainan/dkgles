@@ -88,6 +88,9 @@ public class UIManager extends Scene implements OnTouchListener
 	 */
 	public boolean onTouch(View v, MotionEvent event)
 	{
+		if (!_enable)
+			return false;
+		
 		float x = transformX(event.getX());
 		float y = transformY(event.getY());
 		int action = event.getAction();
@@ -156,6 +159,11 @@ public class UIManager extends Scene implements OnTouchListener
 		_halfAsr = (_width / _height)/2.0f;
 	}
 	
+	public void enable(boolean val)
+	{
+		_enable = val;
+	}
+	
 	
 	
 	public static UIManager instance()
@@ -169,12 +177,13 @@ public class UIManager extends Scene implements OnTouchListener
 		//_touchables = new ArrayList<Touchable>();
 		_touchables = new Touchable[MAX_TOUCHABLES];
 		_halfAsr = 0.5f;
+		_enable = true;
 	}
 	
 	public final static int MAX_TOUCHABLES = 8;
 	Touchable[]	_touchables;
 	
-	
+	boolean _enable;
 	//ArrayList<Touchable> 	_touchables;
 	float _width;
 	float _height;
