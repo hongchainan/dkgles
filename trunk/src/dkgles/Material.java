@@ -81,7 +81,9 @@ public class Material
 	
 	public void bindTexture(Texture texture)
 	{
-		if (texture!=null)
+		_texture = texture;
+		
+		/*if (texture!=null)
 		{
 			_texture = texture;
 		}
@@ -89,7 +91,7 @@ public class Material
 		{
 			Log.v("TAG", _name + "bind a dummy texture");
 			_texture = Texture.GetDummyTexture();
-		}
+		}*/
 	}
 	
 	/**
@@ -99,7 +101,16 @@ public class Material
 	public void apply(GL10 gl)
 	{
 		gl.glColor4f(_red, _green, _blue, _alpha);
-		_texture.bind(gl);
+		
+		if (_texture!=null)
+		{
+			gl.glEnable(GL10.GL_TEXTURE_2D);
+			_texture.bind(gl);
+		}
+		else
+		{
+			gl.glDisable(GL10.GL_TEXTURE_2D);
+		}
 	}
 	
 	public String name()
