@@ -1,7 +1,18 @@
 package dkgles.manager;
 
+import java.io.InputStream;
 import java.util.HashMap;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+
+import android.content.Context;
 import android.util.Log;
 import dkgles.Material;
 import dkgles.Texture;
@@ -103,6 +114,35 @@ public class MaterialManager implements TextureManager.EventListener
 	}
 	
 	/**
+	 * Parse material from xml
+	 */
+	public void parse(Context context, int rscId)
+	{
+		InputStream istream = null;
+		try {
+			istream = context.getResources().openRawResource(rscId);
+
+			// Get a SAXParser from the SAXPArserFactory. 
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+			SAXParser sp = spf.newSAXParser();
+			// 	Get the XMLReader of the SAXParser we created. 
+			XMLReader xr = sp.getXMLReader();
+			// 	Create a new ContentHandler and apply it to the XML-Reader
+			MaterialDefHandler handler = new MaterialDefHandler();
+			xr.setContentHandler(handler);
+			//Log.v(logCat, "Calling parse() in ReadTourFromLocal: "+filename);
+			// 	Parse the xml-data from our URL. 
+			InputSource is = new InputSource(istream); 
+
+			xr.parse(is);
+		}
+		catch(Exception e)
+		{
+			Log.e(TAG, e.getMessage());
+		}
+	}
+	
+	/**
 	 *@deprecated
 	 */
 	private int findKey()
@@ -166,3 +206,69 @@ public class MaterialManager implements TextureManager.EventListener
 	final static String TAG = "MaterialManager";
 
 }
+
+class MaterialDefHandler extends DefaultHandler
+{
+	@Override
+    public void startDocument() throws SAXException 
+    {
+    }
+	
+	@Override
+    public void endDocument() throws SAXException 
+    {
+		// Nothing to do
+	}
+	
+	@Override
+	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException 
+	{
+		Log.v(TAG, "startElement");
+		/*if (localName.equals("login")) {
+                 this.login = true;
+           } else if (localName.equals("status")) {
+                 this.status = true;
+           } else if (localName.equals("message")) {
+                 this.message = true;
+           }*/
+	}
+	 
+    @Override
+    public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
+    {
+    	Log.v(TAG, "endElement");
+    	/*
+    	if (localName.equals("login"))
+                 this.login = false;
+           else if (localName.equals("status"))
+                 this.status = false;
+           else if (localName.equals("message"))
+                 this.message = false;
+                 */
+    }
+    
+    final static String TAG = "MaterialDefHandler";
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
