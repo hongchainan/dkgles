@@ -14,7 +14,7 @@ public class Material
 		_name = name;
 		rgba(1.0f, 1.0f, 1.0f, 1.0f);
 	}
-
+	
 	public Material(String name, float r, float g, float b, float a)
 	{
 		_name = name;

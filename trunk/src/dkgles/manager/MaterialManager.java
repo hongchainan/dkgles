@@ -114,7 +114,7 @@ public class MaterialManager implements TextureManager.EventListener
 	}
 	
 	/**
-	 * Parse material from xml
+	 * Parse material from xml 
 	 */
 	public void parse(Context context, int rscId)
 	{
@@ -224,28 +224,46 @@ class MaterialDefHandler extends DefaultHandler
 	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException 
 	{
 		Log.v(TAG, "startElement");
-		/*if (localName.equals("login")) {
-                 this.login = true;
-           } else if (localName.equals("status")) {
-                 this.status = true;
-           } else if (localName.equals("message")) {
-                 this.message = true;
-           }*/
+		
+		//_name = localName;
+		
+		_name = atts.getValue("name");
+		_red = parseFloat(atts, "red", 1.0f);
+		_green = parseFloat(atts, "green", 1.0f);
+		_blue = parseFloat(atts, "blue", 1.0f);
+		_alpha = parseFloat(atts, "alpha", 1.0f);
+	}
+	
+	float parseFloat(Attributes atts, String name, float defaultVal)
+	{
+		float val;
+		
+		try
+		{
+			val = Float.parseFloat(atts.getValue(name));
+		}
+		catch(Exception e)
+		{
+			val = defaultVal;
+		}
+		
+		return val;
 	}
 	 
     @Override
     public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
     {
     	Log.v(TAG, "endElement");
-    	/*
-    	if (localName.equals("login"))
-                 this.login = false;
-           else if (localName.equals("status"))
-                 this.status = false;
-           else if (localName.equals("message"))
-                 this.message = false;
-                 */
+    	
+    	Material m = new Material(_name, _red, _green, _blue, _alpha);
+    	MaterialManager.instance().register(m);
     }
+    
+    String _name;
+    float	_alpha;
+    float	_red;
+    float	_green;
+    float	_blue;
     
     final static String TAG = "MaterialDefHandler";
 }
