@@ -1,9 +1,22 @@
 package dkgles.manager;
 
+import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import lost.kapa.R;
+import lost.kapa.R.drawable;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -15,6 +28,7 @@ import android.opengl.GLUtils;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import dkgles.Material;
 import dkgles.Texture;
 
 /**
@@ -353,4 +367,131 @@ public class TextureManager
 	        super.handleMessage(msg);  
 		}//End of handleMessage
 	}
+	
+	public void parse(Context context, int rscId)
+	{
+		InputStream istream = null;
+		try {
+			istream = context.getResources().openRawResource(rscId);
+
+			// Get a SAXParser from the SAXPArserFactory. 
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+			SAXParser sp = spf.newSAXParser();
+			// 	Get the XMLReader of the SAXParser we created. 
+			XMLReader xr = sp.getXMLReader();
+			// 	Create a new ContentHandler and apply it to the XML-Reader
+			xr.setContentHandler(new TextureDefHandler());
+			//Log.v(logCat, "Calling parse() in ReadTourFromLocal: "+filename);
+			// 	Parse the xml-data from our URL. 
+			InputSource is = new InputSource(istream); 
+
+			xr.parse(is);
+		}
+		catch(Exception e)
+		{
+			Log.e(TAG, e.getMessage());
+		}
+	}
 }
+
+class TextureDefHandler extends DefaultHandler
+{
+	public TextureDefHandler()
+	{
+		initReflection();
+	}
+	
+	@Override
+	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException 
+	{
+		Log.v(TAG, "startElement");
+		
+		_name = atts.getValue("name");
+		_rscId = atts.getValue("rsc_id");
+		
+		//_name = localName;
+	}
+	
+	@Override
+    public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
+    {
+    	Log.v(TAG, "endElement");
+    	TextureManager.instance().create(_name, getRscIdByName(_rscId), null);
+    }
+	
+	public void endDocument() throws SAXException 
+    {
+		// Nothing to do
+	}
+	
+	int getRscIdByName(String name)
+	{
+		int id = -1;
+		try {
+			Field field = _R_drawableClass.getField(name);
+			id = field.getInt(_R_drawableObject);	
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return id;
+	}
+	
+	void initReflection()
+	{	
+		String n;
+		try {
+			Class c = Class.forName("lost.kapa.R");
+			Class[] innerClasses = c.getDeclaredClasses();
+			
+			for (int i=0;i<innerClasses.length;i++)
+			{
+				n = innerClasses[i].getName();
+				if (innerClasses[i].getName().equals("lost.kapa.R$drawable"))
+				{
+					_R_drawableClass = innerClasses[i]; 
+					_R_drawableObject = innerClasses[i].newInstance();
+					break;
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	Object 	_R_drawableObject;
+	Class	_R_drawableClass;
+	
+	String _name;
+	String _rscId;
+	
+	final static String TAG = "TextureDefHandler";
+}
+
+
+
+
+
+
+
+
+
+
+
+
