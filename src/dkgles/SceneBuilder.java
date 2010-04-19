@@ -54,7 +54,7 @@ public class SceneBuilder extends DefaultHandler
 		_movableStack = new Stack<Movable>();
 		_movable = null;
 		_scene = null;
-		//_listener = _defaultListener;
+		_listener = new Listener();
 	}
 	
 	@Override
@@ -222,7 +222,7 @@ public class SceneBuilder extends DefaultHandler
 
 	Listener _listener;
 
-	//static final Listener _defaultListener;// = //new Listener();
+	static Listener _defaultListener;// = new Listener();
 }
 
 
