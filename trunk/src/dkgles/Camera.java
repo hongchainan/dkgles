@@ -10,9 +10,9 @@ public class Camera extends Movable
 {
 	public static final int PERSPECTIVE = 0;
 	
-	public Camera(String name, Scene scene)
+	public Camera(String name, Movable parent, Scene scene)
 	{
-		super(name, null, scene);
+		super(name, parent, scene);
 		_nearPlane = 0.1f;
 		_farPlane = 10000.0f;
 		_fov = 45.0f;
