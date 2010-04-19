@@ -11,7 +11,7 @@ public class Mesh extends Drawable
 {
 	/**
 	 *@param name a human readable string for debugging
-	 &@param subMeshCount total account of sub meshes.
+	 *@param subMeshCount total account of sub meshes.
 	 */
 	public Mesh(String name, int subMeshCount)
 	{
@@ -27,7 +27,17 @@ public class Mesh extends Drawable
 	}
 	
 	/**
-	 *Set sub mesh by index
+	 * Set Material by given index
+	 * @param index
+	 * @param material
+	 */
+	public void setMaterial(int index, Material material)
+	{
+		_subMeshes[index].setMaterial(material);
+	}
+	
+	/**
+	 * Set sub mesh by index
 	 */
 	protected void setSubMesh(int index, SubMesh sm)
 	{

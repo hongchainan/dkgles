@@ -90,7 +90,7 @@ public class MaterialManager implements TextureManager.EventListener
 	 */
 	public Material getByName(String name)
 	{
-		return _materials[getByName(name)];
+		return _materials[findIdByName(name)];
 	}
 
 	/**
@@ -256,7 +256,8 @@ class MaterialDefHandler extends DefaultHandler
 		if (localName.equals("material"))
 		{
 			Material m = new Material(
-				parseString(atts, "name", "N/A"),
+				"name",
+				//parseString(atts, "name", "N/A"),
 				parseFloat(atts, "red", 1.0f),
 				parseFloat(atts, "green", 1.0f),
 				parseFloat(atts, "blue", 1.0f),
