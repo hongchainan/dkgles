@@ -1,9 +1,28 @@
 package dkgles;
 
+import java.util.Stack;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import android.util.Log;
+import dkgles.manager.MaterialManager;
+import dkgles.primitive.Rectangle;
+import dkgles.render.OrthoRenderQueue;
+import dkgles.render.PerspectiveRenderQueue;
+import dkgles.render.RenderQueue;
+
 public class SceneBuilder extends DefaultHandler
 {
 	public class Listener
 	{
+		public Listener()
+		{
+			
+		}
+		
+		
 		public void onCameraCreated(Camera camera)
 		{
 		}
@@ -25,7 +44,7 @@ public class SceneBuilder extends DefaultHandler
 		}
 		else
 		{
-			_listener = _defaultListener;
+			_listener = new Listener();
 		}
 	}	
 
@@ -35,7 +54,7 @@ public class SceneBuilder extends DefaultHandler
 		_movableStack = new Stack<Movable>();
 		_movable = null;
 		_scene = null;
-		_listener = _defaultListener;
+		//_listener = _defaultListener;
 	}
 	
 	@Override
@@ -47,19 +66,19 @@ public class SceneBuilder extends DefaultHandler
 	@Override
 	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException 
 	{
-		Log.v(TAG, "startElement");
+		//Log.v(TAG, "startElement");
 
-		if (loaclName.equals("scene"))
+		if (localName.equals("scene"))
 		{
-			_scene = new Scene(parseString(atts, "name", "Scene:N/A"));
+			_scene = new Scene(parseString(atts, "name", "Scene:N/A"), null);
 			_movable = _scene.root();	
 		}
 		else if (localName.equals("render_queue"))
 		{
 			RenderQueue renderQueue;
-			String type = parseString(atts, "type"), "perspective");
+			String type = parseString(atts, "type", "perspective");
 			
-			if (type.equals("perspective")
+			if (type.equals("perspective"))
 			{
 				renderQueue = new PerspectiveRenderQueue(
 					parseString(atts, "name", "N/A"),
@@ -124,7 +143,7 @@ public class SceneBuilder extends DefaultHandler
 	@Override
 	public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
 	{
-		Log.v(TAG, "endElement");
+		//Log.v(TAG, "endElement");
 		
 		if (localName.equals("scene"))
 		{
@@ -133,8 +152,8 @@ public class SceneBuilder extends DefaultHandler
 		}
 		else if (localName.equals("render_queue"))
 		{
-			_scene.attachRenderQueue(_renderQueue);
-			_renderQueue = null;
+			//_scene.attachRenderQueue(_renderQueue);
+			//_renderQueue = null;
 		}
 		else if (localName.equals("movable"))
 		{
@@ -203,7 +222,7 @@ public class SceneBuilder extends DefaultHandler
 
 	Listener _listener;
 
-	final static Listener _defaultListener = new Listener();
+	//static final Listener _defaultListener;// = //new Listener();
 }
 
 
