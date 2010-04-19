@@ -86,7 +86,33 @@ public class MaterialManager implements TextureManager.EventListener
 	}
 
 	/**
-	 *Destroy material by given id
+	 * Get material by given name
+	 */
+	public Material getByName(String name)
+	{
+		return _materials[getByName(name)];
+	}
+
+	/**
+	 * Find material ID by given name
+	 *
+	 * @param name material name
+	 */
+	public int findIdByName(String name)
+	{
+		for (int i=0;i<MAX_MATERIALS;i++)
+		{
+			if (_materials[i].name().equals(name))
+			{
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Destroy material by given id
 	 */
 	public void destroy(int mid)
 	{
@@ -98,7 +124,7 @@ public class MaterialManager implements TextureManager.EventListener
 	}
 
 	/**
-	 *Release material manager
+	 * Release material manager
 	 */
 	public void release()
 	{
@@ -210,13 +236,13 @@ public class MaterialManager implements TextureManager.EventListener
 class MaterialDefHandler extends DefaultHandler
 {
 	@Override
-    public void startDocument() throws SAXException 
-    {
-    }
+	public void startDocument() throws SAXException 
+	{
+	}
 	
 	@Override
-    public void endDocument() throws SAXException 
-    {
+	public void endDocument() throws SAXException 
+	{
 		// Nothing to do
 	}
 	
@@ -226,6 +252,21 @@ class MaterialDefHandler extends DefaultHandler
 		Log.v(TAG, "startElement");
 		
 		//_name = localName;
+
+		if (localName.equals("material"))
+		{
+			Material m = new Material(
+				parseString(atts, "name", "N/A"),
+				parseFloat(atts, "red", 1.0f),
+				parseFloat(atts, "green", 1.0f),
+				parseFloat(atts, "blue", 1.0f),
+				parseFloat(atts, "alpha", 1.0f)
+			);
+		}
+		else if (localName.equals("texture"))
+		{
+			
+		}
 		
 		_name = atts.getValue("name");
 		_red = parseFloat(atts, "red", 1.0f);
@@ -250,22 +291,22 @@ class MaterialDefHandler extends DefaultHandler
 		return val;
 	}
 	 
-    @Override
-    public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
-    {
-    	Log.v(TAG, "endElement");
+	@Override
+	public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
+	{
+		Log.v(TAG, "endElement");
     	
-    	Material m = new Material(_name, _red, _green, _blue, _alpha);
-    	MaterialManager.instance().register(m);
-    }
+		Material m = new Material(_name, _red, _green, _blue, _alpha);
+		MaterialManager.instance().register(m);
+	}
     
-    String _name;
-    float	_alpha;
-    float	_red;
-    float	_green;
-    float	_blue;
+	String _name;
+	float	_alpha;
+	float	_red;
+	float	_green;
+	float	_blue;
     
-    final static String TAG = "MaterialDefHandler";
+	final static String TAG = "MaterialDefHandler";
 }
 
 

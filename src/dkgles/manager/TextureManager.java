@@ -413,14 +413,14 @@ class TextureDefHandler extends DefaultHandler
 	}
 	
 	@Override
-    public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
-    {
-    	Log.v(TAG, "endElement");
-    	TextureManager.instance().create(_name, getRscIdByName(_rscId), null);
-    }
+	public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
+	{
+		Log.v(TAG, "endElement");
+		TextureManager.instance().create(_name, getRscIdByName(_rscId), null);
+	}
 	
 	public void endDocument() throws SAXException 
-    {
+    	{
 		// Nothing to do
 	}
 	
