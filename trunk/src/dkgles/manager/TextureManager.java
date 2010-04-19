@@ -9,9 +9,6 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import lost.kapa.R;
-import lost.kapa.R.drawable;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -28,7 +25,6 @@ import android.opengl.GLUtils;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import dkgles.Material;
 import dkgles.Texture;
 
 /**
@@ -192,7 +188,7 @@ public class TextureManager
 		_textures 	= new HashMap<Integer, Texture>();
 		_listeners 	= new HashMap<Integer, EventListener>();
 		_handler 	= new TextureManagerHandler();
-		
+		_rconverter = new RConverter();
 	}
 	
 	/**
@@ -392,6 +388,77 @@ public class TextureManager
 			Log.e(TAG, e.getMessage());
 		}
 	}
+	
+	public int getRscIdByString(String str)
+	{
+		return _rconverter.getRscIdByString(str);	
+	}
+	
+	class RConverter
+	{
+		public RConverter()
+		{
+			initReflection();
+		}
+		
+		int getRscIdByString(String str)
+		{
+			int id = -1;
+			try {
+				Field field = _R_drawableClass.getField(str);
+				id = field.getInt(_R_drawableObject);	
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return id;
+		}
+		
+		void initReflection()
+		{	
+			try {
+				Class c = Class.forName("lost.kapa.R");
+				Class[] innerClasses = c.getDeclaredClasses();
+				
+				for (int i=0;i<innerClasses.length;i++)
+				{
+					if (innerClasses[i].getName().equals("lost.kapa.R$drawable"))
+					{
+						_R_drawableClass = innerClasses[i]; 
+						_R_drawableObject = innerClasses[i].newInstance();
+						break;
+					}
+				}
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		Object 	_R_drawableObject;
+		Class	_R_drawableClass;
+		
+		
+	}
+	
+	RConverter _rconverter;// = new RConverter();
+	
+	//static RConverter _conv = new RConverter();
 }
 
 class TextureDefHandler extends DefaultHandler

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import lost.kapa.XmlUtil;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -144,28 +146,7 @@ public class MaterialManager implements TextureManager.EventListener
 	 */
 	public void parse(Context context, int rscId)
 	{
-		InputStream istream = null;
-		try {
-			istream = context.getResources().openRawResource(rscId);
-
-			// Get a SAXParser from the SAXPArserFactory. 
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
-			// 	Get the XMLReader of the SAXParser we created. 
-			XMLReader xr = sp.getXMLReader();
-			// 	Create a new ContentHandler and apply it to the XML-Reader
-			MaterialDefHandler handler = new MaterialDefHandler();
-			xr.setContentHandler(handler);
-			//Log.v(logCat, "Calling parse() in ReadTourFromLocal: "+filename);
-			// 	Parse the xml-data from our URL. 
-			InputSource is = new InputSource(istream); 
-
-			xr.parse(is);
-		}
-		catch(Exception e)
-		{
-			Log.e(TAG, e.getMessage());
-		}
+		XmlUtil.parse(context, new MaterialDefHandler(), rscId);
 	}
 	
 	/**
@@ -255,57 +236,45 @@ class MaterialDefHandler extends DefaultHandler
 
 		if (localName.equals("material"))
 		{
-			Material m = new Material(
-				"name",
-				//parseString(atts, "name", "N/A"),
-				parseFloat(atts, "red", 1.0f),
-				parseFloat(atts, "green", 1.0f),
-				parseFloat(atts, "blue", 1.0f),
-				parseFloat(atts, "alpha", 1.0f)
+			_material = new Material(
+				XmlUtil.parseString(atts, "name", "N/A"),
+				XmlUtil.parseFloat(atts, "red", 1.0f),
+				XmlUtil.parseFloat(atts, "green", 1.0f),
+				XmlUtil.parseFloat(atts, "blue", 1.0f),
+				XmlUtil.parseFloat(atts, "alpha", 1.0f)
 			);
 		}
 		else if (localName.equals("texture"))
 		{
+			TextureManager mgr = TextureManager.instance();
+			int rscId = mgr.getRscIdByString(XmlUtil.parseString(atts, "rsc_id", "N/A"));
 			
+			mgr.create(
+					XmlUtil.parseString(atts, "name", "N/A"),
+					rscId,
+					null
+			);
+			
+			_material.bindTexture(mgr.get(rscId));
 		}
-		
-		_name = atts.getValue("name");
-		_red = parseFloat(atts, "red", 1.0f);
-		_green = parseFloat(atts, "green", 1.0f);
-		_blue = parseFloat(atts, "blue", 1.0f);
-		_alpha = parseFloat(atts, "alpha", 1.0f);
-	}
-	
-	float parseFloat(Attributes atts, String name, float defaultVal)
-	{
-		float val;
-		
-		try
-		{
-			val = Float.parseFloat(atts.getValue(name));
-		}
-		catch(Exception e)
-		{
-			val = defaultVal;
-		}
-		
-		return val;
 	}
 	 
 	@Override
 	public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
 	{
+		if (localName.equals("material"))
+		{
+			MaterialManager.instance().register(_material);
+			_material = null;
+		}
+		else if (localName.equals("texture"))
+		{
+			
+		}
 		Log.v(TAG, "endElement");
-    	
-		Material m = new Material(_name, _red, _green, _blue, _alpha);
-		MaterialManager.instance().register(m);
 	}
-    
-	String _name;
-	float	_alpha;
-	float	_red;
-	float	_green;
-	float	_blue;
+
+	Material _material;
     
 	final static String TAG = "MaterialDefHandler";
 }
