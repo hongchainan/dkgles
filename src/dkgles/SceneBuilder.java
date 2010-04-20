@@ -36,6 +36,11 @@ public class SceneBuilder extends DefaultHandler
 		}
 	}
 
+	public void SceneBuilder(Scene scene)
+	{
+		_scene = scene;
+	}
+
 	public void registerListener(Listener listener)
 	{
 		if (listener!=null)
@@ -53,14 +58,14 @@ public class SceneBuilder extends DefaultHandler
 	{
 		_movableStack = new Stack<Movable>();
 		_movable = null;
-		_scene = null;
+		//_scene = null;
 		_listener = new Listener();
 	}
 	
 	@Override
 	public void endDocument() throws SAXException 
 	{
-		// Nothing to do
+		_movableStack = null;
 	}
 
 	@Override
@@ -70,7 +75,11 @@ public class SceneBuilder extends DefaultHandler
 
 		if (localName.equals("scene"))
 		{
-			_scene = new Scene(parseString(atts, "name", "Scene:N/A"), null);
+			if (_scene==null)
+			{
+				_scene = new Scene(parseString(atts, "name", "Scene:N/A"), null);
+			}
+
 			_movable = _scene.root();	
 		}
 		else if (localName.equals("render_queue"))

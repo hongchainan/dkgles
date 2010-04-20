@@ -247,6 +247,8 @@ class MaterialDefHandler extends DefaultHandler
 		else if (localName.equals("texture"))
 		{
 			TextureManager mgr = TextureManager.instance();
+			
+			// get resource ID by its' name
 			int rscId = mgr.getRscIdByString(XmlUtil.parseString(atts, "rsc_id", "N/A"));
 			
 			mgr.create(
@@ -256,6 +258,10 @@ class MaterialDefHandler extends DefaultHandler
 			);
 			
 			_material.bindTexture(mgr.get(rscId));
+		}
+		else
+		{
+			//skip this TAG
 		}
 	}
 	 
