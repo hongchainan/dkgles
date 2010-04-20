@@ -28,6 +28,15 @@ public class Scene
 		_root = new Movable("Root in " + _name, null, this);
 		attachRenderQueue(renderQueue);
 	}
+
+	/**
+	 * Build a scene by XML file
+	 */
+	public void build(Context context, int resId)
+	{
+		release();
+		XmlUtil.parse(context, new SceneBuilder(this),resId);
+	}
 	
 	/**
 	 *Release self
