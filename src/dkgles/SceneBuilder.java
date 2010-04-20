@@ -36,9 +36,10 @@ public class SceneBuilder extends DefaultHandler
 		}
 	}
 
-	public void SceneBuilder(Scene scene)
+	public SceneBuilder(Scene scene, Listener listener)
 	{
 		_scene = scene;
+		registerListener(listener);
 	}
 
 	public void registerListener(Listener listener)
@@ -78,6 +79,10 @@ public class SceneBuilder extends DefaultHandler
 			if (_scene==null)
 			{
 				_scene = new Scene(parseString(atts, "name", "Scene:N/A"), null);
+			}
+			else
+			{
+				_scene.name(parseString(atts, "name", "Scene:N/A"));
 			}
 
 			_movable = _scene.root();	
@@ -144,6 +149,13 @@ public class SceneBuilder extends DefaultHandler
 				_movable,
 				_scene
 			);
+			
+			float x = parseFloat(atts, "x", 0.0f);
+			float y = parseFloat(atts, "y", 0.0f);
+			float z = parseFloat(atts, "z", 0.0f);
+			
+			camera.position(x, y, z);
+			_scene.bindCamera(camera);
 
 			_listener.onCameraCreated(camera);
 		}
@@ -156,7 +168,7 @@ public class SceneBuilder extends DefaultHandler
 		
 		if (localName.equals("scene"))
 		{
-			SceneManager.instance().register(_scene);
+			//SceneManager.instance().register(_scene);
 			_scene = null;
 		}
 		else if (localName.equals("render_queue"))

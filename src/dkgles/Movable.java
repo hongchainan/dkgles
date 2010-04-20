@@ -27,6 +27,11 @@ public class Movable
 		_children = new ArrayList<Movable>();
 		_localTransformation = new Transformation();
 		_worldTransformationCache = new Transformation();
+		
+		if (parent!=null)
+		{
+			parent.addChild(this);
+		}
 	}
 	
 	/**

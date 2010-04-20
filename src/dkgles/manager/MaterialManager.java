@@ -6,6 +6,7 @@ import java.util.HashMap;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import lost.kapa.ContextHolder;
 import lost.kapa.XmlUtil;
 
 import org.xml.sax.Attributes;
@@ -144,9 +145,9 @@ public class MaterialManager implements TextureManager.EventListener
 	/**
 	 * Parse material from xml 
 	 */
-	public void parse(Context context, int rscId)
+	public void parse(int rscId)
 	{
-		XmlUtil.parse(context, new MaterialDefHandler(), rscId);
+		XmlUtil.parse(ContextHolder.instance().get(), new MaterialDefHandler(), rscId);
 	}
 	
 	/**

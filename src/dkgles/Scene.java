@@ -1,8 +1,7 @@
 package dkgles;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
+import lost.kapa.ContextHolder;
+import lost.kapa.XmlUtil;
 import android.util.Log;
 import dkgles.render.RenderQueue;
 
@@ -32,10 +31,20 @@ public class Scene
 	/**
 	 * Build a scene by XML file
 	 */
-	public void build(Context context, int resId)
+	public void build(int resId, SceneBuilder.Listener listener)
 	{
-		release();
-		XmlUtil.parse(context, new SceneBuilder(this),resId);
+		//release();
+		XmlUtil.parse(ContextHolder.instance().get(), new SceneBuilder(this, listener), resId);
+	}
+	
+	public String name()
+	{
+		return _name;
+	}
+	
+	public void name(String name)
+	{
+		_name = name;
 	}
 	
 	/**
@@ -44,11 +53,18 @@ public class Scene
 	public void release()
 	{
 		visibility(false);
-		_renderQueue.release();
-		_root.release();
-
-		_renderQueue = null;
-		_root = null;
+		
+		if (_renderQueue!=null)
+		{
+			_renderQueue.release();
+			_renderQueue = null;
+		}
+		
+		if (_root!=null)
+		{
+			_root.release();
+			_root = null;
+		}
 	}
 
 	/**
@@ -86,7 +102,10 @@ public class Scene
 	 */
 	public void visibility(boolean b)
 	{
-		_renderQueue.visibility(b);
+		if (_renderQueue!=null)
+		{
+			_renderQueue.visibility(b);
+		}
 	}
 	
 	/**
@@ -141,6 +160,6 @@ public class Scene
 	Movable			_root;
 	Camera 			_camera;
 	IHandler		_handler;
-	final String 	_name;
+	String 			_name;
 	final static String TAG = "Scene";
 }

@@ -132,7 +132,7 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 	 * Called in GLThread
 	 * @param gl
 	 */
-	public void render(GL10 gl)
+	public synchronized void render(GL10 gl)
 	{
 		if (!_visible)
 			return;
