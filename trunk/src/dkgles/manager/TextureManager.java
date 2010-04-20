@@ -128,7 +128,18 @@ public class TextureManager
 			}
 			
 			// issue a queued event to Renderer Thread
-			_glSurfaceView.queueEvent(new GLCreateTextureRequest(name, bitmap, rscId));	 			
+			_glSurfaceView.queueEvent(new GLCreateTextureRequest(name, bitmap, rscId));
+			
+			// block here until texture was created in GLThread
+			synchronized(_lock){
+				try {
+					Log.v(TAG, "wait");
+					_lock.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}	 			
 		}
 		catch(Resources.NotFoundException e)
 		{
@@ -189,6 +200,8 @@ public class TextureManager
 		_listeners 	= new HashMap<Integer, EventListener>();
 		_handler 	= new TextureManagerHandler();
 		_rconverter = new RConverter();
+		byte b = 0;
+		_lock = new Byte(b);
 	}
 	
 	/**
@@ -212,6 +225,7 @@ public class TextureManager
 	final static int GL_TEXTURE_DELETION 	= 1;
 	
 	TextureManagerHandler	_handler;
+	final Byte _lock;// = new Byte("k");
 	
 	Context		_context;
 	GL10 		_gl;
@@ -262,6 +276,15 @@ public class TextureManager
         	        
         	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, _bitmap, 0);
         	_bitmap.recycle();
+        	
+        	Texture t = new Texture(_name, id[0]);
+    		_textures.put(new Integer(_rscId), t);
+        	
+        	synchronized(_lock)
+        	{
+        		Log.v(TAG, "notify");
+        		_lock.notifyAll();
+        	}
         			
         	// notify job is done
         	Message msg = new Message();
@@ -334,8 +357,8 @@ public class TextureManager
 	        		name = (String)msg.obj;
 	        		rsc_id = msg.arg1;
 	        		
-	        		Texture t = new Texture(name, msg.arg2);
-	        		_textures.put(new Integer(rsc_id), t);
+	        		//Texture t = new Texture(name, msg.arg2);
+	        		//_textures.put(new Integer(rsc_id), t);
 	        		
 	        		// try to find out registered listener
 	        		listener = _listeners.get(rsc_id);
@@ -344,7 +367,7 @@ public class TextureManager
 	        			listener.onTextureLoaded(name, rsc_id);
 	        		}
 	        		_texLoaded = true;
-	        		Log.v(TAG, "create texture: " + t);
+	        		//Log.v(TAG, "create texture: " + t);
 	        		break;
 	        	case GL_TEXTURE_DELETION:
 	        		name = (String)msg.obj;
@@ -410,15 +433,19 @@ public class TextureManager
 			} catch (SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				id = -1;
 			} catch (NoSuchFieldException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				id = -1;
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				id = -1;
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				id = -1;
 			}
 			return id;
 		}

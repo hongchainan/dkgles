@@ -17,6 +17,7 @@ public abstract class Drawable
 		_name = name;
 		_visible = true;
 		_groupID = 0;
+		_worldTransformation = Transformation.identity();
 	}
 
 	
