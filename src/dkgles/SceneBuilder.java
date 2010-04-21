@@ -138,6 +138,8 @@ public class SceneBuilder extends DefaultHandler
 				XmlUtil.parseFloat(atts, "height", 0.0f),
 				MaterialManager.instance().getByName(XmlUtil.parseString(atts, "material", "N/A"))
 			);
+			
+			parseDrawableOptionalParam(rectangle, atts);
 
 			_movableStack.peek().setDrawable(rectangle);
 		}
@@ -185,6 +187,12 @@ public class SceneBuilder extends DefaultHandler
 				_movable = _movableStack.pop();
 			}*/
 		}
+	}
+	
+	void parseDrawableOptionalParam(Drawable drawable, Attributes atts)
+	{
+		int group_id = XmlUtil.parseInt(atts, "group_id", 0);
+		drawable.groupID(group_id);
 	}
 
 	void parseMovableOptionalParam(Movable movable, Attributes atts)

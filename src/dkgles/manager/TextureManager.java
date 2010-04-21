@@ -9,6 +9,8 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import lost.kapa.ContextHolder;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -84,7 +86,7 @@ public class TextureManager
 	 */
 	public synchronized void initialize(Context context, GL10 gl)
 	{
-		_context = context;
+		//_context = context;
 		_gl = gl;
 		_initialized = true;
 	}
@@ -132,7 +134,7 @@ public class TextureManager
 		try
 		{
 			final Bitmap bitmap = BitmapFactory.decodeStream(
-					_context.getResources().openRawResource(rscId));
+					ContextHolder.instance().get().getResources().openRawResource(rscId));
 			
 			// may decode fail
 			if (bitmap==null)
@@ -263,7 +265,7 @@ public class TextureManager
 	TextureManagerHandler	_handler;
 	final Byte _lock;// = new Byte("k");
 	
-	Context		_context;
+	//Context		_context;
 	GL10 		_gl;
 	GLSurfaceView	_glSurfaceView;
 
