@@ -2,11 +2,12 @@ package dkgles;
 
 import java.util.Stack;
 
+import lost.kapa.XmlUtil;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.util.Log;
 import dkgles.manager.MaterialManager;
 import dkgles.primitive.Rectangle;
 import dkgles.render.OrthoRenderQueue;
@@ -80,11 +81,11 @@ public class SceneBuilder extends DefaultHandler
 		{
 			if (_scene==null)
 			{
-				_scene = new Scene(parseString(atts, "name", "Scene:N/A"), null);
+				_scene = new Scene(XmlUtil.parseString(atts, "name", "Scene:N/A"), null);
 			}
 			else
 			{
-				_scene.name(parseString(atts, "name", "Scene:N/A"));
+				_scene.name(XmlUtil.parseString(atts, "name", "Scene:N/A"));
 			}
 
 			_movableStack.clear();
@@ -93,22 +94,22 @@ public class SceneBuilder extends DefaultHandler
 		else if (localName.equals("render_queue"))
 		{
 			RenderQueue renderQueue;
-			String type = parseString(atts, "type", "perspective");
+			String type = XmlUtil.parseString(atts, "type", "perspective");
 			
 			if (type.equals("perspective"))
 			{
 				renderQueue = new PerspectiveRenderQueue(
-					parseString(atts, "name", "N/A"),
-					parseInt(atts, "count", 10),
-					parseInt(atts, "layer", 3)
+					XmlUtil.parseString(atts, "name", "N/A"),
+					XmlUtil.parseInt(atts, "count", 10),
+					XmlUtil.parseInt(atts, "layer", 3)
 				);
 			}
 			else
 			{
 				renderQueue = new OrthoRenderQueue(
-					parseString(atts, "name", "N/A"),
-					parseInt(atts, "count", 10),
-					parseInt(atts, "layer", 3)
+					XmlUtil.parseString(atts, "name", "N/A"),
+					XmlUtil.parseInt(atts, "count", 10),
+					XmlUtil.parseInt(atts, "layer", 3)
 				);
 			}			
 
@@ -132,10 +133,10 @@ public class SceneBuilder extends DefaultHandler
 		else if (localName.equals("rectangle"))
 		{
 			Rectangle rectangle = new Rectangle(
-				parseString(atts, "name", "Rectangle:N/A"),
-				parseFloat(atts, "width", 0.0f),
-				parseFloat(atts, "height", 0.0f),
-				MaterialManager.instance().getByName(parseString(atts, "material", "N/A"))
+				XmlUtil.parseString(atts, "name", "Rectangle:N/A"),
+				XmlUtil.parseFloat(atts, "width", 0.0f),
+				XmlUtil.parseFloat(atts, "height", 0.0f),
+				MaterialManager.instance().getByName(XmlUtil.parseString(atts, "material", "N/A"))
 			);
 
 			_movableStack.peek().setDrawable(rectangle);
@@ -143,7 +144,7 @@ public class SceneBuilder extends DefaultHandler
 		else if (localName.equals("camera"))
 		{
 			Camera camera = new Camera(
-				parseString(atts, "name", "Camera:N/A"),
+				XmlUtil.parseString(atts, "name", "Camera:N/A"),
 				_movableStack.peek(),
 				_scene
 			);
