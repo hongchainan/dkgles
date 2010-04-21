@@ -59,7 +59,7 @@ public class MaterialManager implements TextureManager.EventListener
 		Material material = new Material(name);
 		int id = register(material); 
 		_waitedTexs.put(texName, id);
-		TextureManager.instance().create(texName, rscId, this);
+		TextureManager.instance().createAsync(texName, rscId, this);
 		
 		return id;
 	}
@@ -254,8 +254,7 @@ class MaterialDefHandler extends DefaultHandler
 			
 			mgr.create(
 					XmlUtil.parseString(atts, "name", "N/A"),
-					rscId,
-					null
+					rscId
 			);
 			
 			_material.bindTexture(mgr.get(rscId));
