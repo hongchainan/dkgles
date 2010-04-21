@@ -59,10 +59,11 @@ public class TextureManager
 	}
 	
 	/**
-	 *Set GLSurfaceView. Since we have to schedual jobs to GLThreads
-	 *See: http://developer.android.com/reference/android/opengl/GLSurfaceView.html#queueEvent(java.lang.Runnable)
-	 *@see create
-	 *@see destroy
+	 * Set GLSurfaceView. Since we have to schedual jobs to GLThreads
+	 * See: http://developer.android.com/reference/android/opengl/GLSurfaceView.html#queueEvent(java.lang.Runnable)
+	 * @see create
+	 * @see createAsync
+	 * @see destroy
 	 */
 	public void setGLSurfaceView(GLSurfaceView glSurfaceView)
 	{
@@ -71,10 +72,11 @@ public class TextureManager
 	
 	/**
 	 *Set context reference
+	 *@deprecated
 	 */
 	public void setContext(Context context)
 	{
-		_context = context;
+		//_context = context;
 	}
 	
 	/**
@@ -88,7 +90,7 @@ public class TextureManager
 	}
 	
 	/**
-	 *@deprecated
+	 * @deprecated
 	 */
 	public boolean initialized()
 	{
@@ -96,13 +98,30 @@ public class TextureManager
 	}
 	
 	/**
-	 *Create a texture resource
-	 *Note: this operation is asynchronous. if you want to know whether the texture is ready, provide TextureManager.EventListener
-	 *@param name texture name for debugging issue
-	 *@param rsc_id resource id, EX: R.id.my_texture
-	 *@param listener if you want to know whether the texture you request is ready for use. or you can set it to null if you don't care
+	 * Create a texture resource
+	 * @param name texture name for debugging issue
+	 * @param rsc_id resource id, EX: R.id.my_texture
 	 */
-	public synchronized void create(final String name, final int rscId, final EventListener listener)
+	public synchronized void create(final String name, final int rscId)
+	{
+		createImpl(name, rscId, null);
+		waitForTextureCreated();
+	}
+
+	/**
+	 * Create a texture resource
+	 * Note: this operation is asynchronous. if you want to know whether the texture is ready, provide TextureManager.EventListener
+	 * @param name texture name for debugging issue
+	 * @param rsc_id resource id, EX: R.id.my_texture
+	 * @param listener if you want to know whether the texture you request is ready for use. or you can set it to null if you don't care
+	 */
+	public synchronized void createAsync(final String name, final int rscId, final EventListener listener)
+	{
+		createImpl(name, rscId, listener);
+		
+	}
+
+	void createImpl(final String name, final int rscId, final EventListener listener)
 	{
 		if (_textures.containsKey(rscId))
 		{
@@ -130,16 +149,7 @@ public class TextureManager
 			// issue a queued event to Renderer Thread
 			_glSurfaceView.queueEvent(new GLCreateTextureRequest(name, bitmap, rscId));
 			
-			// block here until texture was created in GLThread
-			synchronized(_lock){
-				try {
-					Log.v(TAG, "wait");
-					_lock.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}	 			
+				
 		}
 		catch(Resources.NotFoundException e)
 		{
@@ -149,7 +159,33 @@ public class TextureManager
 		{
 			Log.e(TAG, "catch a GLException:" + e.getMessage());
 		}
-		
+	}
+
+	void waitForTextureCreated()
+	{
+		// block here until texture was created in GLThread
+		synchronized(_lock)
+		{
+			try
+			{
+				Log.v(TAG, "wait");
+				_lock.wait();
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	 		
+	}
+
+	void notifyTextureCreated()
+	{
+		synchronized(_lock)
+        	{
+        		Log.v(TAG, "notify");
+        		_lock.notifyAll();
+        	}
 	}
 
 	
@@ -256,14 +292,14 @@ public class TextureManager
 		public void run()
 		{
 			int[] id = new int[1];
-       		_gl.glEnable(GL10.GL_TEXTURE_2D);
+       			_gl.glEnable(GL10.GL_TEXTURE_2D);
 			_gl.glGenTextures(1, id, 0);
         			
-       		if (id[0]==0)
-       		{
-       			Log.e(TAG, "GL gens invalid id for:" + _name);
-       			return;
-       		}
+			if (id[0]==0)
+			{
+				Log.e(TAG, "GL gens invalid id for:" + _name);
+				return;
+			}
         	        
        		// Set default parameters
        		_gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
@@ -280,11 +316,7 @@ public class TextureManager
         	Texture t = new Texture(_name, id[0]);
     		_textures.put(new Integer(_rscId), t);
         	
-        	synchronized(_lock)
-        	{
-        		Log.v(TAG, "notify");
-        		_lock.notifyAll();
-        	}
+        	notifyTextureCreated();
         			
         	// notify job is done
         	Message msg = new Message();

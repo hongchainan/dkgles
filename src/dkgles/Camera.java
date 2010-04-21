@@ -17,6 +17,12 @@ public class Camera extends Movable
 		_farPlane = 10000.0f;
 		_fov = 45.0f;
 		_viewMatrix = new float[16];
+
+		if (scene!=null)
+		{
+			scene.bindCamera(this);
+		}
+		
 		Matrix.setIdentityM(_viewMatrix, 0);
 	}
 	
