@@ -40,16 +40,13 @@ import dkgles.Texture;
  *	Make sure local event handler stay in UI Thread
  *@author doki lin
  */
-public class TextureManager
+public enum TextureManager
 {
-	public static TextureManager instance()
+	INSTANCE;
+	
+	public void release()
 	{
-		if (_instance==null)
-		{
-			_instance = new TextureManager();
-		}
 		
-		return _instance;
 	}
 	
 	/**
@@ -73,26 +70,17 @@ public class TextureManager
 	}
 	
 	/**
-	 *Set context reference
-	 *@deprecated
+	 *
 	 */
-	public void setContext(Context context)
+	public synchronized void initialize(GLSurfaceView glSurfaceView, GL10 gl)
 	{
-		//_context = context;
-	}
-	
-	/**
-	 *@deprecated
-	 */
-	public synchronized void initialize(Context context, GL10 gl)
-	{
-		//_context = context;
+		_glSurfaceView = glSurfaceView;
 		_gl = gl;
 		_initialized = true;
 	}
 	
 	/**
-	 * @deprecated
+	 * 
 	 */
 	public boolean initialized()
 	{
@@ -123,6 +111,12 @@ public class TextureManager
 		
 	}
 
+	/**
+	 * Implementation of creating texture
+	 * @param name
+	 * @param rscId
+	 * @param listener
+	 */
 	void createImpl(final String name, final int rscId, final EventListener listener)
 	{
 		if (_textures.containsKey(rscId))
@@ -163,9 +157,11 @@ public class TextureManager
 		}
 	}
 
+	/**
+	 * block here until texture was created in GLThread
+	 */
 	void waitForTextureCreated()
 	{
-		// block here until texture was created in GLThread
 		synchronized(_lock)
 		{
 			try
@@ -181,6 +177,9 @@ public class TextureManager
 		}	 		
 	}
 
+	/**
+	 * 
+	 */
 	void notifyTextureCreated()
 	{
 		synchronized(_lock)
@@ -263,21 +262,18 @@ public class TextureManager
 	final static int GL_TEXTURE_DELETION 	= 1;
 	
 	TextureManagerHandler	_handler;
-	final Byte _lock;// = new Byte("k");
+	final Byte _lock;
 	
-	//Context		_context;
 	GL10 		_gl;
 	GLSurfaceView	_glSurfaceView;
 
 	// deprecated
 	boolean 		_initialized;
-	boolean 		_texLoaded;
 	
 	//	
 	HashMap<Integer, Texture> 		_textures;
 	HashMap<Integer, EventListener>	_listeners;
 	
-	static TextureManager _instance;
 	final static String TAG = "TextureManager";
 
 	/**
@@ -400,7 +396,6 @@ public class TextureManager
 	        		{
 	        			listener.onTextureLoaded(name, rsc_id);
 	        		}
-	        		_texLoaded = true;
 	        		//Log.v(TAG, "create texture: " + t);
 	        		break;
 	        	case GL_TEXTURE_DELETION:
@@ -544,7 +539,7 @@ class TextureDefHandler extends DefaultHandler
 	public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
 	{
 		Log.v(TAG, "endElement");
-		TextureManager.instance().createAsync(_name, getRscIdByName(_rscId), null);
+		TextureManager.INSTANCE.createAsync(_name, getRscIdByName(_rscId), null);
 	}
 	
 	public void endDocument() throws SAXException 

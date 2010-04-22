@@ -2,8 +2,6 @@ package dkgles.render;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-
 import javax.microedition.khronos.opengles.GL10;
 
 import android.util.Log;
@@ -49,14 +47,18 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 	 */
 	public void release()
 	{
-
-		for (int i=0;i<_groupCount;i++)
+		if (_groups!=null)
 		{
-			_groups[i].release();
-			_groups[i] = null;
-		}
+			for (int i=0;i<_groupCount;i++)
+			{
+				_groups[i].release();
+				_groups[i] = null;
+			}
 
-		_groups = null;		
+			_groups = null;
+		}
+		
+		_camera = null;
 
 		synchronized(RenderQueue.class)
 		{
@@ -165,7 +167,10 @@ public abstract class RenderQueue implements Comparable<RenderQueue>
 		
 		public void release()
 		{
-			
+			if (_drawables!=null)
+			{
+				_drawables = null;
+			}
 		}
 		
 		public int id()

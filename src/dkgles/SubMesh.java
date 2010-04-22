@@ -14,7 +14,12 @@ public class SubMesh
 	public final static int DRAW_ARRAY 	= 0;
 	public final static int DRAW_ELEMENT 	= 1;
 	
-	
+	/**
+	 * 
+	 * @param name a human readable string for debugging
+	 * @param drawMode could be SubMesh.DRAW_ARRAY or SubMesh.DRAW_ELEMENT  
+	 * @param material
+	 */
 	public SubMesh(final String name, final int drawMode, final Material material)
 	{
 		_name 		= name;
@@ -30,6 +35,11 @@ public class SubMesh
 		}
 		
 		setMaterial(material);
+	}
+	
+	public void release()
+	{
+		//TODO
 	}
 	
 	public void setMaterial(Material material)
@@ -65,6 +75,11 @@ public class SubMesh
 	{
 		_renderImpl.setTexcoords(texcoords);
   	}
+	
+	public String toString()
+	{
+		return _name;
+	}
 	
 	private RenderImpl		_renderImpl;
 	protected Material 		_material;
@@ -232,8 +247,8 @@ class DrawElementImpl extends RenderImpl
   		return _indicesBuffer;
   	}
   	
-  	private FloatBuffer 	_verticesBuffer;
-	private FloatBuffer 	_texcoordsBuffer;
-	private	ShortBuffer 	_indicesBuffer;
-	private int	_icount;
+  	FloatBuffer 	_verticesBuffer;
+	FloatBuffer 	_texcoordsBuffer;
+	ShortBuffer 	_indicesBuffer;
+	int	_icount;
 }

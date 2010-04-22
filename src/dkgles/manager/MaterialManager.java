@@ -1,21 +1,14 @@
 package dkgles.manager;
 
-import java.io.InputStream;
 import java.util.HashMap;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import lost.kapa.ContextHolder;
 import lost.kapa.XmlUtil;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.content.Context;
 import android.util.Log;
 import dkgles.Material;
 import dkgles.Texture;
@@ -27,16 +20,17 @@ import dkgles.Texture;
  *	Material m = MaterialManager.instance().get(mid);
  *	MaterialManager.instance().destroy(mid);
  */
-public class MaterialManager implements TextureManager.EventListener
+public enum MaterialManager implements TextureManager.EventListener
 {
+	INSTANCE;
 	
 	public final static int BLACK_ID = 0;
 	
 	
 	/**
 	 * Create a material and return material ID
-	 *@param name a human readable string for debugging
-	 *@param texture A texture that can bind to or a null reference if you need flat color only.
+	 * @param name a human readable string for debugging
+	 * @param texture A texture that can bind to or a null reference if you need flat color only.
 	 */
 	public int create(String name, Texture texture)
 	{
@@ -48,8 +42,8 @@ public class MaterialManager implements TextureManager.EventListener
 	/**
 	 *An utility let you create material and texture at sametime
 	 *This method is equal to:
-	 *	TextureManager.instance().create(texName, rscId);
-	 *	MaterialManager.instance().create(matName, TextureManager.instance().get(rscId));
+	 *	TextureManager.INSTANCE.create(texName, rscId);
+	 *	MaterialManager.instance().create(matName, TextureManager.INSTANCE.get(rscId));
 	 *@param name A human readable name for material
 	 *@param texName name for texture
 	 *@param rscID resource ID for texture
@@ -58,9 +52,9 @@ public class MaterialManager implements TextureManager.EventListener
 	{
 		Material material = new Material(name);
 		int id = register(material); 
-		_waitedTexs.put(texName, id);
-		TextureManager.instance().createAsync(texName, rscId, this);
-		
+		//_waitedTexs.put(texName, id);
+		TextureManager.INSTANCE.create(texName, rscId);
+		material.bindTexture(TextureManager.INSTANCE.get(rscId));
 		return id;
 	}
 
@@ -105,12 +99,14 @@ public class MaterialManager implements TextureManager.EventListener
 	{
 		for (int i=0;i<MAX_MATERIALS;i++)
 		{
-			if (_materials[i].name().equals(name))
+			if (_materials[i]!=null)
 			{
-				return i;
+				if (_materials[i].name().equals(name))
+				{
+					return i;
+				}
 			}
 		}
-
 		return -1;
 	}
 
@@ -151,21 +147,6 @@ public class MaterialManager implements TextureManager.EventListener
 	}
 	
 	/**
-	 *@deprecated
-	 */
-	private int findKey()
-	{
-		//int id = 0;
-		//while (_materials.containsKey(id))
-		//{
-		//	id++;
-		//}
-		
-		return 0;
-	}
-	
-	
-	/**
 	 *@see TextureManager.EventListener
 	 *@see TextureManager#create
 	 */
@@ -187,20 +168,14 @@ public class MaterialManager implements TextureManager.EventListener
 		
 		if (m!=null)
 		{
-			m.bindTexture(TextureManager.instance().get(rscId));
+			m.bindTexture(TextureManager.INSTANCE.get(rscId));
 			Log.v(TAG, m.name() + " bind texture:" + name);
 		}
-	}
-
-	public static MaterialManager instance()
-	{
-		return _instance;
 	}
 
 	MaterialManager()
 	{
 		_materials = new Material[MAX_MATERIALS];
-		_waitedTexs = new HashMap<String, Integer>();
 	}
 	
 	
@@ -210,7 +185,6 @@ public class MaterialManager implements TextureManager.EventListener
 	Material[] _materials;
 	
 	HashMap<String, Integer>	_waitedTexs;
-	static MaterialManager _instance = new MaterialManager();
 	final static String TAG = "MaterialManager";
 
 }
@@ -247,7 +221,7 @@ class MaterialDefHandler extends DefaultHandler
 		}
 		else if (localName.equals("texture"))
 		{
-			TextureManager mgr = TextureManager.instance();
+			TextureManager mgr = TextureManager.INSTANCE;
 			
 			// get resource ID by its' name
 			int rscId = mgr.getRscIdByString(XmlUtil.parseString(atts, "rsc_id", "N/A"));
@@ -270,7 +244,7 @@ class MaterialDefHandler extends DefaultHandler
 	{
 		if (localName.equals("material"))
 		{
-			MaterialManager.instance().register(_material);
+			MaterialManager.INSTANCE.register(_material);
 			_material = null;
 		}
 		else if (localName.equals("texture"))

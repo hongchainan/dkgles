@@ -13,6 +13,8 @@ import dkgles.primitive.Rectangle;
 import dkgles.render.OrthoRenderQueue;
 import dkgles.render.PerspectiveRenderQueue;
 import dkgles.render.RenderQueue;
+import dkgles.ui.Touchable;
+import dkgles.ui.UIManager;
 
 /**
  * Build scene from xml config file
@@ -63,6 +65,12 @@ public class SceneBuilder extends DefaultHandler
 	public void startDocument() throws SAXException 
 	{
 		_movableStack = new Stack<Movable>();
+		
+		if (_scene!=null)
+		{
+			_movableStack.push(_scene.root());
+		}
+		
 		//_movable = null;
 		//_scene = null;
 		_listener = new Listener();
@@ -136,12 +144,25 @@ public class SceneBuilder extends DefaultHandler
 				XmlUtil.parseString(atts, "name", "Rectangle:N/A"),
 				XmlUtil.parseFloat(atts, "width", 0.0f),
 				XmlUtil.parseFloat(atts, "height", 0.0f),
-				MaterialManager.instance().getByName(XmlUtil.parseString(atts, "material", "N/A"))
+				MaterialManager.INSTANCE.getByName(XmlUtil.parseString(atts, "material", "N/A"))
 			);
 			
 			parseDrawableOptionalParam(rectangle, atts);
 
 			_movableStack.peek().setDrawable(rectangle);
+		}
+		else if (localName.equals("touchable"))
+		{
+			Touchable touchable = new Touchable(
+					XmlUtil.parseString(atts, "name", "Touchable:N/A"),
+					XmlUtil.parseFloat(atts, "width", 0.0f),
+					XmlUtil.parseFloat(atts, "height", 0.0f),
+					MaterialManager.INSTANCE.getByName(XmlUtil.parseString(atts, "material", "N/A"))
+			);
+			
+			UIManager.instance().register(touchable);
+			_movableStack.peek().setDrawable(touchable);
+			
 		}
 		else if (localName.equals("camera"))
 		{

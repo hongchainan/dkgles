@@ -1,7 +1,5 @@
 package dkgles.ui;
 
-import java.util.ArrayList;
-
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -71,7 +69,10 @@ public class UIManager extends Scene implements OnTouchListener
 	
 	public void destroyAll()
 	{
-		
+		for (int i=0;i<MAX_TOUCHABLES;i++)
+		{
+			destroy(i);
+		}
 	}
 	
 	/**

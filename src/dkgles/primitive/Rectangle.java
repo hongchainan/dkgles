@@ -20,6 +20,28 @@ public class Rectangle extends Mesh
 		initTexcoordsBuffer();
 	}
 	
+	public void release()
+	{
+		super.release();
+		if (_subMesh!=null)
+		{
+			_subMesh.release();
+			_subMesh = null;
+		}
+	}
+	
+	public void finalize() throws Throwable
+	{
+		try
+		{
+			release();
+		}
+		finally
+		{
+			super.finalize();
+		}
+	}
+	
 	private void initVerticesBuffer()
 	{
 		float hx = _width / 2;
