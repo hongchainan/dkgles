@@ -31,6 +31,11 @@ public class Transformation implements Cloneable
 		return _identity;
 	}
 	
+	public void release()
+	{
+		
+	}
+	
 	
 	public void rotateInLocalSpace(float angle, float x, float y, float z)
 	{

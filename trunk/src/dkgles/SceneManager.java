@@ -5,8 +5,9 @@ import dkgles.render.RenderQueue;
 /**
  *@autuor doki
  */
-public class SceneManager
+public enum SceneManager
 {
+	INSTANCE;
 	/**
 	 * Create a scene
 	 * @param name
@@ -25,7 +26,6 @@ public class SceneManager
 	 */
 	public int register(Scene scene)
 	{
-
 		for (int i=0;i<MAX_SCENES;i++)
 		{
 			if (_scenes[i]==null)
@@ -33,15 +33,13 @@ public class SceneManager
 				_scenes[i] = scene;
 				return i;
 			}
-		}
-		
+		}	
 		return -1;
-		
 	}
 
 	/**
-	 *Get scene by ID
-	 *@return scene
+	 * Get scene by ID
+	 * @return scene
 	 */
 	public Scene get(int id)
 	{
@@ -109,17 +107,18 @@ public class SceneManager
 	/**
 	 *Called by GC
 	 */
-	protected void finalize()
+	protected void finalize() throws Throwable
 	{
-		release();
+		try
+		{
+			release();
+		}
+		finally
+		{
+			super.finalize();
+		}
 	}
-	
-	public static SceneManager instance()
-	{
-		return _instance;
-
-	}
-	
+		
 	SceneManager()
 	{
 		_scenes = new Scene[MAX_SCENES];
@@ -129,5 +128,5 @@ public class SceneManager
 	
 	public static final int MAX_SCENES = 8;
 	
-	static SceneManager _instance = new SceneManager();
+	//static SceneManager _instance = new SceneManager();
 }

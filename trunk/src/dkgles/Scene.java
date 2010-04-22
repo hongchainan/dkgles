@@ -60,6 +60,12 @@ public class Scene
 			_renderQueue = null;
 		}
 		
+		if (_camera!=null)
+		{
+			_camera.release();
+			_camera = null;
+		}
+		
 		if (_root!=null)
 		{
 			_root.release();

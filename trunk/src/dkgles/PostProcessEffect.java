@@ -40,7 +40,7 @@ public class PostProcessEffect extends Scene
 	PostProcessEffect()
 	{
 		super("PPEScene", new OrthoRenderQueue("PPERenderQueue", 1, RenderQueue.POST_EFFECT_LAYER));
-		MaterialManager matmgr = MaterialManager.instance();
+		MaterialManager matmgr = MaterialManager.INSTANCE;
 		int mid = matmgr.create("MAT_PP_EFFECT", null);
 		_material = matmgr.get(mid);
 		_material.rgb(.0f,.0f,.0f);

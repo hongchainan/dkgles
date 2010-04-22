@@ -26,6 +26,12 @@ public class Camera extends Movable
 		Matrix.setIdentityM(_viewMatrix, 0);
 	}
 	
+	public void release()
+	{
+		super.release();
+		_viewMatrix = null;
+	}
+	
 	public void updateTransformation(Transformation parentTransformation, boolean parentDirty)
 	{
 		if (_dirty||parentDirty)
@@ -80,10 +86,10 @@ public class Camera extends Movable
 		return _viewMatrix;
 	}
 	
-	private float[] _viewMatrix;
-	private float _nearPlane;
-	private float _farPlane;
-	private float _fov;
+	float[] _viewMatrix;
+	float _nearPlane;
+	float _farPlane;
+	float _fov;
 	
 	private final static String TAG = "Camera"; 
 	

@@ -2,7 +2,6 @@ package dkgles;
 
 import java.util.ArrayList;
 import java.util.List;
-import dkgles.math.MathUtils;
 
 /**
  *@author doki lin
@@ -42,7 +41,7 @@ public class Movable
 	 * @param z
 	 * @param space Movable.LOCAL / Movable.PARENT
 	 */
-	public void rotate(float angle, float x, float y, float z, int space)
+	public void rotate(float angle, float x, float y, float z, int space) throws IllegalArgumentException 
 	{
 		if (space == LOCAL)
 		{
@@ -86,7 +85,7 @@ public class Movable
 	 * @param y
 	 * @param z
 	 */
-	public void position(float x, float y, float z)
+	public synchronized void position(float x, float y, float z)
 	{
 		_localTransformation._matrix[12] = x;
 		_localTransformation._matrix[13] = y;
@@ -134,13 +133,19 @@ public class Movable
 		rotate(angle, 0.0f, 0.0f, 1.0f, LOCAL);
 	}
 	
-	
+	/**
+	 * Rotate around local Y axis
+	 * @param angle
+	 */
 	public void yaw(float angle)
 	{
 		rotate(angle, 0.0f, 1.0f, 0.0f, LOCAL);
 	}
 	
-	
+	/**
+	 * Rotate around local X axis
+	 * @param angle
+	 */
 	public void pitch(float angle)
 	{
 		rotate(angle, 1.0f, 0.0f, 0.0f, LOCAL);
@@ -175,13 +180,34 @@ public class Movable
 	 */
 	public void release()
 	{
-		for (Movable m : _children)
+		_parent = null;
+		_scene = null;
+		
+		if (_localTransformation!=null)
 		{
-			m.release();
+			_localTransformation.release();
+			_localTransformation = null;
+			
 		}
-
-		_children.clear();
-		_children = null;
+		
+		if (_worldTransformationCache!=null)
+		{
+			_worldTransformationCache.release();
+			_worldTransformationCache = null;
+		}
+			
+		if (_children!=null)
+		{
+			for (Movable m : _children)
+			{
+				if (m!=null)
+				{
+					m.release();
+				}
+			}
+			_children.clear();
+			_children = null;
+		}
 
 		if (_drawable!=null)
 		{
@@ -261,9 +287,16 @@ public class Movable
 		return _name;
 	}
 
-	protected void finalize()
+	protected void finalize() throws Throwable
 	{
-		release();
+		try
+		{
+			release();
+		}
+		finally
+		{
+			super.finalize();
+		}
 	}
 	
 	protected Transformation	_localTransformation;
