@@ -50,7 +50,7 @@ public enum SceneManager
 	/**
 	 *Remove scene by ID
 	 */
-	public void remove(int id)
+	public synchronized void destroy(int id)
 	{
 		if (_scenes[id]==null)
 			return;
@@ -62,11 +62,11 @@ public enum SceneManager
 	/**
 	 *Remove all scenes
 	 */
-	public void removeAll()
+	public synchronized void destroyAll()
 	{
 		for (int i=0;i<MAX_SCENES;i++)
 		{
-			remove(i);
+			destroy(i);
 		}
 	}
 
@@ -74,7 +74,7 @@ public enum SceneManager
 	 */
 	public void release()
 	{
-		removeAll();
+		destroyAll();
 		_scenes = null;
 	}
 	

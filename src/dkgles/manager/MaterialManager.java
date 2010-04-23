@@ -20,7 +20,7 @@ import dkgles.Texture;
  *	Material m = MaterialManager.instance().get(mid);
  *	MaterialManager.instance().destroy(mid);
  */
-public enum MaterialManager implements TextureManager.EventListener
+public enum MaterialManager
 {
 	INSTANCE;
 	
@@ -48,14 +48,10 @@ public enum MaterialManager implements TextureManager.EventListener
 	 *@param texName name for texture
 	 *@param rscID resource ID for texture
 	 */
-	public int create(final String name, final String texName, final int rscId)
+	public int create(final String name, final String texName, final int resId)
 	{
-		Material material = new Material(name);
-		int id = register(material); 
-		//_waitedTexs.put(texName, id);
-		TextureManager.INSTANCE.create(texName, rscId);
-		material.bindTexture(TextureManager.INSTANCE.get(rscId));
-		return id;
+		int id = TextureManager.INSTANCE.create(texName, resId);
+		return create(name, TextureManager.INSTANCE.get(id));
 	}
 
 	/**
@@ -121,58 +117,35 @@ public enum MaterialManager implements TextureManager.EventListener
 			_materials[mid] = null;
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public void destroyAll()
+	{
+		for (int i=0;i<MAX_MATERIALS;i++)
+		{
+			destroy(i);
+		}
+	}
 
 	/**
 	 * Release material manager
 	 */
 	public void release()
 	{
-		for (Material m : _materials)
-		{
-			if (m!=null)
-			{
-				m.release();
-			}
-		}
-
+		destroyAll();
 		_materials = null;
 	}
 	
 	/**
 	 * Parse material from xml 
 	 */
-	public void parse(int rscId)
+	public void parse(int resId)
 	{
-		XmlUtil.parse(ContextHolder.instance().get(), new MaterialDefHandler(), rscId);
+		XmlUtil.parse(ContextHolder.INSTANCE.get(), new MaterialDefHandler(), resId);
 	}
 	
-	/**
-	 *@see TextureManager.EventListener
-	 *@see TextureManager#create
-	 */
-	//@override
-	public void onTextureDeleted(String name, int rscId)
-	{
-		Log.v(TAG, "onTextureDeleted:" + name);
-	}
-
-	/**
-	 *@see TextureManager.EventListener
-	 *@see TextureManager#create
-	 */
-	//@override
-	public void onTextureLoaded(String name, int rscId)
-	{
-		Integer key = _waitedTexs.get(name);
-		Material m = _materials[key];
-		
-		if (m!=null)
-		{
-			m.bindTexture(TextureManager.INSTANCE.get(rscId));
-			Log.v(TAG, m.name() + " bind texture:" + name);
-		}
-	}
-
 	MaterialManager()
 	{
 		_materials = new Material[MAX_MATERIALS];
@@ -183,8 +156,6 @@ public enum MaterialManager implements TextureManager.EventListener
 	public final static int MAX_MATERIALS = 16;
 	
 	Material[] _materials;
-	
-	HashMap<String, Integer>	_waitedTexs;
 	final static String TAG = "MaterialManager";
 
 }
@@ -221,17 +192,16 @@ class MaterialDefHandler extends DefaultHandler
 		}
 		else if (localName.equals("texture"))
 		{
-			TextureManager mgr = TextureManager.INSTANCE;
-			
 			// get resource ID by its' name
-			int rscId = mgr.getRscIdByString(XmlUtil.parseString(atts, "rsc_id", "N/A"));
+			int resId = TextureManager.INSTANCE.getRscIdByString(
+					XmlUtil.parseString(atts, "rsc_id", "N/A"));
 			
-			mgr.create(
+			int id = TextureManager.INSTANCE.create(
 					XmlUtil.parseString(atts, "name", "N/A"),
-					rscId
-			);
-			
-			_material.bindTexture(mgr.get(rscId));
+					resId);
+				
+			_material.bindTexture(
+					TextureManager.INSTANCE.get(id));
 		}
 		else
 		{
