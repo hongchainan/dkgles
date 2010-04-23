@@ -34,7 +34,7 @@ public class Scene
 	public void build(int resId, SceneBuilder.Listener listener)
 	{
 		//release();
-		XmlUtil.parse(ContextHolder.instance().get(), new SceneBuilder(this, listener), resId);
+		XmlUtil.parse(ContextHolder.INSTANCE.get(), new SceneBuilder(this, listener), resId);
 	}
 	
 	public String name()
