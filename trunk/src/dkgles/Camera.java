@@ -1,7 +1,9 @@
 package dkgles;
 
+import javax.microedition.khronos.opengles.GL10;
+
+import android.opengl.GLU;
 import android.opengl.Matrix;
-import android.util.Log;
 
 //import javax.microedition.khronos.opengles.GL10;
 
@@ -16,7 +18,9 @@ public class Camera extends Movable
 		_nearPlane = 0.1f;
 		_farPlane = 10000.0f;
 		_fov = 45.0f;
+		_aspectRatio = 1.5f;
 		_viewMatrix = new float[16];
+		_skyboxTransformation = new Transformation();
 
 		if (scene!=null)
 		{
@@ -39,6 +43,16 @@ public class Camera extends Movable
 			//Log.v(TAG, "dirty- update");
 			_worldTransformationCache.mul(parentTransformation, _localTransformation);
 			_worldTransformationCache.getViewMatrix(_viewMatrix);
+			
+			// write transformation to skybox?
+			if (_drawable!=null)
+			{
+				_skyboxTransformation._matrix[12] = _worldTransformationCache._matrix[12];
+				_skyboxTransformation._matrix[13] = _worldTransformationCache._matrix[13];
+				_skyboxTransformation._matrix[14] = _worldTransformationCache._matrix[14];
+				
+				_drawable.setWorldTransformation(_skyboxTransformation);
+			}
 		}
 	}
 	
@@ -76,9 +90,16 @@ public class Camera extends Movable
 	}
 	
 	
-	public final void fov(float f)
+	public final void fov(float fov)
 	{
-		_fov = f;
+		_fov = fov;
+		_updateProjectionRQ.setCamera(this);
+		GLHost.INSTANCE.request(_updateProjectionRQ);
+	}
+	
+	public float aspectRatio()
+	{
+		return _aspectRatio;
 	}
 	
 	public float[] viewMatrix()
@@ -86,11 +107,58 @@ public class Camera extends Movable
 		return _viewMatrix;
 	}
 	
+	Transformation _skyboxTransformation;
+	
 	float[] _viewMatrix;
 	float _nearPlane;
 	float _farPlane;
 	float _fov;
+	float _aspectRatio;
 	
-	private final static String TAG = "Camera"; 
+	private final static String TAG = "Camera";
 	
+	static GLUpdateProjectionRequest _updateProjectionRQ = new GLUpdateProjectionRequest();	
 }
+
+class GLUpdateProjectionRequest implements Runnable
+{
+	public GLUpdateProjectionRequest()
+	{
+	}
+	
+	public void setCamera(Camera camera)
+	{
+		_camera = camera;
+	}
+	
+	public void run()
+	{
+		GL10 gl = GLHost.INSTANCE.get();
+		
+		gl.glMatrixMode(GL10.GL_PROJECTION);
+		gl.glLoadIdentity();
+		GLU.gluPerspective(gl, _camera.fov(), _camera.aspectRatio(), _camera.nearPlane(), _camera.farPlane());
+		gl.glMatrixMode(GL10.GL_MODELVIEW);
+		gl.glLoadIdentity();
+	}
+	
+	Camera _camera;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

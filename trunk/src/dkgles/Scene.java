@@ -31,7 +31,7 @@ public class Scene
 	/**
 	 * Build a scene by XML file
 	 */
-	public void build(int resId, SceneBuilder.Listener listener)
+	public void build(int resId, IBuildSceneHandler listener)
 	{
 		//release();
 		XmlUtil.parse(ContextHolder.INSTANCE.get(), new SceneBuilder(this, listener), resId);

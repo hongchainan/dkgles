@@ -99,7 +99,7 @@ public class UIManager extends Scene implements OnTouchListener
 		if (action == MotionEvent.ACTION_DOWN)
 		{
 			Log.v(CLASS_TAG, "action down!!" + x + ", " + y);
-			ServiceManager.instance().vibrator().vibrate(70);
+			ServiceManager.INSTANCE.vibrator().vibrate(70);
 			
 			for (Touchable touchable : _touchables)
 			{
@@ -175,7 +175,6 @@ public class UIManager extends Scene implements OnTouchListener
 	UIManager()
 	{
 		super("UIScene", new OrthoRenderQueue("UIRenderQueue", 5, RenderQueue.UI_LAYER));
-		//_touchables = new ArrayList<Touchable>();
 		_touchables = new Touchable[MAX_TOUCHABLES];
 		_halfAsr = 0.5f;
 		_enable = true;

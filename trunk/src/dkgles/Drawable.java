@@ -81,6 +81,11 @@ public abstract class Drawable
 		}
 	}
 	
+	public String name()
+	{
+		return _name;
+	}
+	
 	
 	public String toString()
 	{

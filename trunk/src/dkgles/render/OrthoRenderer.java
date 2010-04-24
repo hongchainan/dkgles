@@ -57,7 +57,8 @@ public final class OrthoRenderer
 	{
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glPushMatrix();
-		gl.glOrthof(-1.0f, 1.0f, -1.0f, 1.0f, 1, 100);
+		gl.glLoadIdentity();
+		gl.glOrthof(-.75f, .75f, -.5f, .5f, 1, 100);
 		
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();

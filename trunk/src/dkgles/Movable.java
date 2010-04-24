@@ -286,6 +286,11 @@ public class Movable
 	{
 		return _name;
 	}
+	
+	public String name()
+	{
+		return _name;
+	}
 
 	protected void finalize() throws Throwable
 	{
