@@ -31,9 +31,9 @@ public class Skybox extends Mesh
 	void initFaceList()
 	{
 		int[] flist = new int[]{
-			//0,	// 	+X
-			//4,	// 	-X
-			//8, 	// 	+Y
+			0,	// 	+X
+			4,	// 	-X
+			8, 	// 	+Y
 			12,	//	_Y
 			//16,	//	+Z
 			20, //	-Z
@@ -50,22 +50,22 @@ public class Skybox extends Mesh
 		
 		float[] vertices = new float[]{
 				// +X
-		         x, -y,  z,
-		         x, -y, -z,
 		         x,  y, -z,
 		         x,  y,  z,
+		         x, -y, -z,
+		         x, -y,  z,
 
 		        // -X
+		        -x,  y,  z,
+		        -x,  y, -z,
+		        -x, -y,  z,
 		        -x, -y, -z,
-		        -x, -y, z,
-		        -x, y, z,
-		        -x, y, -z,
 
 		        // +Y
-		        -x, y, z,
-		        x, y, z,
-		        x, y, -z,
-		        -x, y, -z,
+		        -x,  y,  z,
+		         x,  y,  z,
+		        -x,  y, -z,
+		         x,  y, -z,
 
 		        // -Y
 		        -x, -y, -z,
@@ -93,22 +93,22 @@ public class Skybox extends Mesh
 	{
 		float[] texcoords = new float[]{
 				// +X
-	            1.0f, 0.5f,
-	            0.66f, 0.5f,
-	            0.66f, 0.25f,
+	            .66f, .25f,
 	            1.0f, .25f,
+	            .66f, .50f,
+	            1.0f, .50f,
 
 	            // -X
-	            .33f, .5f,
-	            .0f, .5f,
-	            .0f, .25f,
+	            0.0f, .25f,
 	            .33f, .25f,
+	            0.0f, .50f,
+	            .33f, .50f,
 
 	            // +Y
 	           .33f, .0f,
 	           .66f, .0f,
-	           .66f, .25f,
 	           .33f, .25f,
+	           .66f, .25f,
 
 	            // -Y
 	           .66f, .75f,
@@ -123,10 +123,10 @@ public class Skybox extends Mesh
 	           .33f, 1.0f,
 
 	            // -Z
-	           .66f, .5f,
-	           .33f, .5f,
 	           .33f, .25f,
-	           .66f, .25f
+	           .66f, .25f,
+	           .33f, .50f,
+	           .66f, .50f
 		};
 		
 		_subMesh.setTexcoords(texcoords);

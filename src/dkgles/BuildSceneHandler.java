@@ -25,4 +25,9 @@ public class BuildSceneHandler implements IBuildSceneHandler
 		
 	}
 	
+	public void onSceneCreated(Scene scene)
+	{
+		
+	}
+	
 }
