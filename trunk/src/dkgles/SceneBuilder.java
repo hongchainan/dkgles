@@ -181,15 +181,6 @@ public class SceneBuilder extends DefaultHandler
 		else if (localName.equals("movable"))
 		{
 			_movableStack.pop();
-			/*
-			if (_movableStack.empty())
-			{
-				_movable = _scene.root();
-			}
-			else
-			{
-				_movable = _movableStack.pop();
-			}*/
 		}
 	}
 	
@@ -217,8 +208,6 @@ public class SceneBuilder extends DefaultHandler
 	Scene _scene;
 
 	IBuildSceneHandler _listener;
-
-	//static Listener _defaultListener;// = new Listener();
 	static final String TAG = "SceneBuilder";
 }
 

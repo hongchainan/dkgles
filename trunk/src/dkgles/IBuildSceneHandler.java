@@ -12,4 +12,6 @@ public interface IBuildSceneHandler
 	public void onRectangleCreated(Rectangle rectangle);
 	
 	public void onTouchableCreated(Touchable touchable);
+	
+	public void onSceneCreated(Scene scene);
 }
