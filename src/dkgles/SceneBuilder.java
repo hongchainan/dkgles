@@ -22,34 +22,13 @@ import dkgles.ui.UIManager;
  */
 public class SceneBuilder extends DefaultHandler
 {
-	public class Listener
-	{
-		public Listener()
-		{
-			
-		}
-		
-		
-		public void onCameraCreated(Camera camera)
-		{
-		}
-
-		public void onMovableCreated(Movable movable)
-		{
-		}
-
-		public void onRectangleCreated(Rectangle rectangle)
-		{
-		}
-	}
-
-	public SceneBuilder(Scene scene, Listener listener)
+	public SceneBuilder(Scene scene, IBuildSceneHandler listener)
 	{
 		_scene = scene;
 		registerListener(listener);
 	}
 
-	public void registerListener(Listener listener)
+	public void registerListener(IBuildSceneHandler listener)
 	{
 		if (listener!=null)
 		{
@@ -57,7 +36,7 @@ public class SceneBuilder extends DefaultHandler
 		}
 		else
 		{
-			_listener = new Listener();
+			_listener = new BuildSceneHandler();
 		}
 	}	
 
@@ -73,7 +52,10 @@ public class SceneBuilder extends DefaultHandler
 		
 		//_movable = null;
 		//_scene = null;
-		_listener = new Listener();
+		if (_listener==null)
+		{
+			_listener = new BuildSceneHandler();
+		}
 	}
 	
 	@Override
@@ -162,6 +144,7 @@ public class SceneBuilder extends DefaultHandler
 			
 			UIManager.instance().register(touchable);
 			_movableStack.peek().setDrawable(touchable);
+			_listener.onTouchableCreated(touchable);
 			
 		}
 		else if (localName.equals("camera"))
@@ -233,9 +216,9 @@ public class SceneBuilder extends DefaultHandler
 	Stack<Movable> _movableStack;
 	Scene _scene;
 
-	Listener _listener;
+	IBuildSceneHandler _listener;
 
-	static Listener _defaultListener;// = new Listener();
+	//static Listener _defaultListener;// = new Listener();
 	static final String TAG = "SceneBuilder";
 }
 

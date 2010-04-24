@@ -71,6 +71,11 @@ public class SubMesh
   	}
 	
 	
+	public void setFaceList(int[] flist)
+	{
+		_renderImpl.setFaceList(flist);
+	}
+	
 	public void setTexcoords(float[] texcoords)
 	{
 		_renderImpl.setTexcoords(texcoords);
@@ -106,6 +111,11 @@ abstract class RenderImpl
 		
 		setTextureBuffer(texBuf);
   	}
+	
+	public void setFaceList(int[] faceList)
+	{
+		_faceList = faceList;
+	}
   	
   	public void setVertices(float[] vertices)
 	{
@@ -151,6 +161,8 @@ abstract class RenderImpl
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 	}
 	
+	protected int[]	_faceList;
+	
   	protected abstract void setTextureBuffer(FloatBuffer buffer);
   	protected abstract void setVerticeBuffer(FloatBuffer buffer);
   	protected abstract void setIndicesBuffer(ShortBuffer buffer);
@@ -165,7 +177,19 @@ class DrawArrayImpl extends RenderImpl
 	public void render(GL10 gl)
 	{
 		enableClientState(gl);
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, _vcount); 
+		
+		if (_faceList==null)
+		{
+			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, _vcount);
+		}
+		else
+		{
+			for (int i=0;i<_faceList.length;i++)
+			{
+				gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, _faceList[i], 4);
+			}
+			
+		}
 		disableClientState(gl);
 	}
 	

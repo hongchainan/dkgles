@@ -1,37 +1,59 @@
 package dkgles.android.wrapper;
 
+import java.util.List;
+
+import lost.kapa.ContextHolder;
+import lost.kapa.GameManager;
 import android.content.Context;
+import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.PowerManager;
 import android.os.Vibrator;
+import android.util.Log;
 
 /**
  * 
  * @author doki
  * Remenber to turn on the user.permission
  */
-public class ServiceManager
+public enum ServiceManager
 {
-	public static ServiceManager instance()
+	INSTANCE;
+	
+	ServiceManager()
 	{
-		if (_instance==null)
-		{
-			_instance = new ServiceManager();
-		}
+		_initialized = false;
+	}
+	
+	public void release()
+	{
 		
-		return _instance;
 	}
 	
 	/**
 	 * 
 	 * @param context
 	 */
-	public void initialize(Context context)
+	public void initialize()
 	{
-		_vibrator = (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE);
-		_sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-		_powerManager = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
-		_initialized = true;
+		_vibrator 		= (Vibrator)ContextHolder.INSTANCE.get().getSystemService(Context.VIBRATOR_SERVICE);
+		_sensorManager 	= (SensorManager)ContextHolder.INSTANCE.get().getSystemService(Context.SENSOR_SERVICE);
+		_powerManager 	= (PowerManager)ContextHolder.INSTANCE.get().getSystemService(Context.POWER_SERVICE);
+		_wakelock 		= _powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "FooTag");
+		
+		List<Sensor> sensors = _sensorManager.getSensorList(Sensor.TYPE_ORIENTATION);
+		
+		for (Sensor s : sensors)
+		{
+			Log.d("SENSOR_INFO", s.getName());
+		}
+		
+		if (sensors.size()>0)
+		{
+			_orientSensor = sensors.get(0);
+		}
+		
+		_initialized 	= true;
 	}
 	
 	public Vibrator vibrator()
@@ -59,6 +81,27 @@ public class ServiceManager
 		}
 	}
 	
+	public void pause()
+	{
+		_sensorManager.unregisterListener(
+				GameManager.INSTANCE
+				);
+		
+		releaseWakeLock();
+	}
+	
+	public void resume()
+	{
+		_sensorManager.registerListener(
+				GameManager.INSTANCE,
+				_orientSensor,
+				SensorManager.SENSOR_DELAY_FASTEST
+		);
+		
+		acquireWakeLock();
+		
+	}
+	
 	public SensorManager sensorManager()
 	{
 		if (_initialized)
@@ -71,19 +114,22 @@ public class ServiceManager
 		}
 	}
 	
-	
-	
-	private ServiceManager()
+	public void acquireWakeLock()
 	{
-		_initialized = false;
+		_wakelock.acquire();
 	}
 	
-	private PowerManager	_powerManager;
-	private SensorManager 	_sensorManager;
-	private Vibrator 		_vibrator;
+	public void releaseWakeLock()
+	{
+		_wakelock.release();
+	}
 	
-	private boolean _initialized;
+	PowerManager	_powerManager;
+	SensorManager 	_sensorManager;
+	Vibrator 		_vibrator;
+	Sensor					_orientSensor;
+	PowerManager.WakeLock 	_wakelock;
 	
-	private static ServiceManager _instance;
+	boolean _initialized;
 	private static final String TAG = "ServiceManager";
 }
