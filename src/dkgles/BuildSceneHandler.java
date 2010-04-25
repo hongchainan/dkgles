@@ -30,4 +30,6 @@ public class BuildSceneHandler implements IBuildSceneHandler
 		
 	}
 	
+	public void onSkyboxCreated(Skybox skybox){}
+	
 }

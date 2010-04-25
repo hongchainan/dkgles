@@ -14,4 +14,6 @@ public interface IBuildSceneHandler
 	public void onTouchableCreated(Touchable touchable);
 	
 	public void onSceneCreated(Scene scene);
+	
+	public void onSkyboxCreated(Skybox skybox);
 }

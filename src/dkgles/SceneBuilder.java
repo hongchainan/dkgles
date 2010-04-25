@@ -156,9 +156,21 @@ public class SceneBuilder extends DefaultHandler
 			);
 
 			parseMovableOptionalParam(camera, atts);
-			
+			_camera = camera;
 			//_scene.bindCamera(camera);
 			_listener.onCameraCreated(camera);
+		}
+		else if (localName.equals("skybox"))
+		{
+			Skybox skybox = new Skybox(
+					XmlUtil.parseString(atts, "name", "Skybox:N/A"),
+					MaterialManager.INSTANCE.getByName(XmlUtil.parseString(atts, "material", "N/A")),
+					XmlUtil.parseFloat(atts, "size", 30.0f)
+			);
+			
+			_camera.setDrawable(skybox);
+					
+					
 		}
 	}
 	
@@ -181,6 +193,10 @@ public class SceneBuilder extends DefaultHandler
 		else if (localName.equals("movable"))
 		{
 			_movableStack.pop();
+		}
+		else if (localName.equals("camera"))
+		{
+			_camera = null;
 		}
 	}
 	
@@ -205,6 +221,7 @@ public class SceneBuilder extends DefaultHandler
 	
 	
 	Stack<Movable> _movableStack;
+	Camera _camera;
 	Scene _scene;
 
 	IBuildSceneHandler _listener;
