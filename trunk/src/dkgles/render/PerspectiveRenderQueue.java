@@ -2,8 +2,6 @@ package dkgles.render;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import dkgles.render.RenderQueue.Group;
-
 public class PerspectiveRenderQueue extends RenderQueue
 {
 

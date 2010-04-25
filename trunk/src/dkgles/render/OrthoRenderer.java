@@ -2,37 +2,9 @@ package dkgles.render;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import dkgles.Drawable;
-import dkgles.Texture;
-
-public final class OrthoRenderer
+public enum OrthoRenderer
 {
-	public static OrthoRenderer instance()
-	{
-		if (_instance==null)
-		{
-			_instance = new OrthoRenderer();
-		}	
-		return _instance;
-	}
-	
-	
-	public boolean initialized()
-	{
-		return _initialized;
-	}
-	
-	
-	public void initialize(GL10 gl)
-	{
-		if (_initialized)
-		{
-			return;
-		}
-		
-		_gl = gl;
-		_initialized = true;
-	}
+	INSTANCE;
 	
 	public void render(GL10 gl, RenderQueue renderQueue)
 	{
@@ -58,8 +30,7 @@ public final class OrthoRenderer
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		gl.glOrthof(-.75f, .75f, -.5f, .5f, 1, 100);
-		
+		gl.glOrthof(-.75f, .75f, -.5f, .5f, _nearPlane, _farPlane);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
 	}
@@ -77,26 +48,13 @@ public final class OrthoRenderer
 		_renderQueue = q; 
 	}
 	
-	private OrthoRenderer()
+	OrthoRenderer()
 	{
 		_nearPlane 	= 1.0f;
 		_farPlane 	= 100.0f;
-		_initialized = false;
-		
-		//_drawables = new ArrayList<Drawable>();
 	}
 	
-	private RenderQueue	_renderQueue;
-	private GL10	_gl;
-	private boolean _initialized;
-	private Texture _texture;
-	
-	private float _nearPlane;
-	private float _farPlane;
-	
-	
-	//private ArrayList<Drawable> _drawables;
-	private Drawable _drawable;
-	private static OrthoRenderer _instance;
-	
+	RenderQueue	_renderQueue;
+	float 		_nearPlane;
+	float 		_farPlane;
 }
