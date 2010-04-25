@@ -257,6 +257,17 @@ public class Movable
 		_dirty = true;
 	}
 	
+	public Transformation getLocalTransformation() throws CloneNotSupportedException
+	{
+		return (Transformation)_localTransformation.clone();
+	}
+	
+	public synchronized void mulTransformation(Transformation transformation)
+	{
+		_localTransformation.mul(transformation);
+		_dirty = true;
+	}
+	
 	/**
 	 *Update world transformation by world = parent x local
 	 *@param parentTransformation transformation from parent node

@@ -104,6 +104,11 @@ public class Transformation implements Cloneable
 		//return new Transformation(q, t);
 	//}
 	
+	public void mul(Transformation rhs)
+	{
+		Matrix.multiplyMM(_matrix, 0, _matrix, 0, rhs._matrix, 0);
+	}
+	
 	public final void mul(Transformation lhs, Transformation rhs)
 	{
 		Matrix.multiplyMM(_matrix, 0, lhs._matrix, 0, rhs._matrix, 0);

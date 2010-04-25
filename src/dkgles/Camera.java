@@ -5,9 +5,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLU;
 import android.opengl.Matrix;
 
-//import javax.microedition.khronos.opengles.GL10;
-
-
 public class Camera extends Movable
 {
 	public static final int PERSPECTIVE = 0;
@@ -115,7 +112,7 @@ public class Camera extends Movable
 	float _fov;
 	float _aspectRatio;
 	
-	private final static String TAG = "Camera";
+	final static String TAG = "Camera";
 	
 	static GLUpdateProjectionRequest _updateProjectionRQ = new GLUpdateProjectionRequest();	
 }
