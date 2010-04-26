@@ -11,8 +11,10 @@ import dkgles.android.wrapper.ServiceManager;
 import dkgles.render.OrthoRenderQueue;
 import dkgles.render.RenderQueue;
 
-public class UIManager extends Scene implements OnTouchListener
+public enum UIManager implements OnTouchListener
 {	
+	INSTANCE;
+
 	public int createTouchable(String name, float width, float height, Material material, Movable node)
 	{
 		Touchable touchable = new Touchable(name, width, height, material);
@@ -69,19 +71,14 @@ public class UIManager extends Scene implements OnTouchListener
 	
 	public void destroyAll()
 	{
-		for (int i=0;i<MAX_TOUCHABLES;i++)
+		if (_touchables!=null)
 		{
-			destroy(i);
+			for (int i=0;i<MAX_TOUCHABLES;i++)
+			{
+				destroy(i);
+			}
+			_touchables = null;
 		}
-	}
-	
-	/**
-	 * @deprecated
-	 * @param touchable
-	 */
-	public void addTouchable(Touchable touchable)
-	{
-		//_touchables.add(touchable);
 	}
 		
 	/**
@@ -98,7 +95,7 @@ public class UIManager extends Scene implements OnTouchListener
 		
 		if (action == MotionEvent.ACTION_DOWN)
 		{
-			Log.v(CLASS_TAG, "action down!!" + x + ", " + y);
+			//Log.v(CLASS_TAG, "action down!!" + x + ", " + y);
 			ServiceManager.INSTANCE.vibrator().vibrate(70);
 			
 			for (Touchable touchable : _touchables)
@@ -114,7 +111,7 @@ public class UIManager extends Scene implements OnTouchListener
 		}
 		else if (action == MotionEvent.ACTION_UP)
 		{
-			Log.v(CLASS_TAG, "action up");
+			//Log.v(CLASS_TAG, "action up");
 			
 			for (Touchable touchable : _touchables)
 			{
@@ -154,7 +151,7 @@ public class UIManager extends Scene implements OnTouchListener
 	
 	public void onSize(float width, float height)
 	{
-		Log.v(CLASS_TAG, "onSize Event" + width + ", " + height);
+		//Log.v(CLASS_TAG, "onSize Event" + width + ", " + height);
 		_width	= width;
 		_height = height;
 		_halfAsr = (_width / _height)/2.0f;
@@ -164,32 +161,54 @@ public class UIManager extends Scene implements OnTouchListener
 	{
 		_enable = val;
 	}
-	
-	
-	
-	public static UIManager instance()
-	{	
-		return _instance;
+
+	public Scene getScene()
+	{
+		return SceneManager.INSTANCE.get(_sceneId);
 	}
+	
 	
 	UIManager()
 	{
-		super("UIScene", new OrthoRenderQueue("UIRenderQueue", 5, RenderQueue.UI_LAYER));
-		_touchables = new Touchable[MAX_TOUCHABLES];
-		_halfAsr = 0.5f;
-		_enable = true;
+		reset();
+		
+	}
+
+	public void reset()
+	{
+		release();
+		_touchables 	= new Touchable[MAX_TOUCHABLES];
+		_halfAsr 	= 0.5f;
+		_enable 	= true;
+		_sceneId 	= SceneManager.INSTANCE.create(
+			"UIScene",
+			 new OrthoRenderQueue("UIRenderQueue", 5, RenderQueue.UI_LAYER));
+		_active = true;
+		
+	}
+
+	public void release()
+	{
+		if (!_active)
+			return;
+		enable(false);
+		destroyAll();
+		SceneManager.INSTANCE.destory(_sceneId);
+		_sceneId = -1;
+		_active = false;
 	}
 	
-	public final static int MAX_TOUCHABLES = 8;
-	Touchable[]	_touchables;
 	
+	Touchable[]	_touchables;
+	int 	_sceneId;	
+
 	boolean _enable;
-	//ArrayList<Touchable> 	_touchables;
+	boolean	_active;
 	float _width;
 	float _height;
 	float _halfAsr;	// Half value of aspect ratio
 	
-	static UIManager	_instance = new UIManager();
 	static final String CLASS_TAG = "UIManager";
+	public final static int MAX_TOUCHABLES = 8;
 	
 }
