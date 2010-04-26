@@ -26,6 +26,18 @@ public enum MaterialManager
 	
 	public final static int BLACK_ID = 0;
 	
+	public interface IListener
+	{
+		public void onCreated(Material material);
+	}
+	
+	IListener _listener;
+	
+	public void registerListener(IListener listener)
+	{
+		_listener = listener;
+	}
+	
 	
 	/**
 	 * Create a material and return material ID
@@ -36,6 +48,12 @@ public enum MaterialManager
 	{
 		Material material = new Material(name);
 		material.bindTexture(texture);
+		
+		if (_listener!=null)
+		{
+			_listener.onCreated(material);
+		}
+		
 		return register(material);
 	}
 
@@ -153,7 +171,7 @@ public enum MaterialManager
 	
 	
 
-	public final static int MAX_MATERIALS = 16;
+	public final static int MAX_MATERIALS = 64;
 	
 	Material[] _materials;
 	final static String TAG = "MaterialManager";
