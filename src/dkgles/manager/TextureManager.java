@@ -232,7 +232,7 @@ public enum TextureManager
 	Texture[]	_textures;
 	
 	
-	final static int MAX_TEXTURES = 10;
+	final static int MAX_TEXTURES = 64;
 	
 	final static String TAG = "TextureManager";
 

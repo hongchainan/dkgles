@@ -30,11 +30,12 @@ public class Scene
 
 	/**
 	 * Build a scene by XML file
+	 * @deprecated
 	 */
 	public void build(int resId, IBuildSceneHandler listener)
 	{
 		//release();
-		XmlUtil.parse(ContextHolder.INSTANCE.get(), new SceneBuilder(this, listener), resId);
+		//XmlUtil.parse(ContextHolder.INSTANCE.get(), new SceneBuilder(this, listener), resId);
 	}
 	
 	public String name()

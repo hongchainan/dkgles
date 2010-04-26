@@ -1,7 +1,9 @@
 package dkgles;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
+import lost.kapa.ContextHolder;
 import lost.kapa.XmlUtil;
 
 import org.xml.sax.Attributes;
@@ -22,14 +24,22 @@ import dkgles.ui.UIManager;
  */
 public class SceneBuilder extends DefaultHandler
 {
-	public SceneBuilder(Scene scene, IBuildSceneHandler listener)
+	public SceneBuilder(Scene scene)
 	{
 		_scene = scene;
-		registerListener(listener);
+		_listeners = new ArrayList<IBuildSceneHandler>();
+		//registerListener(listener);
+	}
+	
+	public void build(int resId)
+	{
+		XmlUtil.parse(ContextHolder.INSTANCE.get(), this, resId);
 	}
 
 	public void registerListener(IBuildSceneHandler listener)
 	{
+		_listeners.add(listener);
+		/*
 		if (listener!=null)
 		{
 			_listener = listener;
@@ -37,7 +47,7 @@ public class SceneBuilder extends DefaultHandler
 		else
 		{
 			_listener = new BuildSceneHandler();
-		}
+		}*/
 	}	
 
 	@Override
@@ -52,10 +62,10 @@ public class SceneBuilder extends DefaultHandler
 		
 		//_movable = null;
 		//_scene = null;
-		if (_listener==null)
+		/*if (_listener==null)
 		{
 			_listener = new BuildSceneHandler();
-		}
+		}*/
 	}
 	
 	@Override
@@ -117,7 +127,11 @@ public class SceneBuilder extends DefaultHandler
 			_movableStack.push(movable);
 
 			// notify movable created
-			_listener.onMovableCreated(_movableStack.peek());
+			for (IBuildSceneHandler listener : _listeners)
+			{
+				listener.onMovableCreated(_movableStack.peek());
+			}
+			//_listener.
 			
 		}
 		else if (localName.equals("rectangle"))
@@ -144,7 +158,13 @@ public class SceneBuilder extends DefaultHandler
 			
 			UIManager.INSTANCE.register(touchable);
 			_movableStack.peek().setDrawable(touchable);
-			_listener.onTouchableCreated(touchable);
+			
+			for (IBuildSceneHandler listener : _listeners)
+			{
+				listener.onTouchableCreated(touchable);
+			}
+			
+			//_listener.onTouchableCreated(touchable);
 			
 		}
 		else if (localName.equals("camera"))
@@ -158,7 +178,13 @@ public class SceneBuilder extends DefaultHandler
 			parseMovableOptionalParam(camera, atts);
 			_camera = camera;
 			//_scene.bindCamera(camera);
-			_listener.onCameraCreated(camera);
+			
+			for (IBuildSceneHandler listener : _listeners)
+			{
+				listener.onCameraCreated(camera);
+			}
+			
+			//_listener.onCameraCreated(camera);
 		}
 		else if (localName.equals("skybox"))
 		{
@@ -224,7 +250,7 @@ public class SceneBuilder extends DefaultHandler
 	Camera _camera;
 	Scene _scene;
 
-	IBuildSceneHandler _listener;
+	ArrayList<IBuildSceneHandler> _listeners;
 	static final String TAG = "SceneBuilder";
 }
 
