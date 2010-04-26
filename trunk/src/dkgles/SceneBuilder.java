@@ -142,7 +142,7 @@ public class SceneBuilder extends DefaultHandler
 					MaterialManager.INSTANCE.getByName(XmlUtil.parseString(atts, "material", "N/A"))
 			);
 			
-			UIManager.instance().register(touchable);
+			UIManager.INSTANCE.register(touchable);
 			_movableStack.peek().setDrawable(touchable);
 			_listener.onTouchableCreated(touchable);
 			
