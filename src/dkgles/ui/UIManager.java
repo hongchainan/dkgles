@@ -1,12 +1,12 @@
 package dkgles.ui;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import dkgles.Material;
 import dkgles.Movable;
 import dkgles.Scene;
+import dkgles.SceneManager;
 import dkgles.android.wrapper.ServiceManager;
 import dkgles.render.OrthoRenderQueue;
 import dkgles.render.RenderQueue;
@@ -193,7 +193,7 @@ public enum UIManager implements OnTouchListener
 			return;
 		enable(false);
 		destroyAll();
-		SceneManager.INSTANCE.destory(_sceneId);
+		SceneManager.INSTANCE.destroy(_sceneId);
 		_sceneId = -1;
 		_active = false;
 	}

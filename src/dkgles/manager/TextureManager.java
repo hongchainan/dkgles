@@ -90,19 +90,6 @@ public enum TextureManager
 		return -1;
 	}
 	
-	public int register(Texture texture)
-	{
-		for (int i=0;i<MAX_TEXTURES;i++)
-		{
-			if (_textures[i]==null)
-			{
-				_textures[i] = texture;
-				return i;
-			}
-		}
-		return -1;
-	}
-
 	/**
 	 * 
 	 * @author doki
