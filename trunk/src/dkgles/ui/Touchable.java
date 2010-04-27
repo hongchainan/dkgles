@@ -1,5 +1,7 @@
 package dkgles.ui;
 
+import java.util.ArrayList;
+
 import android.util.Log;
 import dkgles.Material;
 import dkgles.Transformation;
@@ -18,24 +20,46 @@ public class Touchable extends Rectangle
 	{
 		super(name, width, height, material);
 		_position = new float[3];
-		_handler = _nilTouchEventHandler;
+		_handlers = new ArrayList<ITouchEventHandler>();
+		//_handler = _nilTouchEventHandler;
 		_enable = true;
+	}
+	
+	public void release()
+	{
+		super.release();
+		
+		if (_handlers!=null)
+		{
+			_handlers.clear();
+			_handlers = null;
+		}
+		
+		if (_position!=null)
+		{
+			_position = null;
+		}
 	}
 	
 	/**
 	 * Bind a touch event handler
 	 * @param handler
 	 */
-	public void bindTouchEventHandler(ITouchEventHandler handler)
+	public void addTouchEventHandler(ITouchEventHandler handler)
 	{
 		if (handler!=null)
+		{
+			_handlers.add(handler);
+		}
+		
+		/*if (handler!=null)
 		{
 			_handler = handler;
 		}
 		else
 		{
 			_handler = _nilTouchEventHandler;
-		}
+		}*/
 	}
 	
 	/**
@@ -45,7 +69,12 @@ public class Touchable extends Rectangle
 	public void enable(boolean val)
 	{
 		_enable = val;
-		_handler.enable(_enable);
+		
+		for (ITouchEventHandler handler : _handlers)
+		{
+			handler.enable(_enable);
+		}
+		//_handler.enable(_enable);
 		
 	}
 	
@@ -92,7 +121,14 @@ public class Touchable extends Rectangle
 			return;
 		
 		_touched = true;
-		_handler.touch(0);
+		//_handler.touch(0);
+		
+		for (ITouchEventHandler handler : _handlers)
+		{
+			handler.touch(0);
+		}
+		
+		
 		Log.v(TAG, _name + " touch!!");
 	}
 	
@@ -104,7 +140,15 @@ public class Touchable extends Rectangle
 	{
 		if (!_enable)
 			return;
-		_handler.unTouch(0);
+		
+		//_handler.unTouch(0);
+		
+		for (ITouchEventHandler handler : _handlers)
+		{
+			handler.unTouch(0);
+		}
+		
+		
 		_touched = false;
 		Log.v(TAG, _name + " untouch!!");
 	}
@@ -119,7 +163,8 @@ public class Touchable extends Rectangle
 	final static String TAG = "Touchable";
 	boolean _enable;
 	boolean _touched;
-	ITouchEventHandler _handler;
+	//ITouchEventHandler _handler;
+	ArrayList<ITouchEventHandler> _handlers;
 	static NilTouchEventHandler _nilTouchEventHandler = new NilTouchEventHandler();
 	
 	protected float[] _position;

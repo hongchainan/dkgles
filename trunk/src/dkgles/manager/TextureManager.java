@@ -1,15 +1,24 @@
 package dkgles.manager;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+
 import javax.microedition.khronos.opengles.GL10;
+
 import lost.kapa.ContextHolder;
+import lost.kapa.XmlUtil;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLException;
-import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.util.Log;
+import dkgles.GLHost;
 import dkgles.Texture;
 
 /**
@@ -20,45 +29,37 @@ import dkgles.Texture;
  *	Texture t = TextureManager.instance().get(TexID);
  *	TextureManager.instance().destroy(TexID);
  *TODO:
- *	Make sure local event handler stay in UI Thread
+ *	Make GLCreateTextureRequest and GLDeleteTextureRequest be a single object 
  *@author doki lin
  */
 public enum TextureManager
 {
 	INSTANCE;
 	
-	/**
-	 *Set GL context
-	 */
-	public void setGL(GL10 gl)
+	public interface IListener
 	{
-		_gl = gl;
+		public void onCreated(int id, Texture texture);
 	}
 	
-	/**
-	 * Set GLSurfaceView. Since we have to submit jobs to GLThreads
-	 * See: http://developer.android.com/reference/android/opengl/GLSurfaceView.html#queueEvent(java.lang.Runnable)
-	 * @see create
-	 * @see createAsync
-	 * @see destroy
-	 */
-	public void setGLSurfaceView(GLSurfaceView glSurfaceView)
-	{
-		_glSurfaceView = glSurfaceView;
-	}
+	ArrayList<IListener> _listeners;
 	
-	/**
-	 * 
-	 */
-	public boolean initialized()
+	public void registerListener(IListener listener)
 	{
-		if (_glSurfaceView!=null&&_gl!=null)
+		if (listener!=null)
 		{
-			return true;
+			_listeners.add(listener);
 		}
-		
-		return false;
 	}
+	
+	public void unregisterListener(IListener listener)
+	{
+		if (listener!=null)
+		{
+			_listeners.remove(listener);
+		}
+	}
+	
+	
 	
 	/**
 	 * Create a texture resource
@@ -74,7 +75,15 @@ public enum TextureManager
 		if (textureHolder==null)
 			return -1;
 		
-		return register(textureHolder.get());
+		Texture texture = textureHolder.get();
+		int id = register(texture);
+		
+		for (IListener listener : _listeners)
+		{
+			listener.onCreated(id, texture);
+		}
+		
+		return id;
 	}
 	
 	public int register(Texture texture)
@@ -149,7 +158,8 @@ public enum TextureManager
 			
 			// issue a queued event to Renderer Thread
 			TextureHolder holder = new TextureHolder();
-			_glSurfaceView.queueEvent(new GLCreateTextureRequest(name, bitmap, resId, holder));
+			
+			GLHost.INSTANCE.request(new GLCreateTextureRequest(name, bitmap, resId, holder));
 			return holder;
 		}
 		catch(Resources.NotFoundException e)
@@ -172,7 +182,7 @@ public enum TextureManager
 		if (_textures[id]==null)
 			return;
 		
-		_glSurfaceView.queueEvent(new GLDeleteTextureRequest(_textures[id]));
+		GLHost.INSTANCE.request(new GLDeleteTextureRequest(_textures[id]));
 		_textures[id].release();
 		_textures[id] = null;
 	}
@@ -193,9 +203,51 @@ public enum TextureManager
 	/**
 	 *	Get texture by givenID
 	 */
-	public synchronized Texture get(int id)
+	public synchronized Texture get(int id) //throws TextureNotFoundException
 	{
 		return _textures[id];
+	}
+	
+	/**
+	 * Get material by given name
+	 */
+	public Texture getByName(String name) throws TextureNotFoundException
+	{
+		int id = findIdByName(name);
+		
+		if (id!=-1)
+		{
+			return _textures[findIdByName(name)];
+		}
+		else
+		{
+			throw new TextureNotFoundException();
+		}
+	}
+
+	/**
+	 * Find material ID by given name
+	 *
+	 * @param name material name
+	 */
+	public int findIdByName(String name)
+	{
+		for (int i=0;i<MAX_TEXTURES;i++)
+		{
+			if (_textures[i]!=null)
+			{
+				if (_textures[i].name().equals(name))
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	public void parse(int resId)
+	{
+		XmlUtil.parse(ContextHolder.INSTANCE.get(), new TextureDefHandler(), resId);
 	}
 	
 	
@@ -203,6 +255,7 @@ public enum TextureManager
 	{
 		_textures 	= new Texture[MAX_TEXTURES];
 		_rconverter = new RConverter();
+		_listeners = new ArrayList<IListener>();
 	}
 	
 	/**
@@ -222,9 +275,6 @@ public enum TextureManager
 	    }
 	}
 	
-	GL10 			_gl;
-	GLSurfaceView	_glSurfaceView;
-
 	// deprecated
 	boolean 		_initialized;
 	
@@ -233,8 +283,17 @@ public enum TextureManager
 	
 	
 	final static int MAX_TEXTURES = 64;
-	
 	final static String TAG = "TextureManager";
+	
+	
+	public class TextureNotFoundException extends RuntimeException
+	{
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+	}
 
 	/**
 	 */
@@ -251,8 +310,9 @@ public enum TextureManager
 		public void run()
 		{
 			int[] id = new int[1];
-       		_gl.glEnable(GL10.GL_TEXTURE_2D);
-			_gl.glGenTextures(1, id, 0);
+			GL10 gl = GLHost.INSTANCE.get();
+       		gl.glEnable(GL10.GL_TEXTURE_2D);
+			gl.glGenTextures(1, id, 0);
         			
 			if (id[0]==0)
 			{
@@ -262,13 +322,13 @@ public enum TextureManager
 			}
         	        
        		// Set default parameters
-       		_gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
+       		gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
 
-       		_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-       		_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
-       		_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT);
-       		_gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,	GL10.GL_REPEAT);
-       		_gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE);
+       		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+       		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+       		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT);
+       		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,	GL10.GL_REPEAT);
+       		gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE);
         	        
         	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, _bitmap, 0);
         	_bitmap.recycle();    	
@@ -296,7 +356,7 @@ public enum TextureManager
 		{
 			int[] id = new int[1];
 			id[0] = _texture.glID();
-        	_gl.glDeleteTextures(1, id, 0);
+			GLHost.INSTANCE.get().glDeleteTextures(1, id, 0);
 		}
 		
 		final Texture _texture;
@@ -372,6 +432,47 @@ public enum TextureManager
 	}
 	
 	RConverter _rconverter;
+}
+
+class TextureDefHandler extends DefaultHandler
+{
+	@Override
+	public void startDocument() throws SAXException 
+	{
+	}
+	
+	@Override
+	public void endDocument() throws SAXException 
+	{
+		// Nothing to do
+	}
+	
+	@Override
+	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException 
+	{
+		//Log.v(TAG, "startElement");
+		if (localName.equals("texture"))
+		{
+			// get resource ID by its' name
+			int resId = TextureManager.INSTANCE.getRscIdByString(
+					XmlUtil.parseString(atts, "rsc_id", "N/A"));
+			
+			TextureManager.INSTANCE.create(
+					XmlUtil.parseString(atts, "name", "N/A"),
+					resId);
+		}
+		else
+		{
+			//skip this TAG
+		}
+	}
+	 
+	@Override
+	public void endElement(String namespaceURI, String localName, String qName) throws SAXException 
+	{
+		//Log.v(TAG, "endElement");
+	}
+	final static String TAG = "TextureDefHandler";
 }
 
 
