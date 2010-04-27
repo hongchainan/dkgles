@@ -49,11 +49,6 @@ public enum MaterialManager
 		Material material = new Material(name);
 		material.bindTexture(texture);
 		
-		if (_listener!=null)
-		{
-			_listener.onCreated(material);
-		}
-		
 		return register(material);
 	}
 
@@ -82,6 +77,12 @@ public enum MaterialManager
 			if (_materials[i]==null)
 			{
 				_materials[i] = material;
+				
+				if (_listener!=null)
+				{
+					_listener.onCreated(material);
+				}
+				
 				return i;
 			}
 		}
@@ -207,6 +208,14 @@ class MaterialDefHandler extends DefaultHandler
 				XmlUtil.parseFloat(atts, "blue", 1.0f),
 				XmlUtil.parseFloat(atts, "alpha", 1.0f)
 			);
+			
+			String textureName = XmlUtil.parseString(atts, "texture_name", "N/A");
+			if (!textureName.equals("N/A"))
+			{
+				_material.bindTexture(
+						TextureManager.INSTANCE.getByName(textureName));
+			}
+			
 		}
 		else if (localName.equals("texture"))
 		{
