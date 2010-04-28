@@ -125,6 +125,7 @@ public class SceneBuilder extends DefaultHandler
 			parseMovableOptionalParam(movable, atts);
 
 			_movableStack.push(movable);
+			_curNodeType = MOVABLE;
 
 			// notify movable created
 			for (IBuildSceneHandler listener : _listeners)
@@ -145,7 +146,14 @@ public class SceneBuilder extends DefaultHandler
 			
 			parseDrawableOptionalParam(rectangle, atts);
 
-			_movableStack.peek().setDrawable(rectangle);
+			if (_curNodeType==IMMOVABLE)
+			{
+				_immovable.setDrawable(rectangle);
+			}
+			else
+			{
+				_movableStack.peek().setDrawable(rectangle);
+			}
 		}
 		else if (localName.equals("touchable"))
 		{
@@ -195,8 +203,28 @@ public class SceneBuilder extends DefaultHandler
 			);
 			
 			_camera.setDrawable(skybox);
-					
-					
+		}
+		else if (localName.equals("immovable"))
+		{
+			String name = XmlUtil.parseString(atts, "name", "Immovable:N/A");
+			float x = XmlUtil.parseFloat(atts, "x", 0);
+			float y = XmlUtil.parseFloat(atts, "y", 0);
+			float z = XmlUtil.parseFloat(atts, "z", 0);
+			
+			float pitch = XmlUtil.parseFloat(atts, "pitch",	0);
+			float yaw 	= XmlUtil.parseFloat(atts, "yaw",	0);
+			float roll 	= XmlUtil.parseFloat(atts, "roll",	0);
+			
+			Transformation t = new Transformation();
+			t.rotateInLocalSpace(pitch, 1, 0, 0);
+			t.rotateInLocalSpace(roll, 	0, 0, 1);
+			t.rotateInLocalSpace(yaw, 	0, 1, 0);
+			t._matrix[12] = x;
+			t._matrix[13] = y;
+			t._matrix[14] = z;
+			
+			_immovable = new Immovable(name, t, _scene);
+			_curNodeType = IMMOVABLE;
 		}
 	}
 	
@@ -224,6 +252,11 @@ public class SceneBuilder extends DefaultHandler
 		{
 			_camera = null;
 		}
+		else if (localName.equals("immovable"))
+		{
+			_immovable = null;
+			_curNodeType = MOVABLE;
+		}
 	}
 	
 	void parseDrawableOptionalParam(Drawable drawable, Attributes atts)
@@ -247,8 +280,14 @@ public class SceneBuilder extends DefaultHandler
 	
 	
 	Stack<Movable> _movableStack;
+	
+	Immovable _immovable;
 	Camera _camera;
 	Scene _scene;
+	int _curNodeType;
+	
+	final static int MOVABLE 	= 0;
+	final static int IMMOVABLE 	= 1;
 
 	ArrayList<IBuildSceneHandler> _listeners;
 	static final String TAG = "SceneBuilder";
