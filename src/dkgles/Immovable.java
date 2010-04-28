@@ -1,55 +1,58 @@
 package dkgles;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Immovable
 {
-	public Immovable(String name, Transformation transformation)
+	public Immovable(String name, Transformation transformation, Scene scene)
 	{
-		_name = name;
+		_name 	= name;
+		_scene 	= scene;
 		_transformation = transformation;
-		_childList = new ArrayList<Immovable>(); 
+	}
+	
+	public void release()
+	{
+		_drawable = null;
+		_name = null;
 		
-	}
-	
-	
-	public Immovable createChild(String name, Transformation transformation)
-	{
-		Immovable child = new Immovable(name, transformation);
-		addChild(child);
-		return child;
-	}
-	
-	
-	public void addChild(Immovable child)
-	{
-		child.setParent(this);
-		_childList.add(child);
-	}
-	
-	public Transformation worldTransformation()
-	{
-		return _worldTransformationCache;
-	}
-	
-	
-	private void setParent(Immovable parent)
-	{
-		_parent = parent;
-		_worldTransformationCache.mul(parent.worldTransformation(), _transformation);
+		if (_transformation!=null)
+		{
+			_transformation.release();
+		}
+		
+		if (_movables!=null)
+		{
+			_movables.clear();
+			_movables = null;
+		}
 	}
 	
 	public void setDrawable(Drawable drawable)
 	{
 		_drawable = drawable;
-		_drawable.setWorldTransformation(_worldTransformationCache);
+		_drawable.setWorldTransformation(_transformation);
+		_scene.getRenderQueue().addDrawble(drawable);
 	}
 	
-	private Immovable					_parent;
-	private Drawable 					_drawable;
-	private String 						_name;
-	private Transformation 		_transformation;
-	private List<Immovable> 	_childList;
-	protected Transformation 	_worldTransformationCache;
+	public String name()
+	{
+		return _name;
+	}
+	
+	public void addMovable(Movable movable)
+	{
+		if (_movables==null)
+		{
+			_movables = new ArrayList<Movable>();
+		}
+		
+		_movables.add(movable);
+	}
+	
+	Drawable				_drawable;
+	String					_name;
+	Scene					_scene;
+	final Transformation	_transformation;
+	ArrayList<Movable>		_movables;
 }
