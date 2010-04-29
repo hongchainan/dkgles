@@ -9,7 +9,7 @@ import android.util.Log;
  *Abstract Drawable class
  *@author doki lin
  */
-public abstract class Drawable
+public class Drawable
 {
 	
 	public Drawable(String name)
@@ -18,6 +18,7 @@ public abstract class Drawable
 		_visible = true;
 		_groupID = 0;
 		_worldTransformation = Transformation.identity();
+		_mesh = Mesh.getDummy();
 	}
 
 	
@@ -72,12 +73,25 @@ public abstract class Drawable
 		try
 		{
 			gl.glMultMatrixf(_worldTransformation._matrix, 0);
-			renderImpl(gl);
+			_mesh.renderImpl(gl);
+			//renderImpl(gl);
 		}
 		catch(GLException e)
 		{
 			Log.e(TAG, "catch a GLException:" + e.getMessage());
 			throw e;
+		}
+	}
+	
+	public void setMesh(Mesh mesh)
+	{
+		if (mesh==null)
+		{
+			_mesh = Mesh.getDummy();
+		}
+		else
+		{
+			_mesh = mesh;
 		}
 	}
 	
@@ -92,13 +106,11 @@ public abstract class Drawable
 		return _name + ", group ID:" + _groupID; 
 	}
 	
-	
-	public abstract void renderImpl(GL10 gl);
-	
-	protected boolean 			_visible;
-	protected int				_groupID;
-	protected String 			_name;
-	protected Transformation 	_worldTransformation;
+	boolean			_visible;
+	int				_groupID;
+	String 			_name;
+	Mesh			_mesh;
+	Transformation 	_worldTransformation;
 	static final String TAG = "Drawable";
 	
 }

@@ -7,7 +7,7 @@ import javax.microedition.khronos.opengles.GL10;
  *An implementation of Drawable
  *@author doki lin
  */
-public class Mesh extends Drawable
+public class Mesh
 {
 	/**
 	 *@param name a human readable string for debugging
@@ -22,8 +22,16 @@ public class Mesh extends Drawable
 
 	public void release()
 	{
-		super.release();
-		
+		//super.release();
+		if (_subMeshes!=null)
+		{
+			for (int i=0;i<_SubMeshCount;i++)
+			{
+				_subMeshes[i].release();
+				_subMeshes[i] = null;
+			}
+			_subMeshes = null;
+		}
 	}
 	
 	/**
@@ -53,6 +61,18 @@ public class Mesh extends Drawable
 	}
 	
 	SubMesh[]	_subMeshes;
-	int 		_SubMeshCount;
-		
+	int 		_SubMeshCount;		
+	
+	public static DummyMesh getDummy()
+	{
+		return _dummy;
+	}
+	
+	static DummyMesh _dummy = new DummyMesh();
+}
+
+class DummyMesh extends Mesh
+{
+	public void renderImpl(GL10 gl)
+	{}
 }
