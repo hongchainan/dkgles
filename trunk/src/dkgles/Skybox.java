@@ -7,7 +7,7 @@ public class Skybox extends Mesh
 		super(name, 1);
 		
 		// draw skybox first
-		groupID(0);
+		// groupID(0);
 		
 		_size = size;
 		_subMesh = new SubMesh("SubMesh_" + name, SubMesh.DRAW_ARRAY, material);

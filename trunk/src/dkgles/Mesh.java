@@ -15,7 +15,7 @@ public class Mesh
 	 */
 	public Mesh(String name, int subMeshCount)
 	{
-		super(name);
+		_name = name;
 		_SubMeshCount = subMeshCount;
 		_subMeshes = new SubMesh[subMeshCount];
 	}
@@ -60,6 +60,13 @@ public class Mesh
 		}
 	}
 	
+	public String name()
+	{
+		return _name;
+	}
+	
+	String _name;
+	
 	SubMesh[]	_subMeshes;
 	int 		_SubMeshCount;		
 	
@@ -73,6 +80,12 @@ public class Mesh
 
 class DummyMesh extends Mesh
 {
+	public DummyMesh()
+	{
+		super("DummyMesh", 0);
+		// TODO Auto-generated constructor stub
+	}
+
 	public void renderImpl(GL10 gl)
 	{}
 }

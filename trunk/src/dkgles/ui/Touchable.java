@@ -2,12 +2,13 @@ package dkgles.ui;
 
 import java.util.ArrayList;
 
-import android.util.Log;
+import dkgles.Drawable;
 import dkgles.Material;
+import dkgles.Mesh;
 import dkgles.Transformation;
 import dkgles.primitive.Rectangle;
 
-public class Touchable extends Rectangle
+public class Touchable extends Drawable
 {
 	public interface ITouchEventHandler
 	{
@@ -16,13 +17,39 @@ public class Touchable extends Rectangle
 		public void enable(final boolean b);
 	}
 	
+	public Touchable(String name, Rectangle rectangle)
+	{
+		super(name);
+		setMesh(rectangle);
+		
+		_position 	= new float[3];
+		_handlers 	= new ArrayList<ITouchEventHandler>();
+		_enable 	= true;
+		_width		= rectangle.width();
+		_height		= rectangle.height();
+		
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param width
+	 * @param height
+	 * @param material
+	 * @deprecated
+	 */
 	public Touchable(String name, float width, float height, Material material)
 	{
-		super(name, width, height, material);
-		_position = new float[3];
-		_handlers = new ArrayList<ITouchEventHandler>();
-		//_handler = _nilTouchEventHandler;
-		_enable = true;
+		super(name);
+		
+		Rectangle rectangle =  new Rectangle("RTG_" + name, width, height, material);
+		setMesh(rectangle);
+		
+		_position 	= new float[3];
+		_handlers 	= new ArrayList<ITouchEventHandler>();
+		_enable 	= true;
+		_width		= width;
+		_height		= height;
 	}
 	
 	public void release()
@@ -129,7 +156,7 @@ public class Touchable extends Rectangle
 		}
 		
 		
-		Log.v(TAG, _name + " touch!!");
+		//Log.v(TAG, _name + " touch!!");
 	}
 	
 	/**
@@ -150,7 +177,7 @@ public class Touchable extends Rectangle
 		
 		
 		_touched = false;
-		Log.v(TAG, _name + " untouch!!");
+		//Log.v(TAG, _name + " untouch!!");
 	}
 	
 	//@override from Drawable
@@ -163,6 +190,8 @@ public class Touchable extends Rectangle
 	final static String TAG = "Touchable";
 	boolean _enable;
 	boolean _touched;
+	float	_width;
+	float	_height;
 	//ITouchEventHandler _handler;
 	ArrayList<ITouchEventHandler> _handlers;
 	static NilTouchEventHandler _nilTouchEventHandler = new NilTouchEventHandler();
