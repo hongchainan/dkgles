@@ -1,0 +1,4 @@
+4/29/10
+
+1. public abstract class Drawable -> public class Drawable
+2. public class Mesh extends Drawable -> public class Mesh
