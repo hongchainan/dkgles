@@ -30,6 +30,16 @@ public class Rectangle extends Mesh
 		}
 	}
 	
+	public float width()
+	{
+		return _width;
+	}
+	
+	public float height()
+	{
+		return _height;
+	}
+	
 	public void finalize() throws Throwable
 	{
 		try

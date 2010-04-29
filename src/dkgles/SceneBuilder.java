@@ -132,37 +132,30 @@ public class SceneBuilder extends DefaultHandler
 			{
 				listener.onMovableCreated(_movableStack.peek());
 			}
-			//_listener.
-			
 		}
-		else if (localName.equals("rectangle"))
+		else if (localName.equals("drawable"))
 		{
-			Rectangle rectangle = new Rectangle(
-				XmlUtil.parseString(atts, "name", "Rectangle:N/A"),
-				XmlUtil.parseFloat(atts, "width", 0.0f),
-				XmlUtil.parseFloat(atts, "height", 0.0f),
-				MaterialManager.INSTANCE.getByName(XmlUtil.parseString(atts, "material", "N/A"))
-			);
+			Drawable drawable = new Drawable(
+					MeshManager.INSTANCE.getByName(XmlUtil.parseString(atts, "mesh", "Mesh:N/A")),
+					XmlUtil.parseInt(atts, "group_id", 0));
 			
-			parseDrawableOptionalParam(rectangle, atts);
-
 			if (_curNodeType==IMMOVABLE)
 			{
-				_immovable.setDrawable(rectangle);
+				_immovable.setDrawable(drawable);
 			}
 			else
 			{
-				_movableStack.peek().setDrawable(rectangle);
+				_movableStack.peek().setDrawable(drawable);
 			}
 		}
 		else if (localName.equals("touchable"))
 		{
+			Rectangle rect = (Rectangle)MeshManager.INSTANCE.getByName(
+					XmlUtil.parseString(atts, "mesh", "Mesh:N/A"));
+			
 			Touchable touchable = new Touchable(
 					XmlUtil.parseString(atts, "name", "Touchable:N/A"),
-					XmlUtil.parseFloat(atts, "width", 0.0f),
-					XmlUtil.parseFloat(atts, "height", 0.0f),
-					MaterialManager.INSTANCE.getByName(XmlUtil.parseString(atts, "material", "N/A"))
-			);
+					rect);
 			
 			UIManager.INSTANCE.register(touchable);
 			_movableStack.peek().setDrawable(touchable);
@@ -170,10 +163,7 @@ public class SceneBuilder extends DefaultHandler
 			for (IBuildSceneHandler listener : _listeners)
 			{
 				listener.onTouchableCreated(touchable);
-			}
-			
-			//_listener.onTouchableCreated(touchable);
-			
+			}			
 		}
 		else if (localName.equals("camera"))
 		{
@@ -202,7 +192,11 @@ public class SceneBuilder extends DefaultHandler
 					XmlUtil.parseFloat(atts, "size", 30.0f)
 			);
 			
-			_camera.setDrawable(skybox);
+			Drawable drawable = new Drawable("");
+			drawable.setMesh(skybox);
+			
+			//_camera.setDrawable(skybox);
+			_camera.setDrawable(drawable);
 		}
 		else if (localName.equals("immovable"))
 		{

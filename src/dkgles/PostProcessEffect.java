@@ -45,7 +45,7 @@ public class PostProcessEffect extends Scene
 		_material = matmgr.get(mid);
 		_material.rgb(.0f,.0f,.0f);
 		_sprite = new Rectangle("PPEffectSprite", 1.33f, 1.0f, matmgr.get(mid));	
-		root().setDrawable(_sprite);
+		//root().setDrawable(_sprite);
 		visibility(false);
 	}
 	

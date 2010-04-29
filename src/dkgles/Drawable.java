@@ -11,6 +11,13 @@ import android.util.Log;
  */
 public class Drawable
 {
+	public Drawable(Mesh mesh, int groupId)
+	{
+		_mesh = mesh;
+		_visible = true;
+		_groupID = groupId;
+		_worldTransformation = Transformation.identity();
+	}
 	
 	public Drawable(String name)
 	{
