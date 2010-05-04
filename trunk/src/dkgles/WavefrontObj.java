@@ -28,8 +28,12 @@ public class WavefrontObj extends Mesh
 		LineNumberReader reader = new LineNumberReader(isr);
 			
 		String string = null;
-		ArrayList<Float> vertList = new ArrayList<Float>();
-		ArrayList<Short> indexList = new ArrayList<Short>();
+		ArrayList<Vector3> vertList 	= new ArrayList<Vector3>();
+		ArrayList<Vector2> texcoordList = new ArrayList<Vector2>();
+		
+		_vertList 		= new ArrayList<Float>();
+		_texcoordList 	= new ArrayList<Float>();
+		_indexList 		= new ArrayList<Short>();
 		
 		try 
 		{
@@ -37,7 +41,7 @@ public class WavefrontObj extends Mesh
 			{
 				Log.v("WavefrontObj", string);
 				
-				StringTokenizer st = new StringTokenizer(string);
+				StringTokenizer st = new StringTokenizer(string, " ");
 				
 				if (!st.hasMoreElements())
 					continue;
@@ -46,19 +50,30 @@ public class WavefrontObj extends Mesh
 				
 				if (tag.equals("v"))
 				{
-					float x = Float.parseFloat(st.nextToken());
-					float y = Float.parseFloat(st.nextToken());
-					float z = Float.parseFloat(st.nextToken());
+					Vector3 vec3 = new Vector3();
+					vec3.x = Float.parseFloat(st.nextToken());
+					vec3.y = Float.parseFloat(st.nextToken());
+					vec3.z = Float.parseFloat(st.nextToken());
 					
-					vertList.add(x);
-					vertList.add(y);
-					vertList.add(z);
+					vertList.add(vec3);
+				}
+				else if (tag.equals("vt"))
+				{
+					Vector2 vec2 = new Vector2();
+					vec2.x = Float.parseFloat(st.nextToken());
+					vec2.y = Float.parseFloat(st.nextToken());
+					texcoordList.add(vec2);
 				}
 				else if (tag.equals("f"))
 				{
 					while (st.hasMoreElements())
 					{
-						indexList.add(Short.parseShort(st.nextToken()));
+						parseVertexOfFace(
+							st.nextToken(),
+							vertList,
+							texcoordList);
+						//String s = st.nextToken();
+						//indexList.add(Short.parseShort(st.nextToken()));
 					}
 				}
 			}// Endof while
@@ -68,7 +83,7 @@ public class WavefrontObj extends Mesh
 					SubMesh.DRAW_ELEMENT,
 					MaterialManager.INSTANCE.getByName("MAT_Green"));
 			
-			Float[] fary = (Float[])vertList.toArray(new Float[1]);
+			Float[] fary = (Float[])_vertList.toArray(new Float[1]);
 			float[] vertexBuffer = new float[fary.length];
 			
 			for (int i=0;i<fary.length;i++)
@@ -76,7 +91,15 @@ public class WavefrontObj extends Mesh
 				vertexBuffer[i] = fary[i].floatValue();
 			}
 			
-			Short[] sary = (Short[])indexList.toArray(new Short[1]);
+			Float[] tary = (Float[])_texcoordList.toArray(new Float[1]);
+			float[] texcoordBuffer = new float[tary.length];
+			
+			for (int i=0;i<tary.length;i++)
+			{
+				texcoordBuffer[i] = tary[i].floatVaule();
+			}
+			
+			Short[] sary = (Short[])_indexList.toArray(new Short[1]);
 			short[] indexBuffer = new short[sary.length];
 			
 			for (int i=0;i<sary.length;i++)
@@ -85,6 +108,7 @@ public class WavefrontObj extends Mesh
 			}
 			
 			sm.setVertices(vertexBuffer);
+			sm.setTexcoords(texcoordBuffer);
 			sm.setIndices(indexBuffer);
 			
 			setSubMesh(0, sm);
@@ -97,4 +121,31 @@ public class WavefrontObj extends Mesh
 		}
 		
 	}
+	
+	void parseVertexOfFace(String tok, ArrayList<Vector3> vertList, ArrayList<Vector2> texcoordList)
+	{
+		StringTokenizer st = new StringTokenizer(string, " /");
+		
+		int vindex = Integer.parseInt(st.nextToken());
+		int tindex = Integer.parseInt(st.nextToken());
+		
+		vindex--;
+		tindex--;
+		
+		Vector3 vert = vertList.get(vindex);
+		
+		_vertList.add(vert.x);
+		_vertList.add(vert.y);
+		_vertList.add(vert.z);
+		
+		Vector2 texc = texcoordList.get(tindex);
+		_texcoordList.add(texc.x);
+		_texcoordList.add(texc.y);
+		
+		_indexList.add(vindex);
+	}
+	
+	ArrayList<Float> 	_vertList;
+	ArrayList<Float>	_texcoordList;
+	ArrayList<Short>	_indexList;
 }
