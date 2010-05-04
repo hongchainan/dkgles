@@ -14,11 +14,15 @@ public class SubMesh
 	public final static int DRAW_ARRAY 		= 0;
 	public final static int DRAW_ELEMENT 	= 1;
 	
+	public final static int TRIANGLE_STRIP 	= GL10.GL_TRIANGLE_STRIP;
+	public final static int TRIANGLES 		= GL10.GL_TRIANGLES;
+	
 	/**
 	 * 
 	 * @param name a human readable string for debugging
 	 * @param drawMode could be SubMesh.DRAW_ARRAY or SubMesh.DRAW_ELEMENT  
 	 * @param material
+	 * @deprecated
 	 */
 	public SubMesh(final String name, final int drawMode, final Material material)
 	{
@@ -33,6 +37,26 @@ public class SubMesh
 		{
 			_renderImpl = new DrawElementImpl();	
 		}
+		
+		_renderImpl.primType(TRIANGLE_STRIP);
+		setMaterial(material);
+	}
+	
+	public SubMesh(final String name, final int drawMode, int primType, final Material material)
+	{
+		_name 		= name;
+		_drawMode 	= drawMode;
+		
+		if (_drawMode == DRAW_ARRAY)
+		{
+			_renderImpl = new DrawArrayImpl();
+		}
+		else
+		{
+			_renderImpl = new DrawElementImpl();	
+		}
+		
+		_renderImpl.primType(primType);
 		
 		setMaterial(material);
 	}
@@ -152,7 +176,13 @@ abstract class RenderImpl
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		
 		gl.glVertexPointer(3, 	GL10.GL_FLOAT, 0, getVerticeBuffer());
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, getTextureBuffer());
+		
+		FloatBuffer fb = getTextureBuffer();
+		
+		if (fb!=null)
+		{
+			gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, fb);
+		}
 	}
 	
 	protected void disableClientState(GL10 gl)
@@ -160,6 +190,13 @@ abstract class RenderImpl
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 	}
+	
+	public void primType(int type)
+	{
+		_primType = type;
+	}
+	
+	protected int _primType;
 	
 	protected int[]	_faceList;
 	
@@ -180,13 +217,15 @@ class DrawArrayImpl extends RenderImpl
 		
 		if (_faceList==null)
 		{
-			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, _vcount);
+			//gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, _vcount);
+			gl.glDrawArrays(_primType, 0, _vcount);
 		}
 		else
 		{
 			for (int i=0;i<_faceList.length;i++)
 			{
-				gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, _faceList[i], 4);
+				//gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, _faceList[i], 4);
+				gl.glDrawArrays(_primType, _faceList[i], 4);
 			}
 			
 		}
