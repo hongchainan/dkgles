@@ -127,11 +127,7 @@ public class SceneBuilder extends DefaultHandler
 			_movableStack.push(movable);
 			_curNodeType = MOVABLE;
 
-			// notify movable created
-			for (IBuildSceneHandler listener : _listeners)
-			{
-				listener.onMovableCreated(_movableStack.peek());
-			}
+			
 		}
 		else if (localName.equals("drawable"))
 		{
@@ -219,6 +215,11 @@ public class SceneBuilder extends DefaultHandler
 			
 			_immovable = new Immovable(name, t, _scene);
 			_curNodeType = IMMOVABLE;
+			
+			for (IBuildSceneHandler listener : _listeners)
+			{
+				listener.onImmovableCreated(_immovable);
+			}
 		}
 	}
 	
@@ -240,6 +241,12 @@ public class SceneBuilder extends DefaultHandler
 		}
 		else if (localName.equals("movable"))
 		{
+			// notify movable created
+			for (IBuildSceneHandler listener : _listeners)
+			{
+				listener.onMovableCreated(_movableStack.peek());
+			}
+			
 			_movableStack.pop();
 		}
 		else if (localName.equals("camera"))

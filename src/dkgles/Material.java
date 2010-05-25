@@ -78,6 +78,11 @@ public class Material
 	{
 		return _alpha;
 	}
+
+	public Texture texture()
+	{
+		return _texture;
+	}
 	
 	public void bindTexture(Texture texture)
 	{

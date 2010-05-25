@@ -35,6 +35,11 @@ public class Immovable
 		_scene.getRenderQueue().addDrawble(drawable);
 	}
 	
+	public Drawable drawable()
+	{
+		return _drawable;
+	}
+	
 	public String name()
 	{
 		return _name;
