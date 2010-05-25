@@ -9,6 +9,11 @@ public class BuildSceneHandler implements IBuildSceneHandler
 	{
 		// TODO Auto-generated method stub	
 	}
+	
+	public void onImmovableCreated(Immovable immovable)
+	{
+		
+	}
 
 	public void onMovableCreated(Movable movable) 
 	{

@@ -240,6 +240,11 @@ public class Movable
 		_scene.root().updateTransformation(Transformation.identity(), false);
 	}
 	
+	public Drawable drawable()
+	{
+		return _drawable;
+	}
+	
 	
 	void setParent(Movable parent)
 	{
