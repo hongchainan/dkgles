@@ -98,25 +98,43 @@ public class Material
 			_texture = Texture.GetDummyTexture();
 		}*/
 	}
+    
+    public void setBackFaceCulling(boolean val)
+    {
+        _backFaceCulling = val;
+    }
+    
+    public boolean backFaceCulling()
+    {
+        return _backFaceCulling;
+    }
 	
 	/**
 	 *Apply this material to current render state
 	 *Should always called in GLThread
 	 */
-	public void apply(GL10 gl)
+	public void beforeApply(GL10 gl)
 	{
 		gl.glColor4f(_red, _green, _blue, _alpha);
 		
 		if (_texture!=null)
 		{
 			gl.glEnable(GL10.GL_TEXTURE_2D);
-			_texture.bind(gl);
+			_texture.beforeBind(gl);
 		}
 		else
 		{
 			gl.glDisable(GL10.GL_TEXTURE_2D);
 		}
 	}
+    
+    public void aferApply(GL10 gl)
+    {
+        if (_texture!=null)
+        {
+            _texture.afterBind(gl);
+        }
+    }
 	
 	public String name()
 	{
@@ -138,15 +156,18 @@ public class Material
 		return _dummy;
 	}
 	
-	float _red;
-	float _green;
-	float _blue;
-	float _alpha;
-	Texture _texture;
+	private float   _red;
+	private float   _green;
+	private float   _blue;
+	private float   _alpha;
+	private Texture _texture;
+    
+    private boolean _backFaceCulling = true;
+    
 	static DummyMaterial _dummy = new DummyMaterial("MAT_DUMMY");
 	
-	final static String TAG = "Material";
-	final String _name;
+	public  final static String TAG = "Material";
+	private final String _name;
 }
 
 class DummyMaterial extends Material

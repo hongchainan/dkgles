@@ -80,8 +80,9 @@ public class SubMesh
 	
 	public void renderImpl(GL10 gl)
 	{
-		_material.apply(gl);
+		_material.beforeApply(gl);
 		_renderImpl.render(gl);
+		_material.aferApply(gl);
 	}
 	
 	public void setVertices(float[] vertices)
@@ -93,7 +94,6 @@ public class SubMesh
 	{
 		_renderImpl.setIndices(indices);
   	}
-	
 	
 	public void setFaceList(int[] flist)
 	{
