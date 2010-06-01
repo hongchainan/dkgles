@@ -46,9 +46,14 @@ public class Vector3 implements Cloneable
             _x*rhs._y - _y*rhs._x);
 	}
 	
-	public Object clone() throws CloneNotSupportedException 
+	public float dot(Vector3 rhs)
 	{
-		return super.clone();
+		return _x*rhs._x + _y*rhs._y + _z*rhs._z;
+	}
+	
+	public Object clone() 
+	{
+		return new Vector3(_x, _y, _z);
 	}
 	
 	

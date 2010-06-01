@@ -78,6 +78,11 @@ public class SubMesh
 		}
 	}
 	
+	public Material getMaterial()
+	{
+		return _material;
+	}
+	
 	public void renderImpl(GL10 gl)
 	{
 		_material.beforeApply(gl);

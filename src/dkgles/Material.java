@@ -2,8 +2,6 @@ package dkgles;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.util.Log;
-
 /**
  *@author doki lin
  */
@@ -120,7 +118,12 @@ public class Material
 		if (_texture!=null)
 		{
 			gl.glEnable(GL10.GL_TEXTURE_2D);
-			_texture.beforeBind(gl);
+			_texture.bind(gl);
+			
+			if (null!=_uvanimation)
+			{
+				_uvanimation.pre(gl);
+			}
 		}
 		else
 		{
@@ -132,7 +135,10 @@ public class Material
     {
         if (_texture!=null)
         {
-            _texture.afterBind(gl);
+        	if (null!=_uvanimation)
+        	{
+        		_uvanimation.post(gl);
+        	}
         }
     }
 	
@@ -149,6 +155,17 @@ public class Material
 	public void release()
 	{
 		_texture = null;
+		
+		if (_uvanimation!=null)
+		{
+			_uvanimation.release();
+			_uvanimation = null;
+		}
+	}
+	
+	public void setUVAnimation(UVAnimation animation)
+	{
+		_uvanimation = animation;
 	}
 	
 	public static Material GetDummyMaterial()
@@ -161,6 +178,8 @@ public class Material
 	private float   _blue;
 	private float   _alpha;
 	private Texture _texture;
+	
+	private UVAnimation _uvanimation;
     
     private boolean _backFaceCulling = true;
     

@@ -3,6 +3,9 @@ package dkgles;
 import java.util.ArrayList;
 import java.util.List;
 
+import dkgles.math.Vector3;
+
+
 /**
  *@author doki lin
  *TODO add synchronized modifier to let this class thread-safe
@@ -57,6 +60,32 @@ public class Movable
 		}
 		
 		_dirty = true;
+	}
+	
+	/**
+	 * face direction is -Z;
+	 * 
+	 * @return
+	 */
+	public Vector3 faceDirection()
+	{
+		return new Vector3(
+				-_worldTransformationCache._matrix[8],
+				-_worldTransformationCache._matrix[9],
+				-_worldTransformationCache._matrix[10]);
+	}
+	
+	/**
+	 * right is X 
+	 * @return
+	 */
+	public Vector3 rightDirection()
+	{
+		return new Vector3(
+				_worldTransformationCache._matrix[0],
+				_worldTransformationCache._matrix[1],
+				_worldTransformationCache._matrix[2]);
+		
 	}
 	
 	

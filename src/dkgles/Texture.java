@@ -22,24 +22,24 @@ public class Texture
 	 * Bind texture to current render state
 	 * Called this function in GLThread
 	 */
-	public void beforeBind(GL10 gl)
+	public void bind(GL10 gl)
 	{
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, _gid);
 		
-		gl.glMatrixMode(GL10.GL_TEXTURE);
-		gl.glPushMatrix();
-		gl.glLoadIdentity();
-		gl.glTranslatef(_u, _v, 0.0f);
-		gl.glMatrixMode(GL10.GL_MODELVIEW);
+		//gl.glMatrixMode(GL10.GL_TEXTURE);
+		//gl.glPushMatrix();
+		//gl.glLoadIdentity();
+		//gl.glTranslatef(_u, _v, 0.0f);
+		//gl.glMatrixMode(GL10.GL_MODELVIEW);
 	}
 	
-	public void afterBind(GL10 gl)
-	{
-		gl.glMatrixMode(GL10.GL_TEXTURE);
-		gl.glPopMatrix();	
-		gl.glMatrixMode(GL10.GL_MODELVIEW);
+	//public void afterBind(GL10 gl)
+	//{
+		//gl.glMatrixMode(GL10.GL_TEXTURE);
+		//gl.glPopMatrix();	
+		//gl.glMatrixMode(GL10.GL_MODELVIEW);
 		
-	}
+	//}
 	
 	public void translate(float u, float v)
 	{

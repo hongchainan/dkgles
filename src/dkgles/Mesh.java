@@ -44,6 +44,11 @@ public class Mesh
 		_subMeshes[index].setMaterial(material);
 	}
 	
+	public Material getMaterial(short index)
+	{
+		return _subMeshes[index].getMaterial();
+	}
+	
 	/**
 	 * Set sub mesh by index
 	 */
