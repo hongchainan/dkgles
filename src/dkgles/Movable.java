@@ -62,6 +62,21 @@ public class Movable
 		_dirty = true;
 	}
 	
+	public void setRotate(float angle, float x, float y, float z, int space)
+	{
+		float tx, ty, tz;
+		
+		tx = _localTransformation._matrix[12];
+		ty = _localTransformation._matrix[13];
+		tz = _localTransformation._matrix[14];
+		
+		_localTransformation.setIdentity();
+		
+		rotate(angle, x, y, z, space);
+		
+		
+	}
+	
 	/**
 	 * face direction is -Z;
 	 * 
@@ -76,18 +91,50 @@ public class Movable
 	}
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public Vector3 worldPosition()
+	{
+		return new Vector3(
+				_worldTransformationCache._matrix[12],
+				_worldTransformationCache._matrix[13],
+				_worldTransformationCache._matrix[14]);
+	}
+	
+	/**
 	 * right is X 
 	 * @return
 	 */
 	public Vector3 rightDirection()
 	{
-		return new Vector3(
+		Vector3 right = new Vector3(
 				_worldTransformationCache._matrix[0],
 				_worldTransformationCache._matrix[1],
 				_worldTransformationCache._matrix[2]);
 		
+		right.normalize();
+		
+		return right;	
 	}
 	
+	public synchronized void setPosition(Vector3 position)
+	{
+		_localTransformation._matrix[12] = position.x;
+		_localTransformation._matrix[13] = position.y;
+		_localTransformation._matrix[14] = position.z;
+		
+		_dirty = true;
+	}
+	
+	public Vector3 position()
+	{
+		return new Vector3(
+				_localTransformation._matrix[12], 
+				_localTransformation._matrix[13],
+				_localTransformation._matrix[14]
+				);
+	}
 	
 	public synchronized void translate(float x, float y, float z, int space)
 	{
@@ -169,6 +216,11 @@ public class Movable
 	public void yaw(float angle)
 	{
 		rotate(angle, 0.0f, 1.0f, 0.0f, LOCAL);
+	}
+	
+	public void setYaw(float angle)
+	{
+		
 	}
 	
 	/**

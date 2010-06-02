@@ -8,6 +8,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import dkgles.manager.MaterialManager;
+import dkgles.manager.TextureManager.TextureNotFoundException;
 import dkgles.primitive.Rectangle;
 
 //import android.util.Pa
@@ -81,9 +82,18 @@ public enum MeshManager
 		return -1;
 	}
 	
-	public Mesh getByName(String name)
+	public Mesh getByName(String name) throws MeshNotFoundException
 	{
-		return _meshes[findIdByName(name)];
+		int id = findIdByName(name);
+		
+		if (id>=0)
+		{
+			return _meshes[findIdByName(name)];
+		}
+		else
+		{
+			throw new MeshNotFoundException(name);
+		}
 	}
 	
 	public int findIdByName(String name)
@@ -159,6 +169,14 @@ public enum MeshManager
 	MeshDefHandler _meshDefHandler; 
 	
 	static final int MAX_MESHES = 16;
+	
+	public class MeshNotFoundException extends RuntimeException
+	{
+		public MeshNotFoundException(String meshName)
+		{
+			super(meshName);
+		}
+	}
 }
 
 class MeshDefHandler extends DefaultHandler

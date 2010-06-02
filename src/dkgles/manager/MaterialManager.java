@@ -219,13 +219,20 @@ class MaterialDefHandler extends DefaultHandler
 		}
 		else if (localName.equals("texture"))
 		{
-			// get resource ID by its' name
-			int resId = TextureManager.INSTANCE.getRscIdByString(
-					XmlUtil.parseString(atts, "rsc_id", "N/A"));
+			// 1. try to find texture by name, if failed, load texture by rsc_id	
+			int id = TextureManager.INSTANCE.findIdByName(
+					XmlUtil.parseString(atts, "name", "N/A"));
 			
-			int id = TextureManager.INSTANCE.create(
+			if (id<0)
+			{
+				// get resource ID by its' name
+				int resId = TextureManager.INSTANCE.getRscIdByString(
+						XmlUtil.parseString(atts, "rsc_id", "N/A"));
+			
+				id = TextureManager.INSTANCE.create(
 					XmlUtil.parseString(atts, "name", "N/A"),
 					resId);
+			}
 				
 			_material.bindTexture(
 					TextureManager.INSTANCE.get(id));
