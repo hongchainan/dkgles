@@ -7,11 +7,11 @@ import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import dkgles.manager.MaterialManager;
-
 import lost.kapa.ContextHolder;
 import android.content.res.AssetManager;
 import android.util.Log;
+import dkgles.manager.MaterialManager;
+import dkgles.math.Vector3;
 
 public class WavefrontObj extends Mesh
 {

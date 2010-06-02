@@ -14,6 +14,11 @@ public class Transformation implements Cloneable
 	public Transformation()
 	{
 		_matrix = new float[16];
+		setIdentity();
+	}
+	
+	public void setIdentity()
+	{
 		Matrix.setIdentityM(_matrix, 0);
 	}
 	

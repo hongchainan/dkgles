@@ -1,66 +1,94 @@
 package dkgles.math;
 
+import android.util.FloatMath;
+
 public class Vector3 implements Cloneable
 {
-	public float _x;
-	public float _y;
-	public float _z;
+	public float x;
+	public float y;
+	public float z;
+	
+	public Vector3()
+	{
+		x = 0.0f;
+		y = 0.0f;
+		z = 0.0f;
+	}
 	
 	
 	public Vector3(float x, float y, float z)
 	{
-		_x = x;
-		_y = y;
-		_z = z;	
+		this.x = x;
+		this.y = y;
+		this.z = z;	
 	}
 	
 	
 	public Vector3 add(Vector3 rhs)
 	{
 		return new Vector3(
-			_x + rhs._x, _y + rhs._y, _z + rhs._z);
+				this.x + rhs.x, this.y + rhs.y, this.z + rhs.z);
+	}
+	
+	public Vector3 sub(Vector3 rhs)
+	{
+		return new Vector3(
+				this.x - rhs.x, this.y - rhs.y, this.z - rhs.z);
+	}
+	
+	public void normalize()
+	{
+		float l = length();
 		
+		x /= l;
+		y /= l;
+		z /= l;
+	}
+	
+	public float length()
+	{
+		return FloatMath.sqrt(x*x + y*y + z*z);
 	}
 	
 	
 	public Vector3 mul(float fScaler)
 	{
 		return new Vector3(
-				_x*fScaler, _y*fScaler, _z*fScaler);
+				x*fScaler, y*fScaler, z*fScaler);
 	}
 	
 	
 	public void mulSelf(float fScaler)
 	{
-		_x *= fScaler;
-		_y *= fScaler;
-		_z *= fScaler;
+		x *= fScaler;
+		y *= fScaler;
+		z *= fScaler;
 	}
 	
 	
 	public Vector3 crossProduct(Vector3 rhs)
 	{
 		return new Vector3(
-			_y*rhs._z - _z*rhs._y,
-			_z*rhs._x - _x*rhs._z,
-            _x*rhs._y - _y*rhs._x);
+			y*rhs.z - z*rhs.y,
+			z*rhs.x - x*rhs.z,
+            x*rhs.y - y*rhs.x);
 	}
 	
 	public float dot(Vector3 rhs)
 	{
-		return _x*rhs._x + _y*rhs._y + _z*rhs._z;
+		return x*rhs.x + y*rhs.y + z*rhs.z;
 	}
 	
 	public Object clone() 
 	{
-		return new Vector3(_x, _y, _z);
+		return new Vector3(x, y, z);
 	}
 	
 	
 	public String toString()
 	{
 		StringBuilder result = new StringBuilder();
-		result.append("(" + _x + ", " + _y + ", " + _z + ")" );
+		result.append("(" + x + ", " + y + ", " + z + ")" );
 		return result.toString();
 	}
 	

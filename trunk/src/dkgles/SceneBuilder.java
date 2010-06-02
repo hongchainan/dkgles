@@ -131,8 +131,10 @@ public class SceneBuilder extends DefaultHandler
 		}
 		else if (localName.equals("drawable"))
 		{
+			String meshName = XmlUtil.parseString(atts, "mesh", "Mesh:N/A");
+			
 			Drawable drawable = new Drawable(
-					MeshManager.INSTANCE.getByName(XmlUtil.parseString(atts, "mesh", "Mesh:N/A")),
+					MeshManager.INSTANCE.getByName(meshName),
 					XmlUtil.parseInt(atts, "group_id", 0));
 			
 			if (_curNodeType==IMMOVABLE)

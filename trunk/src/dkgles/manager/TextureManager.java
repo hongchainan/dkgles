@@ -221,7 +221,7 @@ public enum TextureManager
 		}
 		else
 		{
-			throw new TextureNotFoundException();
+			throw new TextureNotFoundException(name);
 		}
 	}
 
@@ -288,6 +288,10 @@ public enum TextureManager
 	
 	public class TextureNotFoundException extends RuntimeException
 	{
+		public TextureNotFoundException(String name)
+		{
+			super(name);
+		}
 
 		/**
 		 * 
