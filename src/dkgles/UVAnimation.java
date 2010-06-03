@@ -36,6 +36,9 @@ public class UVAnimation
 	
 	public void pre(GL10 gl)
 	{
+		if (!_enable)
+			return;
+		
 		gl.glMatrixMode(GL10.GL_TEXTURE);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
@@ -51,6 +54,9 @@ public class UVAnimation
 	
 	public void post(GL10 gl)
 	{
+		if (!_enable)
+			return;
+		
 		gl.glMatrixMode(GL10.GL_TEXTURE);
 		gl.glPopMatrix();	
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
