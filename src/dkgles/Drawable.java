@@ -16,7 +16,7 @@ public class Drawable
 		_mesh = mesh;
 		_visible = true;
 		_groupID = groupId;
-		_worldTransformation = Transformation.identity();
+		_worldTransformation = new Transformation();
 	}
 	
 	public Drawable(String name)
@@ -24,14 +24,14 @@ public class Drawable
 		_name = name;
 		_visible = true;
 		_groupID = 0;
-		_worldTransformation = Transformation.identity();
+		_worldTransformation = new Transformation();
 		_mesh = Mesh.getDummy();
 	}
 
 	
 	public void release()
 	{
-		//TODO
+		_worldTransformation.release();
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class Drawable
 	 */
 	public synchronized void setWorldTransformation(Transformation worldTransformation)
 	{
-		_worldTransformation = worldTransformation;
+		_worldTransformation.copy(worldTransformation);
 	}
 	
 	/**
