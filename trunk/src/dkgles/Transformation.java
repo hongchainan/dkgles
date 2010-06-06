@@ -125,7 +125,15 @@ public class Transformation implements Cloneable
 		Matrix.invertM(view, 0, _matrix, 0);
 	}
 	
-	public Object clone() throws CloneNotSupportedException 
+	public void copy(Transformation t)
+	{
+		for (int i=0;i<16;i++)
+		{
+			_matrix[i] = t._matrix[i];
+		}
+	}
+	
+	public Object clone() 
 	{
 		Transformation t = new Transformation();
 

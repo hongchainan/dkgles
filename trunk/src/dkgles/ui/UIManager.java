@@ -167,6 +167,11 @@ public enum UIManager implements OnTouchListener
 		return SceneManager.INSTANCE.get(_sceneId);
 	}
 	
+	public void print(float x, float y, String message)
+	{
+		
+	}
+	
 	
 	UIManager()
 	{

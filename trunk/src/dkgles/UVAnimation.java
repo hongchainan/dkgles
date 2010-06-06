@@ -11,6 +11,8 @@ public class UVAnimation
 		_velocity 	= new Vector2(0.0f, 0.0f);
 		_shift 		= new Vector2(0.0f, 0.0f);
 		
+		_enable = true;
+		
 		_animations.add(this);
 	}
 	
@@ -29,6 +31,11 @@ public class UVAnimation
 		return _enable;
 	}
 	
+	public void setVelocity(float u, float v)
+	{
+		_velocity = new Vector2(u, v);
+	}
+	
 	public void setVelocity(final Vector2 velocity)
 	{
 		_velocity = (Vector2)velocity.clone();
@@ -42,7 +49,7 @@ public class UVAnimation
 		gl.glMatrixMode(GL10.GL_TEXTURE);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		gl.glTranslatef(_velocity.x, _velocity.y, 0.0f);
+		gl.glTranslatef(_shift.x, _shift.y, 0.0f);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		
 	}
