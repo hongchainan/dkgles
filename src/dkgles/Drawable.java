@@ -14,24 +14,24 @@ public class Drawable
 	public Drawable(Mesh mesh, int groupId)
 	{
 		_mesh = mesh;
-		_visible = true;
+		visible_ = true;
 		_groupID = groupId;
-		_worldTransformation = new Transformation();
+		worldTransformation_ = new Transformation();
 	}
 	
 	public Drawable(String name)
 	{
 		_name = name;
-		_visible = true;
+		visible_ = true;
 		_groupID = 0;
-		_worldTransformation = new Transformation();
+		worldTransformation_ = new Transformation();
 		_mesh = Mesh.getDummy();
 	}
 
 	
 	public void release()
 	{
-		_worldTransformation.release();
+		worldTransformation_.release();
 	}
 	
 	/**
@@ -50,14 +50,14 @@ public class Drawable
 		return _groupID;
 	}
 
-	public void visibility(boolean val)
+	public void setVisibility(boolean val)
 	{
-		_visible = val;
+		visible_ = val;
 	}
 	
 	public boolean visible()
 	{
-		return _visible;
+		return visible_;
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class Drawable
 	 */
 	public synchronized void setWorldTransformation(Transformation worldTransformation)
 	{
-		_worldTransformation.copy(worldTransformation);
+		worldTransformation_.copy(worldTransformation);
 	}
 	
 	/**
@@ -74,12 +74,12 @@ public class Drawable
 	 */
 	public synchronized void render(GL10 gl)
 	{
-		if (!_visible)
+		if (!visible_)
 			return;
 		
 		try
 		{
-			gl.glMultMatrixf(_worldTransformation._matrix, 0);
+			gl.glMultMatrixf(worldTransformation_.matrix, 0);
 			_mesh.renderImpl(gl);
 			//renderImpl(gl);
 		}
@@ -113,11 +113,11 @@ public class Drawable
 		return _name + ", group ID:" + _groupID; 
 	}
 	
-	boolean			_visible;
+	boolean			visible_;
 	int				_groupID;
 	String 			_name;
 	Mesh			_mesh;
-	Transformation 	_worldTransformation;
+	Transformation 	worldTransformation_;
 	static final String TAG = "Drawable";
 	
 }

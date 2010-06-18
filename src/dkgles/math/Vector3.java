@@ -57,6 +57,13 @@ public class Vector3 implements Cloneable
 				x*fScaler, y*fScaler, z*fScaler);
 	}
 	
+	public void copy(Vector3 rhs)
+	{
+		x = rhs.x;
+		y = rhs.y;
+		z = rhs.z;
+	}
+	
 	
 	public void mulSelf(float fScaler)
 	{

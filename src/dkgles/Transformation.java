@@ -9,17 +9,17 @@ public class Transformation implements Cloneable
 	//private Vector3 	_translatation;
 	//private Quaternion 	_orientation;
 	
-	public float[] _matrix; 
+	public float[] matrix; 
 	
 	public Transformation()
 	{
-		_matrix = new float[16];
+		matrix = new float[16];
 		setIdentity();
 	}
 	
 	public void setIdentity()
 	{
-		Matrix.setIdentityM(_matrix, 0);
+		Matrix.setIdentityM(matrix, 0);
 	}
 	
 	/**
@@ -31,32 +31,30 @@ public class Transformation implements Cloneable
 		if (_identity==null)
 		{
 			_identity = new Transformation(); 
-		}
-		
+		}	
 		return _identity;
 	}
 	
 	public void release()
 	{
-		
+		matrix = null;
 	}
-	
 	
 	public void rotateInLocalSpace(float angle, float x, float y, float z)
 	{
-		float tx = _matrix[12];
-		float ty = _matrix[13];
-		float tz = _matrix[14];
+		float tx = matrix[12];
+		float ty = matrix[13];
+		float tz = matrix[14];
 		
-		_matrix[12] = 0.0f;
-		_matrix[13] = 0.0f;
-		_matrix[14] = 0.0f;
+		matrix[12] = 0.0f;
+		matrix[13] = 0.0f;
+		matrix[14] = 0.0f;
 		
-		Matrix.rotateM(_matrix, 0, angle, x, y, z);
+		Matrix.rotateM(matrix, 0, angle, x, y, z);
 		
-		_matrix[12] = tx;
-		_matrix[13] = ty;
-		_matrix[14] = tz;
+		matrix[12] = tx;
+		matrix[13] = ty;
+		matrix[14] = tz;
 	}
 	
 	public void rotateInParentSpace(float angle, float x, float y, float z)
@@ -67,37 +65,35 @@ public class Transformation implements Cloneable
 		Matrix.setIdentityM(lhs, 0);
 		Matrix.rotateM(lhs, 0, angle, x, y, z);
 		
-		System.arraycopy(_matrix, 0, rhs, 0, 16);
+		System.arraycopy(matrix, 0, rhs, 0, 16);
 		
-		Matrix.multiplyMM(_matrix, 0, lhs, 0, rhs, 0);
-		
+		Matrix.multiplyMM(matrix, 0, lhs, 0, rhs, 0);	
 	}
-	
 	
 	public void translateInLocalSpace(float x, float y, float z)
 	{
-		float tx = x*_matrix[0] + y*_matrix[4] + z*_matrix[8];
-		float ty = x*_matrix[1] + y*_matrix[5] + z*_matrix[9];
-		float tz = x*_matrix[2] + y*_matrix[6] + z*_matrix[10];
+		float tx = x*matrix[0] + y*matrix[4] + z*matrix[8];
+		float ty = x*matrix[1] + y*matrix[5] + z*matrix[9];
+		float tz = x*matrix[2] + y*matrix[6] + z*matrix[10];
 		
-		_matrix[12] += tx;
-		_matrix[13] += ty;
-		_matrix[14] += tz;
+		matrix[12] += tx;
+		matrix[13] += ty;
+		matrix[14] += tz;
 	}
 	
 	
 	public void translateInParentSpace(float x, float y, float z)
 	{
-		_matrix[12] += x;
-		_matrix[13] += y;
-		_matrix[14] += z;		
+		matrix[12] += x;
+		matrix[13] += y;
+		matrix[14] += z;		
 	}
 	
 	public void getTranslation(float[] t)
 	{
-		t[0] = _matrix[12];
-		t[1] = _matrix[13];
-		t[2] = _matrix[14];
+		t[0] = matrix[12];
+		t[1] = matrix[13];
+		t[2] = matrix[14];
 	}
 	
 	
@@ -111,25 +107,25 @@ public class Transformation implements Cloneable
 	
 	public void mul(Transformation rhs)
 	{
-		Matrix.multiplyMM(_matrix, 0, _matrix, 0, rhs._matrix, 0);
+		Matrix.multiplyMM(matrix, 0, matrix, 0, rhs.matrix, 0);
 	}
 	
 	public final void mul(Transformation lhs, Transformation rhs)
 	{
-		Matrix.multiplyMM(_matrix, 0, lhs._matrix, 0, rhs._matrix, 0);
+		Matrix.multiplyMM(matrix, 0, lhs.matrix, 0, rhs.matrix, 0);
 	}
 	
 	
 	public void getViewMatrix(float[] view)
 	{
-		Matrix.invertM(view, 0, _matrix, 0);
+		Matrix.invertM(view, 0, matrix, 0);
 	}
 	
 	public void copy(Transformation t)
 	{
 		for (int i=0;i<16;i++)
 		{
-			_matrix[i] = t._matrix[i];
+			matrix[i] = t.matrix[i];
 		}
 	}
 	
@@ -139,7 +135,7 @@ public class Transformation implements Cloneable
 
 		for (int i=0;i<16;i++)
 		{
-			t._matrix[i] = _matrix[i];
+			t.matrix[i] = matrix[i];
 		}		
 		
 		return t;

@@ -26,9 +26,8 @@ public class SceneBuilder extends DefaultHandler
 {
 	public SceneBuilder(Scene scene)
 	{
-		_scene = scene;
-		_listeners = new ArrayList<IBuildSceneHandler>();
-		//registerListener(listener);
+		scene_ = scene;
+		listeners_ = new ArrayList<IBuildSceneListener>();
 	}
 	
 	public void build(int resId)
@@ -36,42 +35,37 @@ public class SceneBuilder extends DefaultHandler
 		XmlUtil.parse(ContextHolder.INSTANCE.get(), this, resId);
 	}
 
-	public void registerListener(IBuildSceneHandler listener)
+	public void registerListener(IBuildSceneListener listener)
 	{
-		_listeners.add(listener);
-		/*
-		if (listener!=null)
-		{
-			_listener = listener;
-		}
-		else
-		{
-			_listener = new BuildSceneHandler();
-		}*/
-	}	
-
+		listeners_.add(listener);
+	}
+	
+	public void unregisterListener(IBuildSceneListener listener)
+	{
+		listeners_.remove(listener);
+	}
+	
+	public void unregisterAllListener()
+	{
+		listeners_.clear();
+	}
+	
 	@Override
 	public void startDocument() throws SAXException 
 	{
-		_movableStack = new Stack<Movable>();
+		movableStack_ = new Stack<Movable>();
 		
-		if (_scene!=null)
-		{
-			_movableStack.push(_scene.root());
-		}
-		
-		//_movable = null;
-		//_scene = null;
-		/*if (_listener==null)
-		{
-			_listener = new BuildSceneHandler();
-		}*/
+		//if (scene_!=null)
+		//{
+			//movableStack_.push(scene_.root());
+		//}
 	}
 	
 	@Override
 	public void endDocument() throws SAXException 
 	{
-		_movableStack = null;
+		movableStack_.clear();
+		movableStack_ = null;
 	}
 
 	@Override
@@ -79,17 +73,17 @@ public class SceneBuilder extends DefaultHandler
 	{
 		if (localName.equals("scene"))
 		{
-			if (_scene==null)
+			if (scene_==null)
 			{
-				_scene = new Scene(XmlUtil.parseString(atts, "name", "Scene:N/A"), null);
+				scene_ = new Scene(XmlUtil.parseString(atts, "name", "Scene:N/A"), null);
 			}
 			else
 			{
-				_scene.name(XmlUtil.parseString(atts, "name", "Scene:N/A"));
+				scene_.setName(XmlUtil.parseString(atts, "name", "Scene:N/A"));
 			}
 
-			_movableStack.clear();
-			_movableStack.push(_scene.root());	
+			movableStack_.clear();
+			movableStack_.push(scene_.root());	
 		}
 		else if (localName.equals("render_queue"))
 		{
@@ -113,19 +107,19 @@ public class SceneBuilder extends DefaultHandler
 				);
 			}			
 
-			_scene.attachRenderQueue(renderQueue);			
+			scene_.attachRenderQueue(renderQueue);			
 		}
 		else if (localName.equals("movable"))
 		{
 			Movable movable = new Movable(
 				XmlUtil.parseString(atts, "name", "Movable:N/A"),
-				_movableStack.peek(),
-				_scene);
+				movableStack_.peek(),
+				scene_);
 			
 			parseMovableOptionalParam(movable, atts);
 
-			_movableStack.push(movable);
-			_curNodeType = MOVABLE;
+			movableStack_.push(movable);
+			curNodeType_ = MOVABLE;
 
 			
 		}
@@ -137,13 +131,13 @@ public class SceneBuilder extends DefaultHandler
 					MeshManager.INSTANCE.getByName(meshName),
 					XmlUtil.parseInt(atts, "group_id", 0));
 			
-			if (_curNodeType==IMMOVABLE)
+			if (curNodeType_==IMMOVABLE)
 			{
-				_immovable.setDrawable(drawable);
+				immovable_.setDrawable(drawable);
 			}
 			else
 			{
-				_movableStack.peek().setDrawable(drawable);
+				movableStack_.peek().setDrawable(drawable);
 			}
 		}
 		else if (localName.equals("touchable"))
@@ -151,36 +145,22 @@ public class SceneBuilder extends DefaultHandler
 			Rectangle rect = (Rectangle)MeshManager.INSTANCE.getByName(
 					XmlUtil.parseString(atts, "mesh", "Mesh:N/A"));
 			
-			Touchable touchable = new Touchable(
+			touchable_ = new Touchable(
 					XmlUtil.parseString(atts, "name", "Touchable:N/A"),
 					rect);
 			
-			UIManager.INSTANCE.register(touchable);
-			_movableStack.peek().setDrawable(touchable);
-			
-			for (IBuildSceneHandler listener : _listeners)
-			{
-				listener.onTouchableCreated(touchable);
-			}			
+			UIManager.INSTANCE.register(touchable_);
+			movableStack_.peek().setDrawable(touchable_);
 		}
 		else if (localName.equals("camera"))
 		{
-			Camera camera = new Camera(
+			camera_ = new Camera(
 				XmlUtil.parseString(atts, "name", "Camera:N/A"),
-				_movableStack.peek(),
-				_scene
+				movableStack_.peek(),
+				scene_
 			);
 
-			parseMovableOptionalParam(camera, atts);
-			_camera = camera;
-			//_scene.bindCamera(camera);
-			
-			for (IBuildSceneHandler listener : _listeners)
-			{
-				listener.onCameraCreated(camera);
-			}
-			
-			//_listener.onCameraCreated(camera);
+			parseMovableOptionalParam(camera_, atts);
 		}
 		else if (localName.equals("skybox"))
 		{
@@ -194,7 +174,7 @@ public class SceneBuilder extends DefaultHandler
 			drawable.setMesh(skybox);
 			
 			//_camera.setDrawable(skybox);
-			_camera.setDrawable(drawable);
+			camera_.setDrawable(drawable);
 		}
 		else if (localName.equals("immovable"))
 		{
@@ -211,17 +191,12 @@ public class SceneBuilder extends DefaultHandler
 			t.rotateInLocalSpace(pitch, 1, 0, 0);
 			t.rotateInLocalSpace(roll, 	0, 0, 1);
 			t.rotateInLocalSpace(yaw, 	0, 1, 0);
-			t._matrix[12] = x;
-			t._matrix[13] = y;
-			t._matrix[14] = z;
+			t.matrix[12] = x;
+			t.matrix[13] = y;
+			t.matrix[14] = z;
 			
-			_immovable = new Immovable(name, t, _scene);
-			_curNodeType = IMMOVABLE;
-			
-			for (IBuildSceneHandler listener : _listeners)
-			{
-				listener.onImmovableCreated(_immovable);
-			}
+			immovable_ = new Immovable(name, t, scene_);
+			curNodeType_ = IMMOVABLE;
 		}
 	}
 	
@@ -232,9 +207,14 @@ public class SceneBuilder extends DefaultHandler
 		
 		if (localName.equals("scene"))
 		{
-			//SceneManager.instance().register(_scene);
-			_movableStack.clear();
-			_scene = null;
+			int id = SceneManager.INSTANCE.register(scene_);
+			movableStack_.clear();
+			for (IBuildSceneListener listener : listeners_)
+			{
+				listener.onSceneCreated(id, scene_);
+			}
+			
+			scene_ = null;
 		}
 		else if (localName.equals("render_queue"))
 		{
@@ -244,21 +224,40 @@ public class SceneBuilder extends DefaultHandler
 		else if (localName.equals("movable"))
 		{
 			// notify movable created
-			for (IBuildSceneHandler listener : _listeners)
+			for (IBuildSceneListener listener : listeners_)
 			{
-				listener.onMovableCreated(_movableStack.peek());
+				listener.onMovableCreated(movableStack_.peek());
 			}
 			
-			_movableStack.pop();
+			movableStack_.pop();
 		}
 		else if (localName.equals("camera"))
 		{
-			_camera = null;
+			for (IBuildSceneListener listener : listeners_)
+			{
+				listener.onCameraCreated(camera_);
+			}
+			
+			camera_ = null;
 		}
 		else if (localName.equals("immovable"))
 		{
-			_immovable = null;
-			_curNodeType = MOVABLE;
+			for (IBuildSceneListener listener : listeners_)
+			{
+				listener.onImmovableCreated(immovable_);
+			}
+			
+			immovable_ = null;
+			curNodeType_ = MOVABLE;
+		}
+		else if (localName.equals("touchable"))
+		{
+			for (IBuildSceneListener listener : listeners_)
+			{
+				listener.onTouchableCreated(touchable_);
+			}
+			
+			touchable_ = null;
 		}
 	}
 	
@@ -278,21 +277,29 @@ public class SceneBuilder extends DefaultHandler
 
 		float pitch = XmlUtil.parseFloat(atts, "pitch", 0.0f);
 		movable.pitch(pitch);
+		
+		float yaw = XmlUtil.parseFloat(atts, "yaw", 0.0f);
+		movable.yaw(yaw);
+		
+		float roll = XmlUtil.parseFloat(atts, "roll", 0.0f);
+		movable.roll(roll);
 	}
 
 	
 	
-	Stack<Movable> _movableStack;
+	Stack<Movable> movableStack_;
 	
-	Immovable _immovable;
-	Camera _camera;
-	Scene _scene;
-	int _curNodeType;
+	private Touchable touchable_;
+	
+	Immovable immovable_;
+	Camera camera_;
+	Scene scene_;
+	int curNodeType_;
 	
 	final static int MOVABLE 	= 0;
 	final static int IMMOVABLE 	= 1;
 
-	ArrayList<IBuildSceneHandler> _listeners;
+	ArrayList<IBuildSceneListener> listeners_;
 	static final String TAG = "SceneBuilder";
 }
 

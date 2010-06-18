@@ -32,7 +32,7 @@ public class Scene
 	 * Build a scene by XML file
 	 * @deprecated
 	 */
-	public void build(int resId, IBuildSceneHandler listener)
+	public void build(int resId, IBuildSceneListener listener)
 	{
 		//release();
 		//XmlUtil.parse(ContextHolder.INSTANCE.get(), new SceneBuilder(this, listener), resId);
@@ -43,7 +43,7 @@ public class Scene
 		return _name;
 	}
 	
-	public void name(String name)
+	public void setName(String name)
 	{
 		_name = name;
 	}

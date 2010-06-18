@@ -23,12 +23,12 @@ public class Movable
 	 */
 	public Movable(String name, Movable parent, Scene scene)
 	{
-		_name = name;
-		_parent = parent;
-		_scene = scene;
-		_children = new ArrayList<Movable>();
-		_localTransformation = new Transformation();
-		_worldTransformationCache = new Transformation();
+		name_ = name;
+		parent_ = parent;
+		scene_ = scene;
+		children_ = new ArrayList<Movable>();
+		localTransformation_ = new Transformation();
+		worldTransformationCache_ = new Transformation();
 		
 		if (parent!=null)
 		{
@@ -48,29 +48,29 @@ public class Movable
 	{
 		if (space == LOCAL)
 		{
-			_localTransformation.rotateInLocalSpace(angle, x, y, z);
+			localTransformation_.rotateInLocalSpace(angle, x, y, z);
 		}
 		else if (space == PARENT)
 		{
-			_localTransformation.rotateInParentSpace(angle, x, y, z);
+			localTransformation_.rotateInParentSpace(angle, x, y, z);
 		}
 		else
 		{
 			throw new IllegalArgumentException();
 		}
 		
-		_dirty = true;
+		dirty_ = true;
 	}
 	
 	public void setRotate(float angle, float x, float y, float z, int space)
 	{
 		float tx, ty, tz;
 		
-		tx = _localTransformation._matrix[12];
-		ty = _localTransformation._matrix[13];
-		tz = _localTransformation._matrix[14];
+		tx = localTransformation_.matrix[12];
+		ty = localTransformation_.matrix[13];
+		tz = localTransformation_.matrix[14];
 		
-		_localTransformation.setIdentity();
+		localTransformation_.setIdentity();
 		
 		rotate(angle, x, y, z, space);
 		
@@ -85,9 +85,9 @@ public class Movable
 	public Vector3 faceDirection()
 	{
 		return new Vector3(
-				-_worldTransformationCache._matrix[8],
-				-_worldTransformationCache._matrix[9],
-				-_worldTransformationCache._matrix[10]);
+				-worldTransformationCache_.matrix[8],
+				-worldTransformationCache_.matrix[9],
+				-worldTransformationCache_.matrix[10]);
 	}
 	
 	/**
@@ -97,9 +97,9 @@ public class Movable
 	public Vector3 worldPosition()
 	{
 		return new Vector3(
-				_worldTransformationCache._matrix[12],
-				_worldTransformationCache._matrix[13],
-				_worldTransformationCache._matrix[14]);
+				worldTransformationCache_.matrix[12],
+				worldTransformationCache_.matrix[13],
+				worldTransformationCache_.matrix[14]);
 	}
 	
 	/**
@@ -109,9 +109,9 @@ public class Movable
 	public Vector3 rightDirection()
 	{
 		Vector3 right = new Vector3(
-				_worldTransformationCache._matrix[0],
-				_worldTransformationCache._matrix[1],
-				_worldTransformationCache._matrix[2]);
+				worldTransformationCache_.matrix[0],
+				worldTransformationCache_.matrix[1],
+				worldTransformationCache_.matrix[2]);
 		
 		right.normalize();
 		
@@ -120,19 +120,19 @@ public class Movable
 	
 	public synchronized void setPosition(Vector3 position)
 	{
-		_localTransformation._matrix[12] = position.x;
-		_localTransformation._matrix[13] = position.y;
-		_localTransformation._matrix[14] = position.z;
+		localTransformation_.matrix[12] = position.x;
+		localTransformation_.matrix[13] = position.y;
+		localTransformation_.matrix[14] = position.z;
 		
-		_dirty = true;
+		dirty_ = true;
 	}
 	
 	public Vector3 position()
 	{
 		return new Vector3(
-				_localTransformation._matrix[12], 
-				_localTransformation._matrix[13],
-				_localTransformation._matrix[14]
+				localTransformation_.matrix[12], 
+				localTransformation_.matrix[13],
+				localTransformation_.matrix[14]
 				);
 	}
 	
@@ -140,18 +140,18 @@ public class Movable
 	{
 		if (space == LOCAL)
 		{
-			_localTransformation.translateInLocalSpace(x, y, z);
+			localTransformation_.translateInLocalSpace(x, y, z);
 		}
 		else if (space == PARENT)
 		{
-			_localTransformation.translateInParentSpace(x, y, z);
+			localTransformation_.translateInParentSpace(x, y, z);
 		}
 		else
 		{
 			throw new IllegalArgumentException();
 		}
 		
-		_dirty = true;
+		dirty_ = true;
 	}
 	
 	/**
@@ -163,18 +163,18 @@ public class Movable
 	 */
 	public synchronized void position(float x, float y, float z)
 	{
-		_localTransformation._matrix[12] = x;
-		_localTransformation._matrix[13] = y;
-		_localTransformation._matrix[14] = z;
-		_dirty = true;
+		localTransformation_.matrix[12] = x;
+		localTransformation_.matrix[13] = y;
+		localTransformation_.matrix[14] = z;
+		dirty_ = true;
 	}
 	
 	public synchronized void scale(float x, float y, float z)
 	{
-		_localTransformation._matrix[0] = x;
-		_localTransformation._matrix[5] = y;
-		_localTransformation._matrix[10] = z;
-		_dirty = true;
+		localTransformation_.matrix[0] = x;
+		localTransformation_.matrix[5] = y;
+		localTransformation_.matrix[10] = z;
+		dirty_ = true;
 	}
 	
 	/**
@@ -245,7 +245,7 @@ public class Movable
 	 */
 	public Movable createChild(String name)
 	{
-		Movable child = new Movable(name, this, _scene);
+		Movable child = new Movable(name, this, scene_);
 		addChild(child);
 		return child;
 	}
@@ -261,39 +261,39 @@ public class Movable
 	 */
 	public void release()
 	{
-		_parent = null;
-		_scene = null;
+		parent_ = null;
+		scene_ = null;
 		
-		if (_localTransformation!=null)
+		if (localTransformation_!=null)
 		{
-			_localTransformation.release();
-			_localTransformation = null;
+			localTransformation_.release();
+			localTransformation_ = null;
 			
 		}
 		
-		if (_worldTransformationCache!=null)
+		if (worldTransformationCache_!=null)
 		{
-			_worldTransformationCache.release();
-			_worldTransformationCache = null;
+			worldTransformationCache_.release();
+			worldTransformationCache_ = null;
 		}
 			
-		if (_children!=null)
+		if (children_!=null)
 		{
-			for (Movable m : _children)
+			for (Movable m : children_)
 			{
 				if (m!=null)
 				{
 					m.release();
 				}
 			}
-			_children.clear();
-			_children = null;
+			children_.clear();
+			children_ = null;
 		}
 
-		if (_drawable!=null)
+		if (drawable_!=null)
 		{
-			_drawable.release();
-			_drawable = null;
+			drawable_.release();
+			drawable_ = null;
 		}
 	}
 	
@@ -303,7 +303,7 @@ public class Movable
 	public void addChild(Movable child)
 	{
 		child.setParent(this);
-		_children.add(child);
+		children_.add(child);
 	}
 	
 	/**
@@ -312,24 +312,24 @@ public class Movable
 	 */
 	public void setDrawable(Drawable drawable)
 	{
-		_drawable = drawable;
+		drawable_ = drawable;
 		
-		_scene.getRenderQueue().addDrawble(drawable);
+		scene_.getRenderQueue().addDrawble(drawable);
 		
 		// force scene node write self transformation to drawable
-		_dirty = true;
-		_scene.root().updateTransformation(Transformation.identity(), false);
+		dirty_ = true;
+		scene_.root().updateTransformation(Transformation.identity(), false);
 	}
 	
 	public Drawable drawable()
 	{
-		return _drawable;
+		return drawable_;
 	}
 	
 	
 	void setParent(Movable parent)
 	{
-		_parent = parent;
+		parent_ = parent;
 	}
 
 	/**
@@ -339,24 +339,24 @@ public class Movable
 	public synchronized void setTransformation(Transformation transformation)
 	{
 		// TODO use clone function
-		_localTransformation.copy(transformation);
-		_dirty = true;
+		localTransformation_.copy(transformation);
+		dirty_ = true;
 	}
 	
 	public Transformation getLocalTransformation()
 	{
-		return (Transformation)_localTransformation.clone();
+		return (Transformation)localTransformation_.clone();
 	}
 	
 	public void getLocalTransformation(Transformation transtormation)
 	{
-		transtormation.copy(_localTransformation);
+		transtormation.copy(localTransformation_);
 	}
 	
 	public synchronized void mulTransformation(Transformation transformation)
 	{
-		_localTransformation.mul(transformation);
-		_dirty = true;
+		localTransformation_.mul(transformation);
+		dirty_ = true;
 	}
 	
 	/**
@@ -366,32 +366,32 @@ public class Movable
 	 */
 	public synchronized void updateTransformation(Transformation parentTransformation, boolean parentDirty)
 	{
-		if (_dirty||parentDirty)
+		if (dirty_||parentDirty)
 		{
-			_worldTransformationCache.mul(parentTransformation, _localTransformation);
+			worldTransformationCache_.mul(parentTransformation, localTransformation_);
 			
-			if (_drawable != null)
+			if (drawable_ != null)
 			{
-				_drawable.setWorldTransformation(_worldTransformationCache);
+				drawable_.setWorldTransformation(worldTransformationCache_);
 			}
 		}
 			
-		for (Movable m : _children)
+		for (Movable m : children_)
 		{
-			m.updateTransformation(_worldTransformationCache, _dirty);
+			m.updateTransformation(worldTransformationCache_, dirty_ | parentDirty);
 		}
 		
-		_dirty = false;
+		dirty_ = false;
 	}
 
 	public String toString()
 	{
-		return _name;
+		return name_;
 	}
 	
 	public String name()
 	{
-		return _name;
+		return name_;
 	}
 
 	protected void finalize() throws Throwable
@@ -406,14 +406,14 @@ public class Movable
 		}
 	}
 	
-	protected Transformation	_localTransformation;
-	protected Transformation 	_worldTransformationCache;
-	protected boolean	_dirty;
+	protected Transformation	localTransformation_;
+	protected Transformation 	worldTransformationCache_;
+	protected boolean			dirty_;
 	
-	final String	_name;
+	final String				name_;
 	
-	List<Movable> 	_children;
-	Movable		_parent;
-	Drawable	_drawable;
-	Scene		_scene;
+	List<Movable> 	children_;
+	Movable			parent_;
+	Drawable		drawable_;
+	Scene			scene_;
 }
