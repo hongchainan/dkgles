@@ -1,15 +1,9 @@
 package dkgles;
 
 import java.util.HashMap;
-import java.util.List;
-
-import javax.microedition.khronos.opengles.GL10;
 
 import lost.kapa.R;
-
-import android.opengl.GLException;
-import android.util.Log;
-import dkgles.primitive.Rectangle;
+import dkgles.render.OrthoRenderQueue;
 import dkgles.ui.UIManager;
 
 public enum FontManager
@@ -18,21 +12,23 @@ public enum FontManager
 	
 	public void initialize()
 	{
-		_fontSetMap = new HashMap<String, FontSet>();
-		_fontSetMap.put("MyFont", new FontSet("MyFont", R.raw.myfont));
+		fontSetMap_ = new HashMap<String, FontSet>();
+		fontSetMap_.put("MyFont", new FontSet("MyFont", R.raw.myfont));
 		
-		_messageBuffers = new MessageBuffer[MAX_MESSAGE_BUFFERS];
-		_transformation = new Transformation();
+		messageBuffers_ = new MessageBuffer[MAX_MESSAGE_BUFFERS];
+		transformation_ = new Transformation();
+		
+		renderQueue_ = new OrthoRenderQueue("RDQ_Font", 8, 100); 
 	}
 	
-	public int createMessageBuffer(String fontType, int bufferLen, float fontSize)
+	public int createMessageBuffer(String fontType, int bufferLen, float fontSize, int depth)
 	{
 		for (int i=0;i<MAX_MESSAGE_BUFFERS;++i)
 		{
-			if (_messageBuffers[i]==null)
+			if (messageBuffers_[i]==null)
 			{
-				_messageBuffers[i] = new MessageBuffer(bufferLen, _fontSetMap.get(fontType), fontSize);
-				UIManager.INSTANCE.getScene().getRenderQueue().addDrawble(_messageBuffers[i]);
+				messageBuffers_[i] = new MessageBuffer(bufferLen, fontSetMap_.get(fontType), fontSize, depth);
+				renderQueue_.addDrawble(messageBuffers_[i]);
 				return i;
 			}
 		}
@@ -41,37 +37,38 @@ public enum FontManager
 	
 	public MessageBuffer getMessageBuffer(int i)
 	{
-		return _messageBuffers[i];
+		return messageBuffers_[i];
 	}
 	
 	public void print(int bufferId, float x, float y, String message)
 	{		
-		_transformation.setIdentity();
-		_transformation._matrix[12] = x;
-		_transformation._matrix[13] = y;
-		_transformation._matrix[14] = -1;
+		transformation_.setIdentity();
+		transformation_.matrix[12] = x;
+		transformation_.matrix[13] = y;
+		transformation_.matrix[14] = -1;
 		
-		_messageBuffers[bufferId].setWorldTransformation(_transformation);
-		_messageBuffers[bufferId].setMessage(message);
-		_messageBuffers[bufferId].visibility(true);
+		messageBuffers_[bufferId].setWorldTransformation(transformation_);
+		messageBuffers_[bufferId].setMessage(message);
+		messageBuffers_[bufferId].setVisibility(true);
 	}
 	
 	public void flush()
 	{
-		for (int i=0;i<_messageBuffers.length;++i)
+		for (int i=0;i<messageBuffers_.length;++i)
 		{
-			if (_messageBuffers[i]!=null)
+			if (messageBuffers_[i]!=null)
 			{
-				_messageBuffers[i].visibility(false);
+				messageBuffers_[i].setVisibility(false);
 			}
 		}
 	}
 	
-	private Transformation _transformation;
+	private Transformation transformation_;
 	
 	public final static int MAX_MESSAGE_BUFFERS = 10;
-	private MessageBuffer[]	_messageBuffers;
-	private HashMap<String, FontSet>	_fontSetMap;
+	private MessageBuffer[]	messageBuffers_;
+	private HashMap<String, FontSet>	fontSetMap_;
+	private OrthoRenderQueue renderQueue_;
 }
 
 

@@ -35,20 +35,20 @@ public class Camera extends Movable
 	
 	public void updateTransformation(Transformation parentTransformation, boolean parentDirty)
 	{
-		if (_dirty||parentDirty)
+		if (dirty_||parentDirty)
 		{
 			//Log.v(TAG, "dirty- update");
-			_worldTransformationCache.mul(parentTransformation, _localTransformation);
-			_worldTransformationCache.getViewMatrix(_viewMatrix);
+			worldTransformationCache_.mul(parentTransformation, localTransformation_);
+			worldTransformationCache_.getViewMatrix(_viewMatrix);
 			
 			// write transformation to skybox?
-			if (_drawable!=null)
+			if (drawable_!=null)
 			{
-				_skyboxTransformation._matrix[12] = _worldTransformationCache._matrix[12];
-				_skyboxTransformation._matrix[13] = _worldTransformationCache._matrix[13];
-				_skyboxTransformation._matrix[14] = _worldTransformationCache._matrix[14];
+				_skyboxTransformation.matrix[12] = worldTransformationCache_.matrix[12];
+				_skyboxTransformation.matrix[13] = worldTransformationCache_.matrix[13];
+				_skyboxTransformation.matrix[14] = worldTransformationCache_.matrix[14];
 				
-				_drawable.setWorldTransformation(_skyboxTransformation);
+				drawable_.setWorldTransformation(_skyboxTransformation);
 			}
 		}
 	}

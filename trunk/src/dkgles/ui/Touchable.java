@@ -10,7 +10,7 @@ import dkgles.primitive.Rectangle;
 
 public class Touchable extends Drawable
 {
-	public interface ITouchEventHandler
+	public interface ITouchEventListener
 	{
 		public void touch(final int id);
 		public void unTouch(final int id);
@@ -22,11 +22,11 @@ public class Touchable extends Drawable
 		super(name);
 		setMesh(rectangle);
 		
-		_position 	= new float[3];
-		_handlers 	= new ArrayList<ITouchEventHandler>();
-		_enable 	= true;
-		_width		= rectangle.width();
-		_height		= rectangle.height();
+		position_ 	= new float[3];
+		listeners_ 	= new ArrayList<ITouchEventListener>();
+		enable_ 	= true;
+		width_		= rectangle.width();
+		height_		= rectangle.height();
 		
 	}
 	
@@ -45,38 +45,38 @@ public class Touchable extends Drawable
 		Rectangle rectangle =  new Rectangle("RTG_" + name, width, height, material);
 		setMesh(rectangle);
 		
-		_position 	= new float[3];
-		_handlers 	= new ArrayList<ITouchEventHandler>();
-		_enable 	= true;
-		_width		= width;
-		_height		= height;
+		position_ 	= new float[3];
+		listeners_ 	= new ArrayList<ITouchEventListener>();
+		enable_ 	= true;
+		width_		= width;
+		height_		= height;
 	}
 	
 	public void release()
 	{
 		super.release();
 		
-		if (_handlers!=null)
+		if (listeners_!=null)
 		{
-			_handlers.clear();
-			_handlers = null;
+			listeners_.clear();
+			listeners_ = null;
 		}
 		
-		if (_position!=null)
+		if (position_!=null)
 		{
-			_position = null;
+			position_ = null;
 		}
 	}
 	
 	/**
 	 * Bind a touch event handler
-	 * @param handler
+	 * @param listener
 	 */
-	public void addTouchEventHandler(ITouchEventHandler handler)
+	public void addTouchEventListener(ITouchEventListener listener)
 	{
-		if (handler!=null)
+		if (listener!=null)
 		{
-			_handlers.add(handler);
+			listeners_.add(listener);
 		}
 		
 		/*if (handler!=null)
@@ -95,11 +95,11 @@ public class Touchable extends Drawable
 	 */
 	public void enable(boolean val)
 	{
-		_enable = val;
+		enable_ = val;
 		
-		for (ITouchEventHandler handler : _handlers)
+		for (ITouchEventListener handler : listeners_)
 		{
-			handler.enable(_enable);
+			handler.enable(enable_);
 		}
 		//_handler.enable(_enable);
 		
@@ -107,7 +107,7 @@ public class Touchable extends Drawable
 	
 	public boolean enable()
 	{
-		return _enable;
+		return enable_;
 	}
 	
 	/**
@@ -118,10 +118,10 @@ public class Touchable extends Drawable
 	 */
 	public boolean hit(float x, float y)
 	{
-		float rx = StrictMath.abs(_position[0] - x)*2;
-		float ry = StrictMath.abs(_position[1] - y)*2;
+		float rx = StrictMath.abs(position_[0] - x)*2;
+		float ry = StrictMath.abs(position_[1] - y)*2;
 		
-		if (rx > _width || ry > _height)
+		if (rx > width_ || ry > height_)
 		{
 			return false;
 		}
@@ -144,13 +144,13 @@ public class Touchable extends Drawable
 	 */
 	public synchronized void touch()
 	{
-		if (!_enable)
+		if (!enable_)
 			return;
 		
 		_touched = true;
 		//_handler.touch(0);
 		
-		for (ITouchEventHandler handler : _handlers)
+		for (ITouchEventListener handler : listeners_)
 		{
 			handler.touch(0);
 		}
@@ -165,12 +165,12 @@ public class Touchable extends Drawable
 	 */
 	public synchronized void unTouch()
 	{
-		if (!_enable)
+		if (!enable_)
 			return;
 		
 		//_handler.unTouch(0);
 		
-		for (ITouchEventHandler handler : _handlers)
+		for (ITouchEventListener handler : listeners_)
 		{
 			handler.unTouch(0);
 		}
@@ -184,19 +184,19 @@ public class Touchable extends Drawable
 	public void setWorldTransformation(Transformation worldTransformation)
 	{
 		super.setWorldTransformation(worldTransformation);
-		worldTransformation.getTranslation(_position);
+		worldTransformation.getTranslation(position_);
 	}
 	
 	final static String TAG = "Touchable";
-	boolean _enable;
+	boolean enable_;
 	boolean _touched;
-	float	_width;
-	float	_height;
+	float	width_;
+	float	height_;
 	//ITouchEventHandler _handler;
-	ArrayList<ITouchEventHandler> _handlers;
+	ArrayList<ITouchEventListener> listeners_;
 	static NilTouchEventHandler _nilTouchEventHandler = new NilTouchEventHandler();
 	
-	protected float[] _position;
+	protected float[] position_;
 	
 }
 
@@ -205,7 +205,7 @@ public class Touchable extends Drawable
  * @author doki
  *
  */
-class NilTouchEventHandler implements Touchable.ITouchEventHandler
+class NilTouchEventHandler implements Touchable.ITouchEventListener
 {
 	public void touch(final int id)
 	{

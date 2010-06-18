@@ -8,53 +8,53 @@ import dkgles.primitive.Rectangle;
 
 public class MessageBuffer extends Drawable
 {
-	public MessageBuffer(int bufferLen, FontSet fontSet, float fontSize)
+	public MessageBuffer(int bufferLen, FontSet fontSet, float fontSize, int depth)
 	{
-		super(null, 3);
+		super(null, depth);
 		
-		_fontSize 	= fontSize;
-		_fontSet 	= fontSet;
-		_fonts 		= new Font[bufferLen];
+		fontSize_ 	= fontSize;
+		fontSet_ 	= fontSet;
+		fonts_ 		= new Font[bufferLen];
 	}
 	
 	public void release()
 	{
-		if (_fonts!=null)
+		if (fonts_!=null)
 		{
-			for (int i=0;i<_fonts.length;++i)
+			for (int i=0;i<fonts_.length;++i)
 			{
-				_fonts[i] = null;
+				fonts_[i] = null;
 			}
-			_fonts = null;
+			fonts_ = null;
 		}
 		
-		if (_fontSet!=null)
+		if (fontSet_!=null)
 		{
-			_fontSet = null;
+			fontSet_ = null;
 		}	
 	}
 	
 	public synchronized void render(GL10 gl)
 	{
-		if (!_visible)
+		if (!visible_)
 			return;
 		
 		try
 		{
 			gl.glPushMatrix();
-			gl.glLoadMatrixf(_worldTransformation._matrix, 0);
+			gl.glLoadMatrixf(worldTransformation_.matrix, 0);
 			
-			for (int i=0;i<_fonts.length;++i)
+			for (int i=0;i<fonts_.length;++i)
 			{
 				gl.glPushMatrix();
-				gl.glTranslatef(_fontSize*i, 0.0f, 0.0f);
+				gl.glTranslatef(fontSize_*i, 0.0f, 0.0f);
 
-				if (_fonts[i]!=null)
+				if (fonts_[i]!=null)
 				{
-					gl.glScalef(_fontSize, _fontSize, 1.0f);
-					_material.bindTexture(_fonts[i].texture());
-					_fontMesh.setMaterial(0, _material);
-					_fontMesh.renderImpl(gl);
+					gl.glScalef(fontSize_, fontSize_, 1.0f);
+					material_.bindTexture(fonts_[i].texture());
+					fontMesh_.setMaterial(0, material_);
+					fontMesh_.renderImpl(gl);
 				}
 				gl.glPopMatrix();
 			}
@@ -69,29 +69,29 @@ public class MessageBuffer extends Drawable
 	
 	public void setMessage(String message)
 	{	
-		for (int i=0;i<_fonts.length;i++)
+		for (int i=0;i<fonts_.length;i++)
 		{
 			if (i<message.length())
 			{
-				_fonts[i] = _fontSet.get(message.charAt(i));
+				fonts_[i] = fontSet_.get(message.charAt(i));
 			}
 		}
 	}
 	
 	public void setFontSize(float fontSize)
 	{
-		_fontSize = fontSize;
+		fontSize_ = fontSize;
 	}
 	
 	public void setFontSet(FontSet fontSet)
 	{
-		_fontSet = fontSet;
+		fontSet_ = fontSet;
 	}
 	
-	private float 		_fontSize;
-	private Font[]		_fonts;
-	private FontSet 	_fontSet;
+	private float 		fontSize_;
+	private Font[]		fonts_;
+	private FontSet 	fontSet_;
 	
-	private static Rectangle	_fontMesh = new Rectangle("RTG_Font", 1.0f, 1.0f,  null);
-	private static Material 	_material = new Material("MAT_Font");
+	private static Rectangle	fontMesh_ = new Rectangle("RTG_Font", 1.0f, 1.0f,  null);
+	private static Material 	material_ = new Material("MAT_Font");
 }

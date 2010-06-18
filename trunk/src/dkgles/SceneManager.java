@@ -8,6 +8,20 @@ import dkgles.render.RenderQueue;
 public enum SceneManager
 {
 	INSTANCE;
+	
+	public class TooManyScenesException extends RuntimeException
+	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public TooManyScenesException(String name)
+		{
+			super(name);
+		}
+	}
+	
 	/**
 	 * Create a scene
 	 * @param name
@@ -28,13 +42,14 @@ public enum SceneManager
 	{
 		for (int i=0;i<MAX_SCENES;i++)
 		{
-			if (_scenes[i]==null)
+			if (scenes_[i]==null)
 			{
-				_scenes[i] = scene;
+				scenes_[i] = scene;
 				return i;
 			}
 		}	
-		return -1;
+		
+		throw new TooManyScenesException("");
 	}
 
 	/**
@@ -43,7 +58,37 @@ public enum SceneManager
 	 */
 	public Scene get(int id)
 	{
-		return _scenes[id];
+		return scenes_[id];
+	}
+	
+	public Scene getByName(String name)
+	{
+		int id = getIdByName(name);
+		
+		if (id>=0)
+		{
+			return scenes_[id];
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public int getIdByName(String name)
+	{
+		for (int i=0;i<MAX_SCENES;i++)
+		{
+			if (scenes_[i]==null)
+				continue;
+			
+			if (scenes_[i].name().equals(name))
+			{
+				return i;
+			}
+		}
+		
+		return -1;
 	}
 	
 
@@ -52,11 +97,11 @@ public enum SceneManager
 	 */
 	public synchronized void destroy(int id)
 	{
-		if (_scenes[id]==null)
+		if (scenes_[id]==null)
 			return;
 		
-		_scenes[id].release();
-		_scenes[id] = null;
+		scenes_[id].release();
+		scenes_[id] = null;
 	}
 
 	/**
@@ -75,7 +120,27 @@ public enum SceneManager
 	public void release()
 	{
 		destroyAll();
-		_scenes = null;
+		scenes_ = null;
+	}
+	
+	public void parse(int rsc_id)
+	{
+		sceneBuilder_.build(rsc_id);
+	}
+	
+	public void registerSceneComponentCreatedListener(IBuildSceneListener listener)
+	{
+		sceneBuilder_.registerListener(listener);
+	}
+	
+	public void unregisterSceneComponentCreatedListener(IBuildSceneListener listener)
+	{
+		sceneBuilder_.unregisterListener(listener);
+	}
+	
+	public void unregisterAllSceneComponentCreatedListener()
+	{
+		sceneBuilder_.unregisterAllListener();
 	}
 	
 	/**
@@ -85,9 +150,9 @@ public enum SceneManager
 	{
 		for (int i=0;i<MAX_SCENES;i++)
 		{
-			if (_scenes[i]!=null)
+			if (scenes_[i]!=null)
 			{
-				_scenes[i].updateSceneGraph();
+				scenes_[i].updateSceneGraph();
 			}
 		}
 	}
@@ -96,9 +161,9 @@ public enum SceneManager
 	{
 		for (int i=0;i<MAX_SCENES;i++)
 		{
-			if (_scenes[i]!=null)
+			if (scenes_[i]!=null)
 			{
-				_scenes[i].updateHandler(deltaTime);
+				scenes_[i].updateHandler(deltaTime);
 			}
 		}
 	}
@@ -119,12 +184,14 @@ public enum SceneManager
 		}
 	}
 		
-	SceneManager()
+	private SceneManager()
 	{
-		_scenes = new Scene[MAX_SCENES];
+		scenes_ = new Scene[MAX_SCENES];
+		sceneBuilder_ = new SceneBuilder(null);
 	}
 	
-	Scene[]	_scenes;
+	private Scene[]			scenes_;
+	private SceneBuilder	sceneBuilder_;
 	
 	public static final int MAX_SCENES = 8;
 	

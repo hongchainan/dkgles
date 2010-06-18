@@ -3,13 +3,13 @@ package dkgles.ui;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import dkgles.DefaultBuildSceneListener;
+import dkgles.IBuildSceneListener;
 import dkgles.Material;
 import dkgles.Movable;
 import dkgles.Scene;
 import dkgles.SceneManager;
 import dkgles.android.wrapper.ServiceManager;
-import dkgles.render.OrthoRenderQueue;
-import dkgles.render.RenderQueue;
 
 public enum UIManager implements OnTouchListener
 {	
@@ -36,9 +36,9 @@ public enum UIManager implements OnTouchListener
 	{
 		for (int i=0;i<MAX_TOUCHABLES;i++)
 		{
-			if (_touchables[i]==null)
+			if (touchables_[i]==null)
 			{
-				_touchables[i] = touchable;
+				touchables_[i] = touchable;
 				return i;
 			}
 		}
@@ -53,7 +53,7 @@ public enum UIManager implements OnTouchListener
 	 */
 	public Touchable get(int id)
 	{
-		return _touchables[id];
+		return touchables_[id];
 	}
 	
 	/**
@@ -62,22 +62,22 @@ public enum UIManager implements OnTouchListener
 	 */
 	public void destroy(int id)
 	{
-		if (_touchables[id]!=null)
+		if (touchables_[id]!=null)
 		{
-			_touchables[id].release();
-			_touchables[id] = null;
+			touchables_[id].release();
+			touchables_[id] = null;
 		}
 	}
 	
 	public void destroyAll()
 	{
-		if (_touchables!=null)
+		if (touchables_!=null)
 		{
 			for (int i=0;i<MAX_TOUCHABLES;i++)
 			{
 				destroy(i);
 			}
-			_touchables = null;
+			touchables_ = null;
 		}
 	}
 		
@@ -86,7 +86,7 @@ public enum UIManager implements OnTouchListener
 	 */
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		if (!_enable)
+		if (!enable_)
 			return false;
 		
 		float x = transformX(event.getX());
@@ -98,7 +98,7 @@ public enum UIManager implements OnTouchListener
 			//Log.v(CLASS_TAG, "action down!!" + x + ", " + y);
 			ServiceManager.INSTANCE.vibrator().vibrate(70);
 			
-			for (Touchable touchable : _touchables)
+			for (Touchable touchable : touchables_)
 			{
 				if (touchable!=null)
 				{
@@ -113,7 +113,7 @@ public enum UIManager implements OnTouchListener
 		{
 			//Log.v(CLASS_TAG, "action up");
 			
-			for (Touchable touchable : _touchables)
+			for (Touchable touchable : touchables_)
 			{
 				if (touchable!=null)
 				{
@@ -133,9 +133,9 @@ public enum UIManager implements OnTouchListener
 	 * @param x
 	 * @return
 	 */
-	float transformX(float x)
+	private float transformX(float x)
 	{
-		return (x / _height) - _halfAsr;
+		return (x / height_) - halfAsr_;
 	}
 	
 	/**
@@ -145,26 +145,31 @@ public enum UIManager implements OnTouchListener
 	 */
 	float transformY(float y)
 	{
-		return 0.5f - (y / _height);
+		return 0.5f - (y / height_);
 	}
 	
 	
 	public void onSize(float width, float height)
 	{
 		//Log.v(CLASS_TAG, "onSize Event" + width + ", " + height);
-		_width	= width;
-		_height = height;
-		_halfAsr = (_width / _height)/2.0f;
+		width_	= width;
+		height_ = height;
+		halfAsr_ = (width_ / height_)/2.0f;
 	}
 	
 	public void enable(boolean val)
 	{
-		_enable = val;
+		enable_ = val;
 	}
 
-	public Scene getScene()
+	/**
+	 * 
+	 * @return
+	 * @drepcated
+	 */
+	public Scene scene()
 	{
-		return SceneManager.INSTANCE.get(_sceneId);
+		return SceneManager.INSTANCE.get(sceneId_);
 	}
 	
 	public void print(float x, float y, String message)
@@ -173,47 +178,65 @@ public enum UIManager implements OnTouchListener
 	}
 	
 	
-	UIManager()
+	private UIManager()
 	{
 		reset();
-		
+		sceneCreatedListener_ = new SceneCreatedListener();
 	}
 
 	public void reset()
 	{
 		release();
-		_touchables 	= new Touchable[MAX_TOUCHABLES];
-		_halfAsr 	= 0.5f;
-		_enable 	= true;
-		_sceneId 	= SceneManager.INSTANCE.create(
-			"UIScene",
-			 new OrthoRenderQueue("UIRenderQueue", 5, RenderQueue.UI_LAYER));
-		_active = true;
+		touchables_ 	= new Touchable[MAX_TOUCHABLES];
+		halfAsr_ 	= 0.5f;
+		enable_ 	= true;
+		//sceneId_ 	= SceneManager.INSTANCE.create(
+//			"UIScene",
+	//		 new OrthoRenderQueue("UIRenderQueue", 8, RenderQueue.UI_LAYER));
+		active_ = true;
+		
+	}
+	
+	public IBuildSceneListener sceneCreatedListener()
+	{
+		return sceneCreatedListener_;
 		
 	}
 
 	public void release()
 	{
-		if (!_active)
+		if (!active_)
 			return;
+		
 		enable(false);
 		destroyAll();
-		SceneManager.INSTANCE.destroy(_sceneId);
-		_sceneId = -1;
-		_active = false;
+		SceneManager.INSTANCE.destroy(sceneId_);
+		sceneId_ = -1;
+		active_ = false;
 	}
 	
 	
-	Touchable[]	_touchables;
-	int 	_sceneId;	
+	private Touchable[]	touchables_;
+	private int 	sceneId_;	
 
-	boolean _enable;
-	boolean	_active;
-	float _width;
-	float _height;
-	float _halfAsr;	// Half value of aspect ratio
+	private boolean enable_;
+	private boolean	active_;
+	private float width_;
+	private float height_;
+	private float halfAsr_;	// Half value of aspect ratio
 	
 	static final String CLASS_TAG = "UIManager";
 	public final static int MAX_TOUCHABLES = 8;
+	
+	private SceneCreatedListener sceneCreatedListener_;
+	
+	class SceneCreatedListener extends DefaultBuildSceneListener
+	{
+		public void onSceneCreated(int id, Scene scene)
+		{
+			sceneId_ = id;
+			active_ = true;
+		}
+	}
 	
 }
