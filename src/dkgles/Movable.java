@@ -161,7 +161,7 @@ public class Movable
 	 * @param y
 	 * @param z
 	 */
-	public synchronized void position(float x, float y, float z)
+	public synchronized void setPosition(float x, float y, float z)
 	{
 		localTransformation_.matrix[12] = x;
 		localTransformation_.matrix[13] = y;
@@ -341,6 +341,11 @@ public class Movable
 		// TODO use clone function
 		localTransformation_.copy(transformation);
 		dirty_ = true;
+	}
+	
+	public void copyLocalTransformation(Transformation transformation)
+	{
+		transformation.copy(localTransformation_);
 	}
 	
 	public Transformation getLocalTransformation()

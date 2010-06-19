@@ -5,11 +5,14 @@ import java.util.Stack;
 
 import lost.kapa.ContextHolder;
 import lost.kapa.XmlUtil;
+import lost.kapa.game.Entity;
+import lost.kapa.game.EntityManager;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.util.Log;
 import dkgles.manager.MaterialManager;
 import dkgles.primitive.Rectangle;
 import dkgles.render.OrthoRenderQueue;
@@ -111,25 +114,41 @@ public class SceneBuilder extends DefaultHandler
 		}
 		else if (localName.equals("movable"))
 		{
+			String name = XmlUtil.parseString(atts, "name", "Movable:N/A");
+			Log.v(TAG, "got movable: " + name);
+			
 			Movable movable = new Movable(
-				XmlUtil.parseString(atts, "name", "Movable:N/A"),
+				name,
 				movableStack_.peek(),
 				scene_);
 			
 			parseMovableOptionalParam(movable, atts);
 
 			movableStack_.push(movable);
-			curNodeType_ = MOVABLE;
-
+			curNodeType_ = MOVABLE;			
+		}
+		else if (localName.equals("entity"))
+		{
+			Entity entity = EntityManager.INSTANCE.getByName(XmlUtil.parseString(atts, "name", ""));
 			
+			if (entity!=null) 
+			{
+				if (curNodeType_==IMMOVABLE)
+				{
+					Log.w(TAG, "attach entity to an immovable");
+				}
+				else
+				{
+					Log.v(TAG, "attach entity: " + entity.name());
+					//movableStack_.peek().setDrawable(entity.drawable());
+					entity.linkMovable(movableStack_.peek());
+				}
+			}
 		}
 		else if (localName.equals("drawable"))
-		{
-			String meshName = XmlUtil.parseString(atts, "mesh", "Mesh:N/A");
-			
-			Drawable drawable = new Drawable(
-					MeshManager.INSTANCE.getByName(meshName),
-					XmlUtil.parseInt(atts, "group_id", 0));
+		{	
+			Drawable drawable = new Drawable(atts);	
+			//parseDrawableOptionalParam(drawable, atts);
 			
 			if (curNodeType_==IMMOVABLE)
 			{
@@ -265,6 +284,9 @@ public class SceneBuilder extends DefaultHandler
 	{
 		int group_id = XmlUtil.parseInt(atts, "group_id", 0);
 		drawable.groupID(group_id);
+		
+		boolean visible = XmlUtil.parseBoolean(atts, "visibility", true);
+		drawable.setVisibility(visible);
 	}
 
 	void parseMovableOptionalParam(Movable movable, Attributes atts)
@@ -273,7 +295,7 @@ public class SceneBuilder extends DefaultHandler
 		float y = XmlUtil.parseFloat(atts, "y", 0.0f);
 		float z = XmlUtil.parseFloat(atts, "z", 0.0f);
 
-		movable.position(x, y, z);
+		movable.setPosition(x, y, z);
 
 		float pitch = XmlUtil.parseFloat(atts, "pitch", 0.0f);
 		movable.pitch(pitch);

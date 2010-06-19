@@ -11,26 +11,26 @@ public class Mesh
 {
 	/**
 	 *@param name a human readable string for debugging
-	 *@param subMeshCount total account of sub meshes.
+	 *@param numSubMeshes total account of sub meshes.
 	 */
-	public Mesh(String name, int subMeshCount)
+	public Mesh(String name, int numSubMeshes)
 	{
-		_name = name;
-		_SubMeshCount = subMeshCount;
-		_subMeshes = new SubMesh[subMeshCount];
+		name_ 			= name;
+		numSubMeshes_ 	= numSubMeshes;
+		subMeshes_ 		= new SubMesh[numSubMeshes];
 	}
 
 	public void release()
 	{
 		//super.release();
-		if (_subMeshes!=null)
+		if (subMeshes_!=null)
 		{
-			for (int i=0;i<_SubMeshCount;i++)
+			for (int i=0;i<numSubMeshes_;i++)
 			{
-				_subMeshes[i].release();
-				_subMeshes[i] = null;
+				subMeshes_[i].release();
+				subMeshes_[i] = null;
 			}
-			_subMeshes = null;
+			subMeshes_ = null;
 		}
 	}
 	
@@ -41,12 +41,17 @@ public class Mesh
 	 */
 	public void setMaterial(int index, Material material)
 	{
-		_subMeshes[index].setMaterial(material);
+		subMeshes_[index].setMaterial(material);
 	}
 	
 	public Material getMaterial(short index)
 	{
-		return _subMeshes[index].getMaterial();
+		return subMeshes_[index].getMaterial();
+	}
+	
+	public int numSubMeshes()
+	{
+		return numSubMeshes_;
 	}
 	
 	/**
@@ -54,33 +59,38 @@ public class Mesh
 	 */
 	protected void setSubMesh(int index, SubMesh sm)
 	{
-		_subMeshes[index] = sm;
+		if (index<0||index>=numSubMeshes_)
+		{
+			return;
+		}
+		
+		subMeshes_[index] = sm;
 	}
 	
 	public void renderImpl(GL10 gl)
 	{
-		for (int i=0;i<_SubMeshCount;i++)
+		for (int i=0;i<numSubMeshes_;i++)
 		{
-			_subMeshes[i].renderImpl(gl);
+			subMeshes_[i].renderImpl(gl);
 		}
 	}
 	
 	public String name()
 	{
-		return _name;
+		return name_;
 	}
 	
-	String _name;
+	protected String name_;
 	
-	SubMesh[]	_subMeshes;
-	int 		_SubMeshCount;		
+	private SubMesh[]	subMeshes_;
+	private int 		numSubMeshes_;		
 	
 	public static DummyMesh getDummy()
 	{
-		return _dummy;
+		return dummyMesh_;
 	}
 	
-	static DummyMesh _dummy = new DummyMesh();
+	private static DummyMesh dummyMesh_ = new DummyMesh();
 }
 
 class DummyMesh extends Mesh

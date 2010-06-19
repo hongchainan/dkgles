@@ -36,7 +36,7 @@ public class MessageBuffer extends Drawable
 	
 	public synchronized void render(GL10 gl)
 	{
-		if (!visible_)
+		if (!visibility_)
 			return;
 		
 		try
@@ -68,12 +68,21 @@ public class MessageBuffer extends Drawable
 	}// End of render
 	
 	public void setMessage(String message)
-	{	
+	{
+		for (int i=0;i<fonts_.length;i++)
+		{
+			fonts_[i] = null;
+		}
+		
 		for (int i=0;i<fonts_.length;i++)
 		{
 			if (i<message.length())
 			{
 				fonts_[i] = fontSet_.get(message.charAt(i));
+			}
+			else
+			{
+				break;
 			}
 		}
 	}
