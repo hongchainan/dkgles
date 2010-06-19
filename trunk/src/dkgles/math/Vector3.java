@@ -36,6 +36,13 @@ public class Vector3 implements Cloneable
 				this.x - rhs.x, this.y - rhs.y, this.z - rhs.z);
 	}
 	
+	public void subFromSelf(Vector3 rhs)
+	{
+		x -= rhs.x;
+		y -= rhs.y;
+		x -= rhs.z;
+	}
+	
 	public void normalize()
 	{
 		float l = length();

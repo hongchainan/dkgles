@@ -2,6 +2,10 @@ package dkgles;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import lost.kapa.XmlUtil;
+
+import org.xml.sax.Attributes;
+
 import android.opengl.GLException;
 import android.util.Log;
 
@@ -13,22 +17,28 @@ public class Drawable
 {
 	public Drawable(Mesh mesh, int groupId)
 	{
-		_mesh = mesh;
-		visible_ = true;
-		_groupID = groupId;
+		mesh_ = mesh;
+		visibility_ = true;
+		groupID_ = groupId;
 		worldTransformation_ = new Transformation();
 	}
 	
 	public Drawable(String name)
 	{
-		_name = name;
-		visible_ = true;
-		_groupID = 0;
+		name_ = name;
+		visibility_ = true;
+		groupID_ = 0;
 		worldTransformation_ = new Transformation();
-		_mesh = Mesh.getDummy();
+		mesh_ = Mesh.getDummy();
+	}
+	
+	public Drawable(Attributes atts)
+	{
+		mesh_ 		= MeshManager.INSTANCE.getByName(XmlUtil.parseString(atts, "mesh", "Mesh:N/A"));
+		groupID_ 	= XmlUtil.parseInt(atts, "group_id", 0);
+		visibility_ = XmlUtil.parseBoolean(atts, "visibility", true);
 	}
 
-	
 	public void release()
 	{
 		worldTransformation_.release();
@@ -39,7 +49,7 @@ public class Drawable
 	 */
 	public void groupID(int id)
 	{
-		_groupID = id;
+		groupID_ = id;
 	}
 	
 	/**
@@ -47,17 +57,17 @@ public class Drawable
 	 */
 	public int groupID()
 	{
-		return _groupID;
+		return groupID_;
 	}
 
 	public void setVisibility(boolean val)
 	{
-		visible_ = val;
+		visibility_ = val;
 	}
 	
 	public boolean visible()
 	{
-		return visible_;
+		return visibility_;
 	}
 	
 	/**
@@ -74,13 +84,13 @@ public class Drawable
 	 */
 	public synchronized void render(GL10 gl)
 	{
-		if (!visible_)
+		if (!visibility_)
 			return;
 		
 		try
 		{
 			gl.glMultMatrixf(worldTransformation_.matrix, 0);
-			_mesh.renderImpl(gl);
+			mesh_.renderImpl(gl);
 			//renderImpl(gl);
 		}
 		catch(GLException e)
@@ -94,30 +104,35 @@ public class Drawable
 	{
 		if (mesh==null)
 		{
-			_mesh = Mesh.getDummy();
+			mesh_ = Mesh.getDummy();
 		}
 		else
 		{
-			_mesh = mesh;
+			mesh_ = mesh;
 		}
+	}
+	
+	public Mesh mesh()
+	{
+		return mesh_;
 	}
 	
 	public String name()
 	{
-		return _name;
+		return name_;
 	}
 	
 	
 	public String toString()
 	{
-		return _name + ", group ID:" + _groupID; 
+		return name_ + ", group ID:" + groupID_; 
 	}
 	
-	boolean			visible_;
-	int				_groupID;
-	String 			_name;
-	Mesh			_mesh;
-	Transformation 	worldTransformation_;
+	protected boolean			visibility_ = true;
+	protected int				groupID_ = 0;
+	protected String 			name_ = "";
+	protected Mesh			mesh_ = null;
+	protected Transformation 	worldTransformation_ = new Transformation();
 	static final String TAG = "Drawable";
 	
 }
