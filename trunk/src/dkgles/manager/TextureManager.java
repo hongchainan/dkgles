@@ -41,13 +41,13 @@ public enum TextureManager
 		public void onCreated(int id, Texture texture);
 	}
 	
-	ArrayList<IListener> _listeners;
+	ArrayList<IListener> listeners_;
 	
 	public void registerListener(IListener listener)
 	{
 		if (listener!=null)
 		{
-			_listeners.add(listener);
+			listeners_.add(listener);
 		}
 	}
 	
@@ -55,7 +55,7 @@ public enum TextureManager
 	{
 		if (listener!=null)
 		{
-			_listeners.remove(listener);
+			listeners_.remove(listener);
 		}
 	}
 	
@@ -76,12 +76,18 @@ public enum TextureManager
 			return -1;
 		
 		Texture texture = textureHolder.get();
+		
+		if (texture==null)
+			return -1;
+		
 		int id = register(texture);
 		
-		for (IListener listener : _listeners)
+		for (IListener listener : listeners_)
 		{
 			listener.onCreated(id, texture);
 		}
+		
+		Log.v(TAG, "create texture: " + name + "(" + id + ")");
 		
 		return id;
 	}
@@ -90,9 +96,9 @@ public enum TextureManager
 	{
 		for (int i=0;i<MAX_TEXTURES;i++)
 		{
-			if (_textures[i]==null)
+			if (textures_[i]==null)
 			{
-				_textures[i] = texture;
+				textures_[i] = texture;
 				return i;
 			}
 		}
@@ -108,17 +114,17 @@ public enum TextureManager
 	{
 		public synchronized void set(Texture texture)
 		{
-			if (_ready)
+			if (ready_)
 				return;
 			
-			_texture = texture;
-			_ready = true;
+			texture_ = texture;
+			ready_ = true;
 			notifyAll();
 		}
 		
 		public synchronized Texture get()
 		{
-			while(!_ready)
+			while(!ready_)
 			{
 				try
 				{
@@ -129,11 +135,11 @@ public enum TextureManager
 					
 				}
 			}
-			return _texture;
+			return texture_;
 		}
 		
-		boolean _ready;
-		Texture _texture;
+		private boolean ready_ 	 = false;
+		private Texture texture_ = null;
 	}
 
 	/**
@@ -164,7 +170,7 @@ public enum TextureManager
 		}
 		catch(Resources.NotFoundException e)
 		{
-			Log.e(TAG, "resource not found, id: " + resId);
+			Log.e(TAG, "resource(" + name + ") not found, id: " + resId);
 		}
 		catch(GLException e)
 		{
@@ -179,12 +185,12 @@ public enum TextureManager
 	 */
 	public synchronized void destroy(int id)
 	{
-		if (_textures[id]==null)
+		if (textures_[id]==null)
 			return;
 		
-		GLHost.INSTANCE.request(new GLDeleteTextureRequest(_textures[id]));
-		_textures[id].release();
-		_textures[id] = null;
+		GLHost.INSTANCE.request(new GLDeleteTextureRequest(textures_[id]));
+		textures_[id].release();
+		textures_[id] = null;
 	}
 	
 	public void destroyAll()
@@ -205,7 +211,10 @@ public enum TextureManager
 	 */
 	public synchronized Texture get(int id) //throws TextureNotFoundException
 	{
-		return _textures[id];
+		if (id<0||id>=MAX_TEXTURES)
+			return null;
+		
+		return textures_[id];
 	}
 	
 	/**
@@ -213,16 +222,17 @@ public enum TextureManager
 	 */
 	public Texture getByName(String name) throws TextureNotFoundException
 	{
-		int id = findIdByName(name);
+		return get(findIdByName(name));
+		//int id = findIdByName(name);
 		
-		if (id!=-1)
-		{
-			return _textures[findIdByName(name)];
-		}
-		else
-		{
-			throw new TextureNotFoundException(name);
-		}
+		//if (id!=-1)
+		//{
+			//return _textures[findIdByName(name)];
+		//}
+		//else
+		//{
+			//throw new TextureNotFoundException(name);
+		//}
 	}
 
 	/**
@@ -234,9 +244,9 @@ public enum TextureManager
 	{
 		for (int i=0;i<MAX_TEXTURES;i++)
 		{
-			if (_textures[i]!=null)
+			if (textures_[i]!=null)
 			{
-				if (_textures[i].name().equals(name))
+				if (textures_[i].name().equals(name))
 				{
 					return i;
 				}
@@ -251,11 +261,11 @@ public enum TextureManager
 	}
 	
 	
-	TextureManager()
+	private TextureManager()
 	{
-		_textures 	= new Texture[MAX_TEXTURES];
-		_rconverter = new RConverter();
-		_listeners = new ArrayList<IListener>();
+		textures_ 	= new Texture[MAX_TEXTURES];
+		rconverter_ = new RConverter();
+		listeners_ 	= new ArrayList<IListener>();
 	}
 	
 	/**
@@ -279,11 +289,10 @@ public enum TextureManager
 	boolean 		_initialized;
 	
 	//	
-	Texture[]	_textures;
+	private Texture[]	textures_;
 	
-	
-	final static int MAX_TEXTURES = 64;
-	final static String TAG = "TextureManager";
+	public final static int MAX_TEXTURES = 64;
+	public final static String TAG = "TextureManager";
 	
 	
 	public class TextureNotFoundException extends RuntimeException
@@ -305,10 +314,10 @@ public enum TextureManager
 	{
 		GLCreateTextureRequest(final String name, final Bitmap bitmap, int rscId, TextureHolder holder)
 		{
-			_name 	= name;
-			_bitmap = bitmap;
-			_rscId 	= rscId;
-			_holder = holder;
+			name_ 	= name;
+			bitmap_ = bitmap;
+			rscId_ 	= rscId;
+			holder_ = holder;
 		}
 
 		public void run()
@@ -320,8 +329,8 @@ public enum TextureManager
         			
 			if (id[0]==0)
 			{
-				Log.e(TAG, "GL gens invalid id for:" + _name);
-				_holder.set(null);
+				Log.e(TAG, "GL gens invalid id for:" + name_);
+				holder_.set(null);
 				return;
 			}
         	        
@@ -334,16 +343,16 @@ public enum TextureManager
        		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,	GL10.GL_REPEAT);
        		gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE);
         	        
-        	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, _bitmap, 0);
-        	_bitmap.recycle();    	
-        	_holder.set(new Texture(_name, id[0]));
+        	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap_, 0);
+        	bitmap_.recycle();    	
+        	holder_.set(new Texture(name_, id[0]));
         	
 		}
 
-		final String 			_name;
-		final Bitmap			_bitmap;
-		final int				_rscId;
-		final TextureHolder 	_holder;
+		private final String 			name_;
+		private final Bitmap			bitmap_;
+		private final int				rscId_;
+		private final TextureHolder 	holder_;
 	}
 
 	/**
@@ -353,22 +362,22 @@ public enum TextureManager
 	{
 		public GLDeleteTextureRequest(final Texture texture)
 		{
-			_texture = texture;
+			texture_ = texture;
 		}
 	
 		public void run()
 		{
 			int[] id = new int[1];
-			id[0] = _texture.glID();
+			id[0] = texture_.glID();
 			GLHost.INSTANCE.get().glDeleteTextures(1, id, 0);
 		}
 		
-		final Texture _texture;
+		private final Texture texture_;
 	}
 		
 	public int getRscIdByString(String str)
 	{
-		return _rconverter.getRscIdByString(str);	
+		return rconverter_.getRscIdByString(str);	
 	}
 	
 	class RConverter
@@ -381,23 +390,28 @@ public enum TextureManager
 		int getRscIdByString(String str)
 		{
 			int id = -1;
-			try {
+			try
+			{
 				Field field = _R_drawableClass.getField(str);
 				id = field.getInt(_R_drawableObject);	
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
+			}
+			catch (SecurityException e)
+			{
 				e.printStackTrace();
 				id = -1;
-			} catch (NoSuchFieldException e) {
-				// TODO Auto-generated catch block
+			}
+			catch (NoSuchFieldException e)
+			{
 				e.printStackTrace();
 				id = -1;
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
+			}
+			catch (IllegalArgumentException e)
+			{
 				e.printStackTrace();
 				id = -1;
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
+			}
+			catch (IllegalAccessException e)
+			{
 				e.printStackTrace();
 				id = -1;
 			}
@@ -431,11 +445,11 @@ public enum TextureManager
 			}
 		}
 		
-		Object 	_R_drawableObject;
-		Class	_R_drawableClass;	
+		private Object 	_R_drawableObject;
+		private Class	_R_drawableClass;	
 	}
 	
-	RConverter _rconverter;
+	private RConverter rconverter_;
 }
 
 class TextureDefHandler extends DefaultHandler
@@ -478,17 +492,3 @@ class TextureDefHandler extends DefaultHandler
 	}
 	final static String TAG = "TextureDefHandler";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

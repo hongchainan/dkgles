@@ -139,9 +139,15 @@ public class SceneBuilder extends DefaultHandler
 				}
 				else
 				{
-					Log.v(TAG, "attach entity: " + entity.name());
-					//movableStack_.peek().setDrawable(entity.drawable());
 					entity.linkMovable(movableStack_.peek());
+					
+					String defaultState = XmlUtil.parseString(atts, "state", "");
+					if (!defaultState.equals(""))
+					{
+						entity.setState(defaultState);
+					}
+					
+					Log.v(TAG, "attach entity: " + entity.name());
 				}
 			}
 		}

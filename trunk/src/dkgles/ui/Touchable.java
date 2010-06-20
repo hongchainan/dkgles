@@ -93,7 +93,7 @@ public class Touchable extends Drawable
 	 * Enable/ Disable this touchable
 	 * @param val
 	 */
-	public void enable(boolean val)
+	public void setEnable(boolean val)
 	{
 		enable_ = val;
 		

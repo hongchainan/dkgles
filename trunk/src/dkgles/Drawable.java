@@ -13,7 +13,7 @@ import android.util.Log;
  *Abstract Drawable class
  *@author doki lin
  */
-public class Drawable
+public class Drawable implements Cloneable
 {
 	public Drawable(Mesh mesh, int groupId)
 	{
@@ -128,10 +128,18 @@ public class Drawable
 		return name_ + ", group ID:" + groupID_; 
 	}
 	
+	public Drawable clone()
+	{
+		Drawable drawable = new Drawable(mesh_, groupID_);
+		drawable.visibility_ = this.visibility_;
+		drawable.name_ = this.name_;
+		return drawable;
+	}
+	
 	protected boolean			visibility_ = true;
 	protected int				groupID_ = 0;
 	protected String 			name_ = "";
-	protected Mesh			mesh_ = null;
+	protected Mesh				mesh_ = null;
 	protected Transformation 	worldTransformation_ = new Transformation();
 	static final String TAG = "Drawable";
 	
