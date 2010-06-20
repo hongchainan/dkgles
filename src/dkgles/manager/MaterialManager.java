@@ -31,11 +31,11 @@ public enum MaterialManager
 		public void onCreated(Material material);
 	}
 	
-	IListener _listener;
+	private IListener listener_;
 	
 	public void registerListener(IListener listener)
 	{
-		_listener = listener;
+		listener_ = listener;
 	}
 	
 	
@@ -74,13 +74,13 @@ public enum MaterialManager
 	{
 		for (int i=0;i<MAX_MATERIALS;i++)
 		{
-			if (_materials[i]==null)
+			if (materials_[i]==null)
 			{
-				_materials[i] = material;
+				materials_[i] = material;
 				
-				if (_listener!=null)
+				if (listener_!=null)
 				{
-					_listener.onCreated(material);
+					listener_.onCreated(material);
 				}
 				
 				return i;
@@ -92,9 +92,13 @@ public enum MaterialManager
 	/**
 	 *Get material by given ID
 	 */
-	public Material get(int mid)
+	public Material get(int id)
 	{
-		return _materials[mid];
+		if (id<0||id>=MAX_MATERIALS)
+		{
+			return null;
+		}
+		return materials_[id];
 	}
 
 	/**
@@ -102,7 +106,7 @@ public enum MaterialManager
 	 */
 	public Material getByName(String name)
 	{
-		return _materials[findIdByName(name)];
+		return get(findIdByName(name));
 	}
 
 	/**
@@ -114,9 +118,9 @@ public enum MaterialManager
 	{
 		for (int i=0;i<MAX_MATERIALS;i++)
 		{
-			if (_materials[i]!=null)
+			if (materials_[i]!=null)
 			{
-				if (_materials[i].name().equals(name))
+				if (materials_[i].name().equals(name))
 				{
 					return i;
 				}
@@ -130,10 +134,10 @@ public enum MaterialManager
 	 */
 	public void destroy(int mid)
 	{
-		if (_materials[mid]!=null)
+		if (materials_[mid]!=null)
 		{
-			_materials[mid].release();
-			_materials[mid] = null;
+			materials_[mid].release();
+			materials_[mid] = null;
 		}
 	}
 	
@@ -154,7 +158,7 @@ public enum MaterialManager
 	public void release()
 	{
 		destroyAll();
-		_materials = null;
+		materials_ = null;
 	}
 	
 	/**
@@ -165,18 +169,15 @@ public enum MaterialManager
 		XmlUtil.parse(ContextHolder.INSTANCE.get(), new MaterialDefHandler(), resId);
 	}
 	
-	MaterialManager()
+	private MaterialManager()
 	{
-		_materials = new Material[MAX_MATERIALS];
+		materials_ = new Material[MAX_MATERIALS];
 	}
 	
-	
+	private Material[] materials_;
 
 	public final static int MAX_MATERIALS = 64;
-	
-	Material[] _materials;
-	final static String TAG = "MaterialManager";
-
+	public final static String TAG = "MaterialManager";
 }
 
 class MaterialDefHandler extends DefaultHandler
@@ -195,33 +196,16 @@ class MaterialDefHandler extends DefaultHandler
 	@Override
 	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException 
 	{
-		Log.v(TAG, "startElement");
-		
-		//_name = localName;
-
 		if (localName.equals("material"))
 		{
-			_material = new Material(
-				XmlUtil.parseString(atts, "name", "N/A"),
-				XmlUtil.parseFloat(atts, "red", 1.0f),
-				XmlUtil.parseFloat(atts, "green", 1.0f),
-				XmlUtil.parseFloat(atts, "blue", 1.0f),
-				XmlUtil.parseFloat(atts, "alpha", 1.0f)
-			);
-			
-			String textureName = XmlUtil.parseString(atts, "texture_name", "N/A");
-			if (!textureName.equals("N/A"))
-			{
-				_material.bindTexture(
-						TextureManager.INSTANCE.getByName(textureName));
-			}
-			
+			material_ = new Material(atts);
+			Log.v(TAG, "create material: " + material_);
 		}
 		else if (localName.equals("texture"))
 		{
 			// 1. try to find texture by name, if failed, load texture by rsc_id	
 			int id = TextureManager.INSTANCE.findIdByName(
-					XmlUtil.parseString(atts, "name", "N/A"));
+					XmlUtil.parseString(atts, "name", ""));
 			
 			if (id<0)
 			{
@@ -234,7 +218,7 @@ class MaterialDefHandler extends DefaultHandler
 					resId);
 			}
 				
-			_material.bindTexture(
+			material_.bindTexture(
 					TextureManager.INSTANCE.get(id));
 		}
 		else
@@ -248,19 +232,17 @@ class MaterialDefHandler extends DefaultHandler
 	{
 		if (localName.equals("material"))
 		{
-			MaterialManager.INSTANCE.register(_material);
-			_material = null;
+			MaterialManager.INSTANCE.register(material_);
+			material_ = null;
 		}
 		else if (localName.equals("texture"))
 		{
 			
 		}
-		Log.v(TAG, "endElement");
 	}
 
-	Material _material;
-    
-	final static String TAG = "MaterialDefHandler";
+	private Material material_ = null;
+	public final static String TAG = "MaterialDefHandler";
 }
 
 

@@ -66,28 +66,37 @@ public class SubMesh
 		//TODO
 	}
 	
+	public void disableMaterialSharing()
+	{
+		if (material_==null)
+			return;
+		
+		Material localMaterial = material_.clone();
+		material_ = localMaterial;
+	}
+	
 	public void setMaterial(Material material)
 	{
 		if (material!=null)
 		{
-			_material = material;
+			material_ = material;
 		}
 		else
 		{
-			_material = Material.GetDummyMaterial();
+			material_ = Material.GetDummyMaterial();
 		}
 	}
 	
 	public Material getMaterial()
 	{
-		return _material;
+		return material_;
 	}
 	
 	public void renderImpl(GL10 gl)
 	{
-		_material.beforeApply(gl);
+		material_.beforeApply(gl);
 		_renderImpl.render(gl);
-		_material.aferApply(gl);
+		material_.aferApply(gl);
 	}
 	
 	public void setVertices(float[] vertices)
@@ -116,7 +125,7 @@ public class SubMesh
 	}
 	
 	private RenderImpl		_renderImpl;
-	protected Material 		_material;
+	protected Material 		material_;
 	private final String 	_name;
 	private final int		_drawMode;
 

@@ -9,6 +9,12 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class Mesh
 {
+	public Mesh(int numSubMeshes)
+	{
+		numSubMeshes_ 	= numSubMeshes;
+		subMeshes_ 		= new SubMesh[numSubMeshes];
+	}
+	
 	/**
 	 *@param name a human readable string for debugging
 	 *@param numSubMeshes total account of sub meshes.
@@ -49,6 +55,14 @@ public class Mesh
 		return subMeshes_[index].getMaterial();
 	}
 	
+	public void disableMaterialSharing()
+	{
+		for (int i=0;i<numSubMeshes_;++i)
+		{
+			subMeshes_[i].disableMaterialSharing();
+		}
+	}
+	
 	public int numSubMeshes()
 	{
 		return numSubMeshes_;
@@ -73,6 +87,11 @@ public class Mesh
 		{
 			subMeshes_[i].renderImpl(gl);
 		}
+	}
+	
+	public void setName(String name)
+	{
+		name_ = name;
 	}
 	
 	public String name()

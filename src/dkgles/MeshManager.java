@@ -8,7 +8,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import dkgles.manager.MaterialManager;
-import dkgles.manager.TextureManager.TextureNotFoundException;
 import dkgles.primitive.Rectangle;
 
 //import android.util.Pa
@@ -172,6 +171,11 @@ public enum MeshManager
 	
 	public class MeshNotFoundException extends RuntimeException
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public MeshNotFoundException(String meshName)
 		{
 			super(meshName);
@@ -197,12 +201,16 @@ class MeshDefHandler extends DefaultHandler
 	{
 		if (localName.equals("rectangle"))
 		{
+			
+			/*
 			Rectangle rectangle = new Rectangle(
 					XmlUtil.parseString(atts, "name", "Rectangle:N/A"),
 					XmlUtil.parseFloat(atts, "width", 0.0f),
 					XmlUtil.parseFloat(atts, "height", 0.0f),
 					MaterialManager.INSTANCE.getByName(XmlUtil.parseString(atts, "material", "N/A"))
-			);
+			);*/
+			
+			Rectangle rectangle = new Rectangle(atts);
 			
 			MeshManager.INSTANCE.register(rectangle);
 		}

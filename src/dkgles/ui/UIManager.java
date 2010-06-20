@@ -96,7 +96,7 @@ public enum UIManager implements OnTouchListener
 		if (action == MotionEvent.ACTION_DOWN)
 		{
 			//Log.v(CLASS_TAG, "action down!!" + x + ", " + y);
-			ServiceManager.INSTANCE.vibrator().vibrate(70);
+			//ServiceManager.INSTANCE.vibrator().vibrate(70);
 			
 			for (Touchable touchable : touchables_)
 			{
@@ -157,9 +157,17 @@ public enum UIManager implements OnTouchListener
 		halfAsr_ = (width_ / height_)/2.0f;
 	}
 	
-	public void enable(boolean val)
+	public void setEnable(boolean val)
 	{
 		enable_ = val;
+		
+		for (Touchable touchable : touchables_)
+		{
+			if (touchable!=null)
+			{
+				touchable.setEnable(enable_);
+			}
+		}
 	}
 
 	/**
@@ -208,7 +216,7 @@ public enum UIManager implements OnTouchListener
 		if (!active_)
 			return;
 		
-		enable(false);
+		setEnable(false);
 		destroyAll();
 		SceneManager.INSTANCE.destroy(sceneId_);
 		sceneId_ = -1;

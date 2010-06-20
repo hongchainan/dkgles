@@ -2,66 +2,88 @@ package dkgles;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import lost.kapa.XmlUtil;
+
+import org.xml.sax.Attributes;
+
+import dkgles.manager.TextureManager;
+
 /**
  *@author doki lin
  */
-public class Material
+public class Material implements Cloneable
 {
 	public Material(String name)
 	{
-		_name = name;
-		rgba(1.0f, 1.0f, 1.0f, 1.0f);
+		name_ = name;
+		setRGBA(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	
 	public Material(String name, float r, float g, float b, float a)
 	{
-		_name = name;
-		rgba(r, g, b, a);
+		name_ = name;
+		setRGBA(r, g, b, a);
 	}
 	
-	public void rgb(float r, float g, float b)
+	public Material(Attributes atts)
 	{
-		_red = r;
-		_green = g;
-		_blue = b;
+		name_ 	= XmlUtil.parseString(atts, "name", "N/A");
+		red_  	= XmlUtil.parseFloat(atts, "red", 	1.0f);
+		green_ 	= XmlUtil.parseFloat(atts, "green", 1.0f);
+		blue_ 	= XmlUtil.parseFloat(atts, "blue", 	1.0f);
+		alpha_ 	= XmlUtil.parseFloat(atts, "alpha", 1.0f);
+		
+		String textureName = XmlUtil.parseString(atts, "texture_name", "");
+		
+		if (!textureName.equals(""))
+		{
+			texture_ = TextureManager.INSTANCE.getByName(textureName);
+		}
 	}
 	
-	public void rgba(float r, float g, float b, float a)
+	public void setRGB(float r, float g, float b)
 	{
-		_red 	= r;
-		_green 	= g;
-		_blue 	= b;
-		_alpha 	= a;
+		red_ 	= r;
+		green_ 	= g;
+		blue_ 	= b;
+	}
+	
+	public void setRGBA(float r, float g, float b, float a)
+	{
+		red_ 	= r;
+		green_ 	= g;
+		blue_ 	= b;
+		alpha_ 	= a;
 	}
 	
 	public void red(float val)
 	{
-		_red = val;
+		red_ = val;
 	}
 	
 	public float red()
 	{
-		return _red;
+		return red_;
 	}
 	
 	public void green(float val)
 	{
-		_green = val;	
+		green_ = val;	
 	}
 	
 	public float green()
 	{
-		return _green;
+		return green_;
 	}
 	
 	public void blue(float val)
 	{
-		_blue = val;
+		blue_ = val;
 	}
 	
 	public float blue()
 	{
-		return _blue;
+		return blue_;
 	}
 	
 	/**
@@ -69,42 +91,32 @@ public class Material
 	 */
 	public void alpha(float val)
 	{
-		_alpha = val;
+		alpha_ = val;
 	}
 	
 	public float alpha()
 	{
-		return _alpha;
+		return alpha_;
 	}
 
 	public Texture texture()
 	{
-		return _texture;
+		return texture_;
 	}
 	
 	public void bindTexture(Texture texture)
 	{
-		_texture = texture;
-		
-		/*if (texture!=null)
-		{
-			_texture = texture;
-		}
-		else
-		{
-			Log.v("TAG", _name + "bind a dummy texture");
-			_texture = Texture.GetDummyTexture();
-		}*/
+		texture_ = texture;
 	}
     
     public void setBackFaceCulling(boolean val)
     {
-        _backFaceCulling = val;
+        backFaceCulling_ = val;
     }
     
     public boolean backFaceCulling()
     {
-        return _backFaceCulling;
+        return backFaceCulling_;
     }
 	
 	/**
@@ -113,16 +125,16 @@ public class Material
 	 */
 	public void beforeApply(GL10 gl)
 	{
-		gl.glColor4f(_red, _green, _blue, _alpha);
+		gl.glColor4f(red_, green_, blue_, alpha_);
 		
-		if (_texture!=null)
+		if (texture_!=null)
 		{
 			gl.glEnable(GL10.GL_TEXTURE_2D);
-			_texture.bind(gl);
+			texture_.bind(gl);
 			
-			if (null!=_uvanimation)
+			if (null!=uvanimation_)
 			{
-				_uvanimation.pre(gl);
+				uvanimation_.pre(gl);
 			}
 		}
 		else
@@ -133,60 +145,68 @@ public class Material
     
     public void aferApply(GL10 gl)
     {
-        if (_texture!=null)
+        if (texture_!=null)
         {
-        	if (null!=_uvanimation)
+        	if (null!=uvanimation_)
         	{
-        		_uvanimation.post(gl);
+        		uvanimation_.post(gl);
         	}
         }
     }
 	
 	public String name()
 	{
-		return _name;
+		return name_;
 	}
 	
 	public String toString()
 	{
-		return _name;
+		return name_;
 	}
 
 	public void release()
 	{
-		_texture = null;
+		texture_ = null;
 		
-		if (_uvanimation!=null)
+		if (uvanimation_!=null)
 		{
-			_uvanimation.release();
-			_uvanimation = null;
+			uvanimation_.release();
+			uvanimation_ = null;
 		}
 	}
 	
 	public void setUVAnimation(UVAnimation animation)
 	{
-		_uvanimation = animation;
+		uvanimation_ = animation;
 	}
 	
 	public static Material GetDummyMaterial()
 	{
-		return _dummy;
+		return dummy_;
 	}
 	
-	private float   _red;
-	private float   _green;
-	private float   _blue;
-	private float   _alpha;
-	private Texture _texture;
+	public Material clone()
+	{
+		Material material = new Material(name_, red_, green_, blue_, alpha_);
+		material.texture_ = this.texture_;
+		
+		return material;
+	}
 	
-	private UVAnimation _uvanimation;
+	private float   red_;
+	private float   green_;
+	private float   blue_;
+	private float   alpha_;
+	private Texture texture_;
+	
+	private UVAnimation uvanimation_;
     
-    private boolean _backFaceCulling = true;
+    private boolean backFaceCulling_ = true;
     
-	static DummyMaterial _dummy = new DummyMaterial("MAT_DUMMY");
+	static DummyMaterial dummy_ = new DummyMaterial("MAT_DUMMY");
 	
 	public  final static String TAG = "Material";
-	private final String _name;
+	private String name_;
 }
 
 class DummyMaterial extends Material
