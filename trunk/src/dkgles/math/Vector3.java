@@ -1,5 +1,9 @@
 package dkgles.math;
 
+import lost.kapa.XmlUtil;
+
+import org.xml.sax.Attributes;
+
 import android.util.FloatMath;
 
 public class Vector3 implements Cloneable
@@ -21,6 +25,13 @@ public class Vector3 implements Cloneable
 		this.x = x;
 		this.y = y;
 		this.z = z;	
+	}
+	
+	public Vector3(Attributes atts)
+	{
+		x = XmlUtil.parseFloat(atts, "x", 0.0f);
+		y = XmlUtil.parseFloat(atts, "y", 0.0f);
+		z = XmlUtil.parseFloat(atts, "z", 0.0f);
 	}
 	
 	

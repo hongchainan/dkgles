@@ -5,8 +5,8 @@ import java.util.Stack;
 
 import lost.kapa.ContextHolder;
 import lost.kapa.XmlUtil;
-import lost.kapa.game.Entity;
-import lost.kapa.game.EntityManager;
+import lost.kapa.game.entity.Entity;
+import lost.kapa.game.entity.EntityManager;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
